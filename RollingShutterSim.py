@@ -42,15 +42,15 @@ def twoDimensionalGaussian(x, y, x0, y0, sigma_x, sigma_y, amplitude):
     delta_x = x - x0
     delta_y = y - y0
 
-    f = amplitude * np.exp(- (delta_y ** 2 / 2 * sigma_x ** 2 + (delta_y) ** 2 / 2 * sigma_y ** 2))
+    f = amplitude * np.exp(- ((delta_x / (2 * sigma_x)) ** 2 + (delta_y / (2 * sigma_y)) ** 2))
 
     return f
 
 
 if __name__ == "__main__":
 
+    # Array of points in time
     t_meteor = 0.5 / 2
-
     t_arr = np.arange(-t_meteor, t_meteor, 1/30)
 
     # Image size
@@ -63,16 +63,38 @@ if __name__ == "__main__":
     # Meteor angle counterclockwise from the Y axis (deg)
     phi = 15
 
-    # Meter's angular velocity (deg/s)
+    # Meteor's angular velocity (deg/s)
     omega = 35
 
-    print(twoDimensionalGaussian(1, 1, 2, 2, 1, 1, 3))
 
-
-    # Calculate positons of a meter in different points in time
+    # Calculate positions of a meteor in different points in time
     x_arr, y_arr = drawPoints(t_arr, img_x, img_y, scale, phi, omega)
 
+    # Constructing array and meshgrid
+    img_array = np.zeros((img_y, img_x), np.float_)
 
+    x = np.arange(0, img_x)
+    y = np.arange(0, img_y)
+
+    xx, yy = np.meshgrid(x, y)
+
+    # Amplitude and standard deviation of two dimensional gaussian function
+    amplitude = 100
+    sigma_x = 2
+    sigma_y = 2
+
+
+    # Show twoDimensionalGaussian function for each point in time
+    for t in t_arr:
+        x, y = drawPoints(t, img_x, img_y, scale, phi, omega)
+        print(x, y)
+        temp = twoDimensionalGaussian(xx, yy, x, y, sigma_x, sigma_y, amplitude)
+        img_array += temp
+ 
+    plt.imshow(img_array)
+    plt.show()
+
+    # Make scatter plot
     plt.scatter(x_arr, y_arr, c=t_arr)
 
 
