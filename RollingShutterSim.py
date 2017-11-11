@@ -39,6 +39,7 @@ def drawPoints(t, img_x, img_y, scale, phi, omega):
 
 
 def twoDimensionalGaussian(x, y, x0, y0, sigma_x, sigma_y, amplitude):
+
     delta_x = x - x0
     delta_y = y - y0
 
@@ -47,16 +48,20 @@ def twoDimensionalGaussian(x, y, x0, y0, sigma_x, sigma_y, amplitude):
 
 if __name__ == "__main__":
 
+    # Define multiplication factor and framerate for video
+    multi_factor = 10
+    framerate = 1/300
+
     # Array of points in time
     t_meteor = 0.5 / 2
-    t_arr = np.arange(-t_meteor, t_meteor, 1/300)
+    t_arr = np.arange(-t_meteor, t_meteor, framerate)
 
     # Image size
     img_x = 720
     img_y = 576
 
     # Pixel scale in px/deg
-    scale = 720/64
+    scale = img_x/64
 
     # Meteor angle counterclockwise from the Y axis (deg)
     phi = 15
@@ -67,11 +72,8 @@ if __name__ == "__main__":
     x = np.arange(0, img_x)
     y = np.arange(0, img_y)
 
+    # Construct frame grid
     xx, yy = np.meshgrid(x, y)
-
-    # Define multiplication factor and other parameters for video
-    multi_factor = 10
-    rate = 1/300
 
     # Amplitude and standard deviation of two dimensional gaussian function
     amplitude = 255/multi_factor
@@ -91,26 +93,36 @@ if __name__ == "__main__":
 
     # Make video representation
     for i in range(multi_factor):
+
+        # Defining time limits
         t_start = -t_meteor + i * multi_factor * rate
         t_finish = -t_meteor + (i + 1) * multi_factor * rate
 
+        # Array of points in time defined by frame rate
         t_arr_iter = np.arange(t_start, t_finish, rate)
 
+        # Image array
         img_array = np.zeros((img_y, img_x), np.float_)
 
         for t in t_arr_iter:
+            # Draw two dimensional Gaussian function for each point in time
             x, y = drawPoints(t, img_x, img_y, scale, phi, omega)
             temp = twoDimensionalGaussian(xx, yy, x, y, sigma_x, sigma_y, amplitude)
             img_array += temp
 
-        #Add Gaussian noise
-
+        # Add Gaussian noise
         noise = np.random.normal(loc = 0, scale = 10, size = (img_y, img_x))
         img_array += abs(noise)
 
+        # Clip pixel levels
         np.clip(img_array, 0, 255)
+
+        # Convert image to 8-bit unsigned integer
         img_array = img_array.astype(np.uint8)
+        
+        # Show frame
         plt.imshow(img_array, cmap = "gray", vmin = 0, vmax = 255)
+
         plt.show()
 
 
