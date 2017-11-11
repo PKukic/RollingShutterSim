@@ -107,6 +107,7 @@ if __name__ == "__main__":
 
         plt.imshow(img_array)
         plt.show()
+        img_array = np.zeros((img_y, img_x), np.float_)
 
 
     # Calculate positions of a meteor in different points in time
