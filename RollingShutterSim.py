@@ -105,8 +105,16 @@ if __name__ == "__main__":
 
         #Add Gaussian noise
 
-        noise = np.random.normal(loc = 0, scale = 10, size = (img_y, img_x)) 
-        plt.imshow(img_array + noise)
+        noise = np.random.normal(loc = 0, scale = 10, size = (img_y, img_x))
+        img_array += abs(noise)
+
+        for i in np.nditer(img_array):
+            if i > 255:
+                i = 255
+            elif i < 0:
+                i = 0
+        img_array.astype(np.uint8)
+        plt.imshow(img_array)
         plt.show()
 
 
@@ -123,4 +131,3 @@ if __name__ == "__main__":
     plt.colorbar(label='Time (s)')
 
     plt.show()
-    
