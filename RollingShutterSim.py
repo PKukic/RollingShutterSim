@@ -95,11 +95,11 @@ if __name__ == "__main__":
     for i in range(multi_factor):
 
         # Defining time limits
-        t_start = -t_meteor + i * multi_factor * rate
-        t_finish = -t_meteor + (i + 1) * multi_factor * rate
+        t_start = -t_meteor + i * multi_factor * framerate
+        t_finish = -t_meteor + (i + 1) * multi_factor * framerate
 
-        # Array of points in time defined by frame rate
-        t_arr_iter = np.arange(t_start, t_finish, rate)
+        # Array of points in time defined by framerate
+        t_arr_iter = np.arange(t_start, t_finish, framerate)
 
         # Image array
         img_array = np.zeros((img_y, img_x), np.float_)
