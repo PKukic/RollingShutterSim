@@ -42,16 +42,14 @@ def twoDimensionalGaussian(x, y, x0, y0, sigma_x, sigma_y, amplitude):
     delta_x = x - x0
     delta_y = y - y0
 
-    f = amplitude * np.exp(- ((delta_x / (2 * sigma_x)) ** 2 + (delta_y / (2 * sigma_y)) ** 2))
-
-    return f
+    return amplitude * np.exp(- ((delta_x / (np.sqrt(2) * sigma_x)) ** 2 + (delta_y / (np.sqrt(2) * sigma_y)) ** 2))
 
 
 if __name__ == "__main__":
 
     # Array of points in time
     t_meteor = 0.5 / 2
-    t_arr = np.arange(-t_meteor, t_meteor, 1/30)
+    t_arr = np.arange(-t_meteor, t_meteor, 1/300)
 
     # Image size
     img_x = 720
@@ -66,10 +64,6 @@ if __name__ == "__main__":
     # Meteor's angular velocity (deg/s)
     omega = 35
 
-
-    # Calculate positions of a meteor in different points in time
-    x_arr, y_arr = drawPoints(t_arr, img_x, img_y, scale, phi, omega)
-
     # Constructing array and meshgrid
     img_array = np.zeros((img_y, img_x), np.float_)
 
@@ -78,25 +72,48 @@ if __name__ == "__main__":
 
     xx, yy = np.meshgrid(x, y)
 
+    # Define multiplication factor and other parameters for video
+    multi_factor = 10
+    rate = 1/300
+
     # Amplitude and standard deviation of two dimensional gaussian function
-    amplitude = 100
+    amplitude = 255/multi_factor
     sigma_x = 2
     sigma_y = 2
 
-
     # Show twoDimensionalGaussian function for each point in time
+    """
     for t in t_arr:
         x, y = drawPoints(t, img_x, img_y, scale, phi, omega)
-        print(x, y)
         temp = twoDimensionalGaussian(xx, yy, x, y, sigma_x, sigma_y, amplitude)
         img_array += temp
  
     plt.imshow(img_array)
     plt.show()
+    """
+
+    # Make video representation
+    for i in range(multi_factor):
+        t_start = -t_meteor + i * multi_factor * rate
+        t_finish = -t_meteor + (i + 1) * multi_factor * rate
+
+        t_arr_iter = np.arange(t_start, t_finish, rate)
+
+        for t in t_arr_iter:
+            x, y = drawPoints(t, img_x, img_y, scale, phi, omega)
+            temp = twoDimensionalGaussian(xx, yy, x, y, sigma_x, sigma_y, amplitude)
+            img_array += temp
+
+
+        plt.imshow(img_array)
+        plt.show()
+
+
+    # Calculate positions of a meteor in different points in time
+    x_arr, y_arr = drawPoints(t_arr, img_x, img_y, scale, phi, omega)
 
     # Make scatter plot
     plt.scatter(x_arr, y_arr, c=t_arr)
-
 
     # Set plot size
     plt.xlim([0, img_x])
@@ -105,3 +122,4 @@ if __name__ == "__main__":
     plt.colorbar(label='Time (s)')
 
     plt.show()
+    
