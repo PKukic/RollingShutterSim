@@ -108,13 +108,9 @@ if __name__ == "__main__":
         noise = np.random.normal(loc = 0, scale = 10, size = (img_y, img_x))
         img_array += abs(noise)
 
-        for i in np.nditer(img_array):
-            if i > 255:
-                i = 255
-            elif i < 0:
-                i = 0
-        img_array.astype(np.uint8)
-        plt.imshow(img_array)
+        np.clip(img_array, 0, 255)
+        img_array = img_array.astype(np.uint8)
+        plt.imshow(img_array, cmap = "gray", vmin = 0, vmax = 255)
         plt.show()
 
 
@@ -122,12 +118,12 @@ if __name__ == "__main__":
     x_arr, y_arr = drawPoints(t_arr, img_x, img_y, scale, phi, omega)
 
     # Make scatter plot
-    plt.scatter(x_arr, y_arr, c=t_arr)
+    plt.scatter(x_arr, y_arr, c = t_arr)
 
     # Set plot size
     plt.xlim([0, img_x])
     plt.ylim([img_y, 0])
 
-    plt.colorbar(label='Time (s)')
+    plt.colorbar(label = 'Time (s)')
 
     plt.show()
