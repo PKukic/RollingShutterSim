@@ -64,9 +64,6 @@ if __name__ == "__main__":
     # Meteor's angular velocity (deg/s)
     omega = 35
 
-    # Constructing array and meshgrid
-    img_array = np.zeros((img_y, img_x), np.float_)
-
     x = np.arange(0, img_x)
     y = np.arange(0, img_y)
 
@@ -99,15 +96,18 @@ if __name__ == "__main__":
 
         t_arr_iter = np.arange(t_start, t_finish, rate)
 
+        img_array = np.zeros((img_y, img_x), np.float_)
+
         for t in t_arr_iter:
             x, y = drawPoints(t, img_x, img_y, scale, phi, omega)
             temp = twoDimensionalGaussian(xx, yy, x, y, sigma_x, sigma_y, amplitude)
             img_array += temp
 
+        #Add Gaussian noise
 
-        plt.imshow(img_array)
+        noise = np.random.normal(loc = 0, scale = 10, size = (img_y, img_x)) 
+        plt.imshow(img_array + noise)
         plt.show()
-        img_array = np.zeros((img_y, img_x), np.float_)
 
 
     # Calculate positions of a meteor in different points in time
