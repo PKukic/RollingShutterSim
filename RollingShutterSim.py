@@ -39,11 +39,28 @@ def drawPoints(t, img_x, img_y, scale, phi, omega):
 
 
 def twoDimensionalGaussian(x, y, x0, y0, sigma_x, sigma_y, amplitude):
+    """
+    Calculates the probability given by the two dimensional Gaussian function for a calculated meteor position. 
+    
+    Arguments:
+        x [float or numpy meshgrid]: X coordinate of a point for which the probability is calculated
+        y [float or numpy meshgrid]: Y coordinate of the point
+        x0 [float]: X coordinate of the center of the distribution
+        y0 [float]: Y coordinate of the center of the distribution
+        sigma_x [float]: standard deviation along the X axis
+        sigma_y [float]: standard deviation along the Y axis
+        amplitude [float]: amplitude of the Gaussian distribution
+
+    Return:
+        p: probability at a given point
+    """
 
     delta_x = x - x0
     delta_y = y - y0
 
-    return amplitude * np.exp(- ((delta_x / (np.sqrt(2) * sigma_x)) ** 2 + (delta_y / (np.sqrt(2) * sigma_y)) ** 2))
+    p = amplitude * np.exp(- ((delta_x / (np.sqrt(2) * sigma_x)) ** 2 + (delta_y / (np.sqrt(2) * sigma_y)) ** 2))
+
+    return p
 
 
 if __name__ == "__main__":
@@ -79,17 +96,6 @@ if __name__ == "__main__":
     amplitude = 255/multi_factor
     sigma_x = 2
     sigma_y = 2
-
-    # Show twoDimensionalGaussian function for each point in time
-    """
-    for t in t_arr:
-        x, y = drawPoints(t, img_x, img_y, scale, phi, omega)
-        temp = twoDimensionalGaussian(xx, yy, x, y, sigma_x, sigma_y, amplitude)
-        img_array += temp
- 
-    plt.imshow(img_array)
-    plt.show()
-    """
 
     # Make video representation
     for i in range(multi_factor):
