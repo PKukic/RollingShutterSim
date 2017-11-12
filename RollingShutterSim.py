@@ -61,8 +61,52 @@ def twoDimensionalGaussian(x, y, x0, y0, sigma_x, sigma_y, amplitude):
 
     return p
 
+def meteorCentroid(img, x0, y0, r):
+
+    # Define crop boundaries
+    x_start = x0 - r/2
+    y_start = y0 - r/2
+    x_finish = x_start + r
+    y_finish = y_start + r
+
+    # Crop image
+    img_crop = img[x_start:x_finish, y_start:y_finish]
+
+    # Sums
+    sum_x1 = 0
+    sum_x2 = 0
+    sum_y1 = 0
+    sum_y2 = 0
+
+    # Background noise value
+    nx, ny = img.shape
+    x, y = np.ogrid[:nx, :ny]
+    img_mask = ((x - x0)**2 + (y - y0)**2 > r**2)
+    back_noise = np.ma.masked_array(img, mask = img_mask).mean()
+
+    for x in range(img_crop.shape[0]):
+        for y in range(img_crop.shape[1]):
+
+            value = img_crop[y][x] - back_noise
+
+            sum_x1 += x * value
+            sum_x2 += value
+
+            sum_y1 += y * value
+            sum_y2 += value
+
+    # Calculate centroid coordinates
+    x_centr = sum_x1/sum_x2
+    y_centr = sum_y1/sum_y2
+
+
+    return (x_centr, y_centr)
+
 
 if __name__ == "__main__":
+
+    ### Defining function parameters ###
+    ####################################
 
     # Define multiplication factor and framerate for video
     multi_factor = 10
@@ -76,6 +120,10 @@ if __name__ == "__main__":
     img_x = 720
     img_y = 576
 
+    # Center of image
+    x0 = img_x / 2
+    y0 = img_y / 2
+
     # Pixel scale in px/deg
     scale = img_x/64
 
@@ -85,16 +133,19 @@ if __name__ == "__main__":
     # Meteor's angular velocity (deg/s)
     omega = 35
 
+    # Construct frame grid
     x = np.arange(0, img_x)
     y = np.arange(0, img_y)
 
-    # Construct frame grid
     xx, yy = np.meshgrid(x, y)
 
     # Amplitude and standard deviation of two dimensional gaussian function
     amplitude = 255/multi_factor
     sigma_x = 2
     sigma_y = 2
+
+    ### Displaying the simulated meteor and the coordinates of the centroid ###
+    ###########################################################################
 
     # Make video representation
     for i in range(multi_factor):
@@ -105,6 +156,19 @@ if __name__ == "__main__":
 
         # Array of points in time defined by framerate
         t_arr_iter = np.arange(t_start, t_finish, framerate)
+
+        # Calculate beginning and ending points of meteor
+        x_start, y_start = drawPoints(t_start, img_x, img_y, scale, phi, omega)
+        x_finish, y_finish = drawPoints(t_finish, img_x, img_y, scale, phi, omega)
+
+        # Making sure almost every point in the 2d Gaussian is appended
+        x_start += 3 * sigma_x
+        x_finish += 3 * sigma_x
+        y_start += 3 * sigma_y
+        y_finish += 3 * sigma_y
+
+        # Calculate length of meteor
+        r = np.sqrt((x_finish - x_start)**2 + (x_finish - x_start)**2)
 
         # Image array
         img_array = np.zeros((img_y, img_x), np.float_)
@@ -127,12 +191,18 @@ if __name__ == "__main__":
 
         # Convert image to 8-bit unsigned integer
         img_array = img_array.astype(np.uint8)
+
+        # Print centroid coordinates
+        print(meteorCentroid(img_array, x0, y0, r))
         
         # Show frame
         plt.imshow(img_array, cmap = "gray", vmin = 0, vmax = 255)
 
         plt.show()
 
+
+    ### Displaying the meteor's movement ###
+    ########################################
 
     # Calculate positions of a meteor in different points in time
     x_arr, y_arr = drawPoints(t_arr, img_x, img_y, scale, phi, omega)
