@@ -195,11 +195,11 @@ if __name__ == "__main__":
         # Print centroid coordinates
         t_mid = (t_start + t_finish) / 2
         x_mid, y_mid = drawPoints(t_mid, img_x, img_y, scale, phi, omega)
-        print(meteorCentroid(img_array, x_mid, y_mid, r))
+        x_centr, y_centr = meteorCentroid(img_array, x_mid, y_mid, r)
         
         # Show frame
         plt.imshow(img_array, cmap = "gray", vmin = 0, vmax = 255)
-
+        plt.scatter(x_centr, y_centr)
         plt.show()
 
 
