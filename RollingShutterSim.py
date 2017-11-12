@@ -1,4 +1,3 @@
-
 # Python 2/3 compatibility
 from __future__ import print_function, division, absolute_import
 
@@ -110,15 +109,18 @@ if __name__ == "__main__":
         # Image array
         img_array = np.zeros((img_y, img_x), np.float_)
 
+        # Level of background offset
+        offset = 20
+
         for t in t_arr_iter:
             # Draw two dimensional Gaussian function for each point in time
             x, y = drawPoints(t, img_x, img_y, scale, phi, omega)
             temp = twoDimensionalGaussian(xx, yy, x, y, sigma_x, sigma_y, amplitude)
             img_array += temp
 
-        # Add Gaussian noise
+        # Add Gaussian noise and offset
         noise = np.random.normal(loc = 0, scale = 10, size = (img_y, img_x))
-        img_array += abs(noise)
+        img_array += abs(noise) + offset
 
         # Clip pixel levels
         np.clip(img_array, 0, 255)
