@@ -64,10 +64,10 @@ def twoDimensionalGaussian(x, y, x0, y0, sigma_x, sigma_y, amplitude):
 def meteorCentroid(img, x0, y0, r):
 
     # Define crop boundaries
-    x_start = x0 - r/2
-    y_start = y0 - r/2
-    x_finish = x_start + r
-    y_finish = y_start + r
+    x_start = int(x0 - r/2)
+    y_start = int(y0 - r/2)
+    x_finish = int(x_start + r)
+    y_finish = int(y_start + r)
 
     # Crop image
     img_crop = img[x_start:x_finish, y_start:y_finish]
@@ -87,7 +87,7 @@ def meteorCentroid(img, x0, y0, r):
     for x in range(img_crop.shape[0]):
         for y in range(img_crop.shape[1]):
 
-            value = img_crop[y][x] - back_noise
+            value = img_crop[x][y] - back_noise
 
             sum_x1 += x * value
             sum_x2 += value
@@ -96,8 +96,8 @@ def meteorCentroid(img, x0, y0, r):
             sum_y2 += value
 
     # Calculate centroid coordinates
-    x_centr = sum_x1/sum_x2
-    y_centr = sum_y1/sum_y2
+    x_centr = sum_x1/sum_x2 + x_start
+    y_centr = sum_y1/sum_y2 + y_start
 
 
     return (x_centr, y_centr)
@@ -193,7 +193,9 @@ if __name__ == "__main__":
         img_array = img_array.astype(np.uint8)
 
         # Print centroid coordinates
-        print(meteorCentroid(img_array, x0, y0, r))
+        t_mid = (t_start + t_finish) / 2
+        x_mid, y_mid = drawPoints(t_mid, img_x, img_y, scale, phi, omega)
+        print(meteorCentroid(img_array, x_mid, y_mid, r))
         
         # Show frame
         plt.imshow(img_array, cmap = "gray", vmin = 0, vmax = 255)
