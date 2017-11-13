@@ -61,17 +61,25 @@ def twoDimensionalGaussian(x, y, x0, y0, sigma_x, sigma_y, amplitude):
 
     return p
 
-def meteorCentroid(img, x0, y0, r):
 
-    # Define crop boundaries
-    x_start = int(x0 - r/2)
-    y_start = int(y0 - r/2)
-    x_finish = int(x_start + r)
-    y_finish = int(y_start + r)
-    print(x0, y0)
+
+def meteorCentroid(img, x0, y0, x_start, x_finish, y_start, y_finish):
+
+    x_start = int(round(x_start))
+    x_finish = int(round(x_finish))
+    y_start = int(round(y_start))
+    y_finish = int(round(y_finish))
+
+
+    # Calculate length of meteor
+    r = np.sqrt((x_finish - x_start)**2 + (x_finish - x_start)**2)
 
     # Crop image
-    img_crop = img[x_start:x_finish, y_start:y_finish]
+    img_crop = img[y_start:y_finish, x_start:x_finish]
+
+    plt.imshow(img_crop, cmap='gray')
+    plt.show()
+
 
     # Sums
     sum_x = 0
@@ -81,25 +89,27 @@ def meteorCentroid(img, x0, y0, r):
     # Background noise value
     nx, ny = img.shape
     #print(nx, ny)
-    x, y = np.ogrid[:nx, :ny]
+    y, x = np.ogrid[:ny, :nx]
     img_mask = ((x - x0)**2 + (y - y0)**2 > r**2)
     #plt.imshow(img_mask)
     #plt.show()
     back_noise = np.ma.masked_array(img, mask = img_mask).mean()
-    print(back_noise)
 
-    for x in range(img_crop.shape[0]):
-        for y in range(img_crop.shape[1]):
+    for x in range(img_crop.shape[1]):
+        for y in range(img_crop.shape[0]):
+        
 
-            value = img_crop[x][y] - back_noise
+            value = img_crop[y, x] - back_noise
 
             sum_x += x * value
             sum_y += y * value
             sum_intens += value
 
+    print(sum_x/sum_intens, sum_y/sum_intens)
+    
     # Calculate centroid coordinates
-    x_centr = sum_x/sum_intens + x0
-    y_centr = sum_y/sum_intens + y0
+    x_centr = sum_x/sum_intens + x_start
+    y_centr = sum_y/sum_intens + y_start
 
 
     return (x_centr, y_centr)
@@ -112,7 +122,7 @@ if __name__ == "__main__":
 
     # Define multiplication factor and framerate for video
     multi_factor = 10
-    framerate = 1/300
+    framerate = (1/30)/multi_factor
 
     # Array of points in time
     t_meteor = 0.5 / 2
@@ -126,17 +136,17 @@ if __name__ == "__main__":
     offset = 20
 
     # Center of image
-    x0 = img_x / 2
-    y0 = img_y / 2
+    x0 = img_x/2
+    y0 = img_y/2
 
     # Pixel scale in px/deg
     scale = img_x/64
 
     # Meteor angle counterclockwise from the Y axis (deg)
-    phi = 15
+    phi = 45
 
     # Meteor's angular velocity (deg/s)
-    omega = 15
+    omega = 30
 
     # Construct frame grid
     x = np.arange(0, img_x)
@@ -156,8 +166,8 @@ if __name__ == "__main__":
     for i in range(multi_factor):
 
         # Defining time limits
-        t_start = -t_meteor + i * multi_factor * framerate
-        t_finish = -t_meteor + (i + 1) * multi_factor * framerate
+        t_start = -t_meteor + i*multi_factor*framerate
+        t_finish = -t_meteor + (i + 1)*multi_factor*framerate
 
         # Array of points in time defined by framerate
         t_arr_iter = np.arange(t_start, t_finish, framerate)
@@ -166,14 +176,34 @@ if __name__ == "__main__":
         x_start, y_start = drawPoints(t_start, img_x, img_y, scale, phi, omega)
         x_finish, y_finish = drawPoints(t_finish, img_x, img_y, scale, phi, omega)
 
-        # Making sure almost every point in the 2d Gaussian is appended
-        x_start += 3 * sigma_x
-        x_finish += 3 * sigma_x
-        y_start += 3 * sigma_y
-        y_finish += 3 * sigma_y
+        # Make sure beginnings are smaller then endings
+        x_start, x_finish = sorted([x_start, x_finish])
+        y_start, y_finish = sorted([y_start, y_finish])
 
-        # Calculate length of meteor
-        r = np.sqrt((x_finish - x_start)**2 + (x_finish - x_start)**2)
+        # Calculate beginning end ending points of crop
+        if np.sin(np.radians(phi)) >= 0:
+            x_start -= 3*sigma_x
+            x_finish += 3*sigma_x
+
+        else:
+            x_start += 3*sigma_x
+            x_finish -= 3*sigma_x
+
+
+        if np.cos(np.radians(phi)) >= 0:
+            y_start -= 3*sigma_y
+            y_finish += 3*sigma_y
+
+        else:
+            y_start += 3*sigma_y
+            y_finish -= 3*sigma_y
+
+
+        print('Start end:')
+        print(x_start, x_finish)
+        print(y_start, y_finish)
+
+
 
         # Image array
         img_array = np.zeros((img_y, img_x), np.float_)
@@ -196,9 +226,9 @@ if __name__ == "__main__":
         img_array = img_array.astype(np.uint8)
 
         # Centroid coordinates
-        t_mid = (t_start + t_finish) / 2
+        t_mid = (t_start + t_finish)/2
         x_mid, y_mid = drawPoints(t_mid, img_x, img_y, scale, phi, omega)
-        x_centr, y_centr = meteorCentroid(img_array, x_mid, y_mid, r)
+        x_centr, y_centr = meteorCentroid(img_array, x_mid, y_mid, x_start, x_finish, y_start, y_finish)
 
         # Model coordinates
         x_model, y_model = drawPoints(t_mid, img_x, img_y, scale, phi, omega)
