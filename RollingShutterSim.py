@@ -68,36 +68,38 @@ def meteorCentroid(img, x0, y0, r):
     y_start = int(y0 - r/2)
     x_finish = int(x_start + r)
     y_finish = int(y_start + r)
+    print(x0, y0)
 
     # Crop image
     img_crop = img[x_start:x_finish, y_start:y_finish]
 
     # Sums
-    sum_x1 = 0
-    sum_x2 = 0
-    sum_y1 = 0
-    sum_y2 = 0
+    sum_x = 0
+    sum_y = 0
+    sum_intens = 0
 
     # Background noise value
     nx, ny = img.shape
+    #print(nx, ny)
     x, y = np.ogrid[:nx, :ny]
     img_mask = ((x - x0)**2 + (y - y0)**2 > r**2)
+    #plt.imshow(img_mask)
+    #plt.show()
     back_noise = np.ma.masked_array(img, mask = img_mask).mean()
+    print(back_noise)
 
     for x in range(img_crop.shape[0]):
         for y in range(img_crop.shape[1]):
 
             value = img_crop[x][y] - back_noise
 
-            sum_x1 += x * value
-            sum_x2 += value
-
-            sum_y1 += y * value
-            sum_y2 += value
+            sum_x += x * value
+            sum_y += y * value
+            sum_intens += value
 
     # Calculate centroid coordinates
-    x_centr = sum_x1/sum_x2 + x_start
-    y_centr = sum_y1/sum_y2 + y_start
+    x_centr = sum_x/sum_intens + x0
+    y_centr = sum_y/sum_intens + y0
 
 
     return (x_centr, y_centr)
@@ -120,6 +122,9 @@ if __name__ == "__main__":
     img_x = 720
     img_y = 576
 
+    # Level of background offset
+    offset = 20
+
     # Center of image
     x0 = img_x / 2
     y0 = img_y / 2
@@ -131,7 +136,7 @@ if __name__ == "__main__":
     phi = 15
 
     # Meteor's angular velocity (deg/s)
-    omega = 35
+    omega = 15
 
     # Construct frame grid
     x = np.arange(0, img_x)
@@ -173,8 +178,6 @@ if __name__ == "__main__":
         # Image array
         img_array = np.zeros((img_y, img_x), np.float_)
 
-        # Level of background offset
-        offset = 20
 
         for t in t_arr_iter:
             # Draw two dimensional Gaussian function for each point in time
@@ -192,21 +195,25 @@ if __name__ == "__main__":
         # Convert image to 8-bit unsigned integer
         img_array = img_array.astype(np.uint8)
 
-        # Print centroid coordinates
+        # Centroid coordinates
         t_mid = (t_start + t_finish) / 2
         x_mid, y_mid = drawPoints(t_mid, img_x, img_y, scale, phi, omega)
         x_centr, y_centr = meteorCentroid(img_array, x_mid, y_mid, r)
+
+        # Model coordinates
+        x_model, y_model = drawPoints(t_mid, img_x, img_y, scale, phi, omega)
         
         # Show frame
         plt.imshow(img_array, cmap = "gray", vmin = 0, vmax = 255)
-        plt.scatter(x_centr, y_centr)
+        plt.scatter(x_centr, y_centr, marker = 'o')
+        plt.scatter(x_model, y_model, marker = '*')
         plt.show()
 
 
+    """
     ### Displaying the meteor's movement ###
     ########################################
 
-    # Calculate positions of a meteor in different points in time
     x_arr, y_arr = drawPoints(t_arr, img_x, img_y, scale, phi, omega)
 
     # Make scatter plot
@@ -219,3 +226,4 @@ if __name__ == "__main__":
     plt.colorbar(label = 'Time (s)')
 
     plt.show()
+    """
