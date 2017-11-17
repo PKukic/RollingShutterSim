@@ -122,7 +122,7 @@ def meteorCentroid(img, x0, y0, x_start, x_finish, y_start, y_finish):
     return (x_centr, y_centr)
 
 
-def pointsCentroidAndModel(t_meteor, phi, omega, img_x, img_y, scale, framerate, sigma_x, sigma_y, offset):
+def pointsCentroidAndModel(t_meteor, phi, omega, img_x, img_y, scale, multi_factor, sigma_x, sigma_y, offset):
     """
     Returns coordinates of meteor center calculated by centroiding and from a meteeor movement model.
 
@@ -133,19 +133,19 @@ def pointsCentroidAndModel(t_meteor, phi, omega, img_x, img_y, scale, framerate,
         img_x: [int] Size of image X axis. 
         img_y: [int] Size of image Y axis.
         scale: [float] Image scale in px/deg.
-        framerate: [int] Framerate of the camera.
+        multi_factor: [int] Number of meteor points per frame. 
         sigma_x: [float] Standard deviation along the X axis.
         sigma_y: [float] Standard deviation along the Y axis.
         offset: [int or float] Offset of pixel levels for the entire image.
 
     Return:
         centroid_coordinates: [list of tuples] X and Y coordinates of meteor center calculated by centroiding.
-        model_coordinates: [list of tuples] X and Y coordinates of meteor center calculated bz model.
+        model_coordinates: [list of tuples] X and Y coordinates of meteor center calculated by model.
 
     """
     
-    # Define multiplication factor and amplitudem of gaussian
-    multi_factor = (1/30)/framerate
+    # Define multiplication factor and amplitude of gaussian
+    framerate = (1/30)/multi_factor
     amplitude = 255/multi_factor
 
     # Array of points in time
@@ -253,36 +253,12 @@ def pointsCentroidAndModel(t_meteor, phi, omega, img_x, img_y, scale, framerate,
 
 
 
-
-
-
-
 if __name__ == "__main__":
 
     ### Defining function parameters ###
-    ####################################
 
-    # Define multiplication factor and framerate for video
-    multi_factor = 10
-    framerate = (1/30)/multi_factor
-
-    # Array of points in time
-    t_meteor = 0.5 / 2
-    t_arr = np.arange(-t_meteor, t_meteor, framerate)
-
-    # Image size
-    img_x = 720
-    img_y = 576
-
-    # Level of background offset
-    offset = 20
-
-    # Center of image
-    x0 = img_x/2
-    y0 = img_y/2
-
-    # Pixel scale in px/deg
-    scale = img_x/64
+    # Meteor duration
+    t_meteor = 0.5
 
     # Meteor angle counterclockwise from the Y axis (deg)
     phi = 45
@@ -290,101 +266,26 @@ if __name__ == "__main__":
     # Meteor's angular velocity (deg/s)
     omega = 30
 
-    # Construct frame grid
-    x = np.arange(0, img_x)
-    y = np.arange(0, img_y)
+    # Image size
+    img_x = 720
+    img_y = 576
 
-    xx, yy = np.meshgrid(x, y)
+    # Pixel scale in px/deg
+    scale = img_x/64
 
-    # Amplitude and standard deviation of two dimensional gaussian function
-    amplitude = 255/multi_factor
+    # Number of meteor points per frame
+    multi_factor = 10
+
+    # Standard deviation along X and Y axis
     sigma_x = 2
     sigma_y = 2
 
-    ### Displaying the simulated meteor and the coordinates of the centroid ###
-    ###########################################################################
-
-    # Make video representation
-    for i in range(multi_factor):
-
-        # Defining time limits
-        t_start = -t_meteor + i*multi_factor*framerate
-        t_finish = -t_meteor + (i + 1)*multi_factor*framerate
-
-        # Array of points in time defined by framerate
-        t_arr_iter = np.arange(t_start, t_finish, framerate)
-
-        # Calculate beginning and ending points of meteor
-        x_start, y_start = drawPoints(t_start, img_x, img_y, scale, phi, omega)
-        x_finish, y_finish = drawPoints(t_finish, img_x, img_y, scale, phi, omega)
-
-        # Make sure beginnings are smaller then endings
-        x_start, x_finish = sorted([x_start, x_finish])
-        y_start, y_finish = sorted([y_start, y_finish])
-
-        # Calculate beginning end ending points of crop
-        if np.sin(np.radians(phi)) >= 0:
-            x_start -= 3*sigma_x
-            x_finish += 3*sigma_x
-
-        else:
-            x_start += 3*sigma_x
-            x_finish -= 3*sigma_x
-
-
-        if np.cos(np.radians(phi)) >= 0:
-            y_start -= 3*sigma_y
-            y_finish += 3*sigma_y
-
-        else:
-            y_start += 3*sigma_y
-            y_finish -= 3*sigma_y
-
-
-        print('Start\tend:')
-        print(x_start, x_finish, sep = "\t")
-        print(y_start, y_finish, sep = "\t")
-
-
-        # Image array
-        img_array = np.zeros((img_y, img_x), np.float_)
-
-
-        for t in t_arr_iter:
-            # Draw two dimensional Gaussian function for each point in time
-            x, y = drawPoints(t, img_x, img_y, scale, phi, omega)
-            temp = twoDimensionalGaussian(xx, yy, x, y, sigma_x, sigma_y, amplitude)
-            img_array += temp
-
-        # Add Gaussian noise and offset
-        noise = np.random.normal(loc = 0, scale = 10, size = (img_y, img_x))
-        img_array += abs(noise) + offset
-
-        # Clip pixel levels
-        np.clip(img_array, 0, 255)
-
-        # Convert image to 8-bit unsigned integer
-        img_array = img_array.astype(np.uint8)
-
-        # Centroid coordinates
-        t_mid = (t_start + t_finish)/2
-        x_mid, y_mid = drawPoints(t_mid, img_x, img_y, scale, phi, omega)
-        x_centr, y_centr = meteorCentroid(img_array, x_mid, y_mid, x_start, x_finish, y_start, y_finish)
-
-        # Model coordinates
-        x_model, y_model = drawPoints(t_mid, img_x, img_y, scale, phi, omega)
-        
-
-        # Show frame
-        plt.imshow(img_array, cmap = "gray", vmin = 0, vmax = 255)
-        plt.scatter(x_centr, y_centr, marker = 'o')
-        plt.scatter(x_model, y_model, marker = '*')
-        plt.show()
+    # Level of background offset
+    offset = 20
 
 
     """
     ### Displaying the meteor's movement ###
-    ########################################
 
     x_arr, y_arr = drawPoints(t_arr, img_x, img_y, scale, phi, omega)
 
