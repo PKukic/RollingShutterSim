@@ -251,6 +251,34 @@ def pointsCentroidAndModel(t_meteor, phi, omega, img_x, img_y, scale, multi_fact
         
     return (centroid_coordinates, model_coordinates)
 
+def averageDifference(centroid_coordinates, model_coordinates):
+    """
+    Calculates average distance between centroid coordinates and model coordinates for each frame.
+    
+    Arguments:
+        centroid_coordinates: [list or of tuples] List of (X, Y) centroid coordinates for each frame. 
+        model_coordinates: [list or of tuples] List of (X, Y) model coordinates for each frame.
+
+    Return:
+        diff_avg: [float] Average distance of centroid and model points for a given set of frames. 
+    """
+    
+    n = len(centroid_coordinates)
+    diff_list = []
+
+    for c in range(n):
+        
+        x_centr = centroid_coordinates[c][0]
+        y_centr = centroid_coordinates[c][1]
+        x_model = model_coordinates[c][0]
+        y_model = model_coordinates[c][1]
+        
+        diff = np.sqrt((x_centr - x_model)**2 + (y_centr - y_model)**2)
+        diff_list.append(diff)
+
+    diff_avg = np.average(diff_list)
+
+    return diff_avg
 
 
 if __name__ == "__main__":
@@ -284,12 +312,40 @@ if __name__ == "__main__":
     offset = 20
 
     # Plot individual frames?
-    show_plots = True
+    show_plots = False
+
+
+    ### Average difference as a function of angular velocity ###
+
+    # Angular velocity array
+    omega_arr = np.arange(0, 10)
+
+    # Average difference array
+    diff = []
+    
+    for omega_i in omega_arr:
+
+        # Compute centroid and model coordinates
+        centroid_coordinates, model_coordinates = pointsCentroidAndModel(t_meteor, phi, omega_i, img_x, img_y, scale, multi_factor, sigma_x, sigma_y, offset, show_plots)
+        
+        # Compute average distance
+        diff_avg = averageDifference(centroid_coordinates, model_coordinates)
+        
+        print('Angular velocity[deg/s]: {:.2f} Average distance: {:.4f}'.format(omega_i, diff_avg))
+        diff.append(diff_avg)
+
+
+    # Plotting
+    plt.scatter(omega_arr, diff)
+    plt.xlabel('Angular velocity [deg/s]')
+    plt.ylabel('Average distance of meteor and centroid points')
+    plt.xlim([0, np.amax(omega_arr)])
+    plt.show()
+
 
     # Checking
     #centroid, model = pointsCentroidAndModel(t_meteor, phi, omega, img_x, img_y, scale, multi_factor, sigma_x, sigma_y, offset, show_plots)
-    #print(centroid)
-    #print(model)
+    #print(centroid, model)
 
     """
     ### Displaying the meteor's movement ###
