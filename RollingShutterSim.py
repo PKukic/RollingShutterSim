@@ -112,7 +112,7 @@ def meteorCentroid(img, x0, y0, x_start, x_finish, y_start, y_finish):
 
             sum_intens += value
 
-    print(sum_x/sum_intens, sum_y/sum_intens)
+    #print(sum_x/sum_intens, sum_y/sum_intens)
     
     # Calculate centroid coordinates
     x_centr = sum_x/sum_intens + x_start
@@ -122,7 +122,7 @@ def meteorCentroid(img, x0, y0, x_start, x_finish, y_start, y_finish):
     return (x_centr, y_centr)
 
 
-def pointsCentroidAndModel(t_meteor, phi, omega, img_x, img_y, scale, multi_factor, sigma_x, sigma_y, offset):
+def pointsCentroidAndModel(t_meteor, phi, omega, img_x, img_y, scale, multi_factor, sigma_x, sigma_y, offset, show_plots):
     """
     Returns coordinates of meteor center calculated by centroiding and from a meteeor movement model.
 
@@ -137,6 +137,7 @@ def pointsCentroidAndModel(t_meteor, phi, omega, img_x, img_y, scale, multi_fact
         sigma_x: [float] Standard deviation along the X axis.
         sigma_y: [float] Standard deviation along the Y axis.
         offset: [int or float] Offset of pixel levels for the entire image.
+        show_plots: [bool] Argument for showing individual frame plots.
 
     Return:
         centroid_coordinates: [list of tuples] X and Y coordinates of meteor center calculated by centroiding.
@@ -150,6 +151,7 @@ def pointsCentroidAndModel(t_meteor, phi, omega, img_x, img_y, scale, multi_fact
 
     # Array of points in time
     t_arr = np.arange(-t_meteor/2, t_meteor/2, framerate)
+
 
     # X and Y coordinates of image center
     x_center = img_x/2
@@ -165,7 +167,6 @@ def pointsCentroidAndModel(t_meteor, phi, omega, img_x, img_y, scale, multi_fact
     model_coordinates = []
 
 
-
     for i in range(multi_factor):
 
         # Defining time limits
@@ -174,7 +175,6 @@ def pointsCentroidAndModel(t_meteor, phi, omega, img_x, img_y, scale, multi_fact
 
         # Array of points in time defined by framerate
         t_arr_iter = np.arange(t_start, t_finish, framerate)
-
 
 
         # Calculate beginning and ending points of meteor
@@ -226,7 +226,6 @@ def pointsCentroidAndModel(t_meteor, phi, omega, img_x, img_y, scale, multi_fact
         img_array = img_array.astype(np.uint8)
 
 
-
         # Centroid coordinates
         t_mid = (t_start + t_finish)/2
         x_mid, y_mid = drawPoints(t_mid, x_center, y_center, scale, phi, omega)
@@ -236,20 +235,21 @@ def pointsCentroidAndModel(t_meteor, phi, omega, img_x, img_y, scale, multi_fact
         centroid_coordinates.append((x_centr, y_centr))
 
         # Model coordinates
-        x_model, y_model = drawPoints(t_mid, img_x, img_y, scale, phi, omega)        
+        x_model, y_model = drawPoints(t_mid, x_center, y_center, scale, phi, omega)        
 
         # Add model coordinates to list
         model_coordinates.append((x_model, y_model))
 
 
-        return(centroid_coordinates, model_coordinates)
-
-
         # Show frame
-        #plt.imshow(img_array, cmap = "gray", vmin = 0, vmax = 255)
-        #plt.scatter(x_centr, y_centr, marker = 'o')
-        #plt.scatter(x_model, y_model, marker = '*')
-        #plt.show()
+        if show_plots:
+            plt.imshow(img_array, cmap = "gray", vmin = 0, vmax = 255)
+            plt.scatter(x_centr, y_centr, marker = 'o')
+            plt.scatter(x_model, y_model, marker = '*')
+            plt.show()
+
+        
+    return (centroid_coordinates, model_coordinates)
 
 
 
@@ -283,6 +283,13 @@ if __name__ == "__main__":
     # Level of background offset
     offset = 20
 
+    # Plot individual frames?
+    show_plots = True
+
+    # Checking
+    #centroid, model = pointsCentroidAndModel(t_meteor, phi, omega, img_x, img_y, scale, multi_factor, sigma_x, sigma_y, offset, show_plots)
+    #print(centroid)
+    #print(model)
 
     """
     ### Displaying the meteor's movement ###
@@ -299,4 +306,4 @@ if __name__ == "__main__":
     plt.colorbar(label = 'Time (s)')
 
     plt.show()
-    """
+    """ 
