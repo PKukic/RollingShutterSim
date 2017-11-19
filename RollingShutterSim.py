@@ -216,8 +216,8 @@ def pointsCentroidAndModel(t_meteor, phi, omega, img_x, img_y, scale, multi_fact
 
 
         # Add Gaussian noise and offset
-        noise = np.random.normal(loc = 0, scale = 10, size = (img_y, img_x))
-        img_array += abs(noise) + offset
+        gauss_noise = np.random.normal(loc = 0, scale = 10, size = (img_y, img_x))
+        img_array += abs(gauss_noise) + offset
 
         # Clip pixel levels
         np.clip(img_array, 0, 255)
@@ -318,25 +318,39 @@ if __name__ == "__main__":
     ### Average difference as a function of angular velocity ###
 
     # Angular velocity array
-    omega_arr = np.arange(0, 10)
+    omega_arr = np.arange(1, 51)
 
     # Average difference array
-    diff = []
+    diff_avg = []
+
+    # Average of averages difference array
+    diff_avg_avg = []
+
+    # Number of runs
+    n = 10
     
     for omega_i in omega_arr:
 
-        # Compute centroid and model coordinates
-        centroid_coordinates, model_coordinates = pointsCentroidAndModel(t_meteor, phi, omega_i, img_x, img_y, scale, multi_factor, sigma_x, sigma_y, offset, show_plots)
-        
-        # Compute average distance
-        diff_avg = averageDifference(centroid_coordinates, model_coordinates)
-        
-        print('Angular velocity[deg/s]: {:.2f} Average distance: {:.4f}'.format(omega_i, diff_avg))
-        diff.append(diff_avg)
+        # Average differences array
+        diff_avg = []
+
+        for i in range(n):
+
+            # Compute centroid and model coordinates
+            centroid_coordinates, model_coordinates = pointsCentroidAndModel(t_meteor, phi, omega_i, img_x, img_y, scale, multi_factor, sigma_x, sigma_y, offset, show_plots)
+            
+            # Compute average distance
+            diff = averageDifference(centroid_coordinates, model_coordinates)
+            
+            print('{} Average difference: {:.4f}'.format(i, diff))
+            diff_avg.append(diff)
+
+        print('Angular velocity[deg/s]: {:.2f} Average of difference averages: {:.4f}'.format(omega_i, np.average(diff_avg)))
+        diff_avg_avg.append(np.average(diff_avg))
 
 
     # Plotting
-    plt.scatter(omega_arr, diff)
+    plt.scatter(omega_arr, diff_avg_avg)
     plt.xlabel('Angular velocity [deg/s]')
     plt.ylabel('Average distance of meteor and centroid points')
     plt.xlim([0, np.amax(omega_arr)])
