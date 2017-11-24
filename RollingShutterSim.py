@@ -369,9 +369,11 @@ if __name__ == "__main__":
     plt.xlabel('Angular velocity [deg/s]')
     plt.ylabel('Average distance of meteor and centroid points')
     plt.xlim([0, np.amax(omega_arr)])
-    plt.show()
 
+    # Save figure
     plt.savefig('noise_difference_graph.png')
+
+    plt.show()
 
 
     # Checking
