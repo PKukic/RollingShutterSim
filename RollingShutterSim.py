@@ -44,7 +44,7 @@ def twoDimensionalGaussian(x, y, x0, y0, sigma_x, sigma_y, amplitude):
         y0: [int or float] Y coordinate of the center of the distribution.
         sigma_x: [float] Standard deviation along the X axis.
         sigma_y: [float] Standard deviation along the Y axis.
-        amplitude: [float] Mmplitude of the Gaussian distribution.
+        amplitude: [float] Amplitude of the Gaussian distribution.
 
     Return:
         p [float]: Probability at a given point.
@@ -76,13 +76,6 @@ def meteorCentroid(img, x0, y0, x_start, x_finish, y_start, y_finish):
     Return:
         (x_centr, y_centr): [tuple of floats] X and Y coordinates of the calculated centroid, 
     """
-
-    # Define starting and finishing points
-    x_start = int(round(x_start))
-    x_finish = int(round(x_finish))
-    y_start = int(round(y_start))
-    y_finish = int(round(y_finish))
-
 
     # Calculate length of meteor
     r = np.sqrt((x_finish - x_start)**2 + (x_finish - x_start)**2)
@@ -158,11 +151,6 @@ def pointsCentroidAndModel(t_meteor, phi, omega, img_x, img_y, scale, multi_fact
     x_center = img_x/2
     y_center = img_y/2
 
-    # Frame grid
-    x_frame = np.arange(0, img_x)
-    y_frame = np.arange(0, img_y)
-    xx, yy = np.meshgrid(x_frame, y_frame)
-
     # Lists of model and centroid coordinates
     centroid_coordinates = []
     model_coordinates = []
@@ -205,6 +193,16 @@ def pointsCentroidAndModel(t_meteor, phi, omega, img_x, img_y, scale, multi_fact
             y_finish -= 3*sigma_y
 
 
+        # Adjusting crop borders
+        x_start = int(round(x_start))
+        x_finish = int(round(x_finish))
+        y_start = int(round(y_start))
+        y_finish = int(round(y_finish))
+
+        # Two dimensional gaussian function crop window
+        x_window = np.arange(x_start, x_finish)
+        y_window = np.arange(y_start, y_finish)
+        xx, yy = np.meshgrid(x_window, y_window)
 
         # Image array
         img_array = np.zeros((img_y, img_x), np.float_)
@@ -213,7 +211,8 @@ def pointsCentroidAndModel(t_meteor, phi, omega, img_x, img_y, scale, multi_fact
             # Draw two dimensional Gaussian function for each point in time
             x, y = drawPoints(t, x_center, y_center, scale, phi, omega)
             temp = twoDimensionalGaussian(xx, yy, x, y, sigma_x, sigma_y, amplitude)
-            img_array += temp
+
+            img_array[y_start:y_finish, x_start:x_finish] += temp
 
 
         # Add Gaussian noise and offset
@@ -362,37 +361,5 @@ if __name__ == "__main__":
         noise_diff_arr.append(diff_avg_avg)
 
 
-    # Plotting
-    plt.scatter(omega_arr, noise_diff_arr[0], c = 'red')
-    plt.scatter(omega_arr, noise_diff_arr[1], c = 'green')
-    plt.scatter(omega_arr, noise_diff_arr[2], c = 'blue')
-    plt.xlabel('Angular velocity [deg/s]')
-    plt.ylabel('Average distance of meteor and centroid points')
-    plt.xlim([0, np.amax(omega_arr)])
-
-    # Save figure
-    plt.savefig('noise_difference_graph.png')
-
-    plt.show()
-
-
-    # Checking
-    #centroid, model = pointsCentroidAndModel(t_meteor, phi, omega, img_x, img_y, scale, multi_factor, sigma_x, sigma_y, offset, show_plots)
-    #print(centroid, model)
-
-    """
-    ### Displaying the meteor's movement ###
-
-    x_arr, y_arr = drawPoints(t_arr, img_x, img_y, scale, phi, omega)
-
-    # Make scatter plot
-    plt.scatter(x_arr, y_arr, c = t_arr)
-
-    # Set plot size
-    plt.xlim([0, img_x])
-    plt.ylim([img_y, 0])
-
-    plt.colorbar(label = 'Time (s)')
-
-    plt.show()
-    """ 
+    # Saving data
+    np.savez('data.npz', omega_arr, noise_diff_arr[0], noise_diff_arr[1], noise_diff_arr[2])
