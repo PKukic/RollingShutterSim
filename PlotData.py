@@ -7,16 +7,16 @@ data = np.load('data.npz')
 
 # Setting variable names
 omega_arr = data['arr_0']
-noise0 = data['arr_0']
-noise1 = data['arr_1']
-noise2 = data['arr_2']
+noise0 = data['arr_1']
+noise1 = data['arr_2']
+noise2 = data['arr_3']
 
 print(noise0)
 print(noise1)
 print(noise2)
 
 # Plotting
-#plt.scatter(omega_arr, noise0, c = 'red')
+plt.scatter(omega_arr, noise0, c = 'red')
 plt.scatter(omega_arr, noise1, c = 'green')
 plt.scatter(omega_arr, noise2, c = 'blue')
 plt.xlabel('Angular velocity [deg/s]')
