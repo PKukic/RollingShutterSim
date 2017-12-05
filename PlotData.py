@@ -11,10 +11,6 @@ noise0 = data['arr_1']
 noise1 = data['arr_2']
 noise2 = data['arr_3']
 
-print(noise0)
-print(noise1)
-print(noise2)
-
 # Plotting
 plt.plot(omega_arr, noise0, 'r-', label = 'Noise level 5 $\sigma$')
 plt.plot(omega_arr, noise1, 'g-', label = 'Noise level 10 $\sigma$')
