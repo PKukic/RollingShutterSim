@@ -16,11 +16,12 @@ print(noise1)
 print(noise2)
 
 # Plotting
-plt.scatter(omega_arr, noise0, c = 'red')
-plt.scatter(omega_arr, noise1, c = 'green')
-plt.scatter(omega_arr, noise2, c = 'blue')
+plt.plot(omega_arr, noise0, 'r-', label = 'Noise level 5 $\sigma$')
+plt.plot(omega_arr, noise1, 'g-', label = 'Noise level 10 $\sigma$')
+plt.plot(omega_arr, noise2, 'b-', label = 'Noise level 20 $\sigma$')
 plt.xlabel('Angular velocity [deg/s]')
 plt.ylabel('Average distance of meteor and centroid points')
+plt.legend(loc = 'lower right')
 plt.xlim([0, np.amax(omega_arr)])
 
 # Saving figure

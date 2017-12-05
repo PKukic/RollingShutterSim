@@ -295,7 +295,7 @@ if __name__ == "__main__":
     omega = 30
 
     # Angular velocity array
-    omega_arr = np.arange(1, 51)
+    omega_arr = np.arange(1, 51, 0.5)
 
     # Image size
     img_x = 720
