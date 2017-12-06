@@ -207,8 +207,9 @@ def pointsCentroidAndModel(t_meteor, phi, omega, img_x, img_y, scale, multi_fact
         # Image array
         img_array = np.zeros((img_y, img_x), np.float_)
 
+        # Draw two dimensional Gaussian function for each point in time
         for t in t_arr_iter:
-            # Draw two dimensional Gaussian function for each point in time
+            
             x, y = drawPoints(t, x_center, y_center, scale, phi, omega)
             temp = twoDimensionalGaussian(xx, yy, x, y, sigma_x, sigma_y, amplitude)
 
@@ -216,8 +217,9 @@ def pointsCentroidAndModel(t_meteor, phi, omega, img_x, img_y, scale, multi_fact
 
 
         # Add Gaussian noise and offset
-        gauss_noise = np.random.normal(loc = 0, scale = noise_scale, size = (img_y, img_x))
-        img_array += abs(gauss_noise) + offset
+        if noise_scale > 0:
+            gauss_noise = np.random.normal(loc = 0, scale = noise_scale, size = (img_y, img_x))
+            img_array += abs(gauss_noise) + offset
 
         # Clip pixel levels
         np.clip(img_array, 0, 255)
@@ -295,7 +297,7 @@ if __name__ == "__main__":
     omega = 30
 
     # Angular velocity array
-    omega_arr = np.arange(1, 51, 0.5)
+    omega_arr = np.arange(1, 50.5, 0.5)
 
     # Image size
     img_x = 720
@@ -315,7 +317,7 @@ if __name__ == "__main__":
     noise_scale = 10
 
     # Scale of background noise array
-    noise_scale_arr = [5, 10, 20]
+    noise_scale_arr = [0, 5, 10, 20]
 
     # Level of background offset
     offset = 20
@@ -362,4 +364,4 @@ if __name__ == "__main__":
 
 
     # Saving data
-    np.savez('data.npz', omega_arr, noise_diff_arr[0], noise_diff_arr[1], noise_diff_arr[2])
+    np.savez('data.npz', omega_arr, *noise_diff_arr)
