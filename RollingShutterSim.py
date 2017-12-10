@@ -115,18 +115,19 @@ def meteorCentroid(img, x0, y0, x_start, x_finish, y_start, y_finish):
     return (x_centr, y_centr)
 
 
-def pointsCentroidAndModel(t_meteor, phi, omega, img_x, img_y, scale, multi_factor, sigma_x, sigma_y, noise_scale, offset, show_plots):
+def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, scale, fps, sigma_x, sigma_y, noise_scale, offset, show_plots):
     """
-    Returns coordinates of meteor center calculated by centroiding and from a meteeor movement model.
+    Returns coordinates of meteor center calculated by centroiding and from a meteor movement model.
 
     Arguments:
+        rolling_shutter: [bool] True if rolling shutter is used, False otherwise. 
         t_meteor: [int or float] Duration of meteor.         
         phi: [int or float] Meteor angle, counterclockwise from Y axis.
         omega: [int or float] Meteor angular velocity in deg.
         img_x: [int] Size of image X axis. 
         img_y: [int] Size of image Y axis.
         scale: [float] Image scale in px/deg.
-        multi_factor: [int] Number of meteor points per frame. 
+        fps: [int] Number of frames per second.
         sigma_x: [float] Standard deviation along the X axis.
         sigma_y: [float] Standard deviation along the Y axis.
         noise scale [float] The standard deviation of a probability density function. 
@@ -139,12 +140,21 @@ def pointsCentroidAndModel(t_meteor, phi, omega, img_x, img_y, scale, multi_fact
 
     """
     
-    # Define multiplication factor and amplitude of gaussian
-    framerate = (1/30)/multi_factor
-    amplitude = 255/multi_factor
+    # Different parameters depending on type of shutter used
+    if rolling_shutter:
 
-    # Array of points in time
-    t_arr = np.arange(-t_meteor/2, t_meteor/2, framerate)
+        time_step = 1/fps/img_y
+        amplitude = 255/img_y
+        point_number = img_y
+
+    else:
+
+        multi_factor = 10
+        time_step = 1/fps/multi_factor
+        amplitude = 255/multi_factor
+        point_number = multi_factor
+
+    frame_number = int(round(t_meteor*fps))
 
 
     # X and Y coordinates of image center
@@ -156,14 +166,14 @@ def pointsCentroidAndModel(t_meteor, phi, omega, img_x, img_y, scale, multi_fact
     model_coordinates = []
 
 
-    for i in range(multi_factor):
+    for i in range(frame_number):
 
         # Defining time limits
-        t_start = -t_meteor/2 + i*multi_factor*framerate
-        t_finish = -t_meteor/2 + (i + 1)*multi_factor*framerate
+        t_start = -t_meteor/2 + i*point_number*time_step
+        t_finish = -t_meteor/2 + (i + 1)*point_number*time_step
 
-        # Array of points in time defined by framerate
-        t_arr_iter = np.arange(t_start, t_finish, framerate)
+        # Array of points in time defined by time step
+        t_arr_iter = np.arange(t_start, t_finish, time_step)
 
 
         # Calculate beginning and ending points of meteor
@@ -204,8 +214,16 @@ def pointsCentroidAndModel(t_meteor, phi, omega, img_x, img_y, scale, multi_fact
         y_window = np.arange(y_start, y_finish)
         xx, yy = np.meshgrid(x_window, y_window)
 
-        # Image array
-        img_array = np.zeros((img_y, img_x), np.float_)
+        # Sensor array
+        sensor_array = np.zeros(shape = (img_y, img_x), dtype = np.float_)
+
+        # Read image (output image) array
+        read_image_array = np.zeros(shape = (img_y, img_x), dtype = np.float_)
+        
+        if rolling_shutter:
+            
+            # Initialize line counter
+            line_counter = 0
 
         # Draw two dimensional Gaussian function for each point in time
         for t in t_arr_iter:
@@ -213,25 +231,48 @@ def pointsCentroidAndModel(t_meteor, phi, omega, img_x, img_y, scale, multi_fact
             x, y = drawPoints(t, x_center, y_center, scale, phi, omega)
             temp = twoDimensionalGaussian(xx, yy, x, y, sigma_x, sigma_y, amplitude)
 
-            img_array[y_start:y_finish, x_start:x_finish] += temp
+            sensor_array[y_start:y_finish, x_start:x_finish] += temp
+
+            #plt.imshow(sensor_array)
+            #plt.show()
+
+            # Rolling shutter part 
+            if rolling_shutter:
+                
+                # Read a line from the sensor array, add it to the read image array and
+                # set the same line in the sensor array to 0
+                read_image_array[line_counter] = sensor_array[line_counter]
+                sensor_array[line_counter] = np.zeros(shape = img_x, dtype = np.float_)
+
+                # Degugging
+                print(t, line_counter)
+                line_counter += 1
+
+                #plt.imshow(read_image_array)
+                #plt.show()
+
+
+        # ... 
+        if not rolling_shutter:
+            read_image_array = sensor_array
 
 
         # Add Gaussian noise and offset
         if noise_scale > 0:
             gauss_noise = np.random.normal(loc = 0, scale = noise_scale, size = (img_y, img_x))
-            img_array += abs(gauss_noise) + offset
+            read_image_array += abs(gauss_noise) + offset
 
         # Clip pixel levels
-        np.clip(img_array, 0, 255)
+        np.clip(read_image_array, 0, 255)
 
         # Convert image to 8-bit unsigned integer
-        img_array = img_array.astype(np.uint8)
+        read_image_array = read_image_array.astype(np.uint8)
 
 
         # Centroid coordinates
         t_mid = (t_start + t_finish)/2
         x_mid, y_mid = drawPoints(t_mid, x_center, y_center, scale, phi, omega)
-        x_centr, y_centr = meteorCentroid(img_array, x_mid, y_mid, x_start, x_finish, y_start, y_finish)
+        x_centr, y_centr = meteorCentroid(read_image_array, x_mid, y_mid, x_start, x_finish, y_start, y_finish)
 
         # Add centroid coordinates to list
         centroid_coordinates.append((x_centr, y_centr))
@@ -245,9 +286,9 @@ def pointsCentroidAndModel(t_meteor, phi, omega, img_x, img_y, scale, multi_fact
 
         # Show frame
         if show_plots:
-            plt.imshow(img_array, cmap = "gray", vmin = 0, vmax = 255)
-            plt.scatter(x_centr, y_centr, marker = 'o')
-            plt.scatter(x_model, y_model, marker = '*')
+            plt.imshow(read_image_array, cmap = 'gray', vmin = 0, vmax = 255)
+            plt.scatter(x_centr, y_centr, c = 'red', marker = 'o')
+            plt.scatter(x_model, y_model, c = 'blue', marker = 'o')
             plt.show()
 
         
@@ -287,6 +328,9 @@ if __name__ == "__main__":
 
     ### Defining function parameters ###
 
+    # Using rolling shutter
+    rolling_shutter = True
+
     # Meteor duration
     t_meteor = 0.5
 
@@ -294,7 +338,7 @@ if __name__ == "__main__":
     phi = 45
 
     # Meteor's angular velocity (deg/s)
-    omega = 30
+    omega = 50
 
     # Angular velocity array
     omega_arr = np.arange(1, 50.5, 0.5)
@@ -306,15 +350,15 @@ if __name__ == "__main__":
     # Pixel scale in px/deg
     scale = img_x/64
 
-    # Number of meteor points per frame
-    multi_factor = 10
+    #  Number of frames per second
+    fps = 30
 
     # Standard deviation along X and Y axis
     sigma_x = 2
     sigma_y = 2
 
     # Scale of background noise
-    noise_scale = 10
+    noise_scale = 0
 
     # Scale of background noise array
     noise_scale_arr = [0, 5, 10, 20]
@@ -323,7 +367,7 @@ if __name__ == "__main__":
     offset = 20
 
     # Plot individual frames?
-    show_plots = False
+    show_plots = True
 
 
     ### Average difference as a function of angular velocity ###
@@ -333,6 +377,12 @@ if __name__ == "__main__":
 
     # Number of runs
     n = 10
+
+    
+    pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, scale, fps, sigma_x, sigma_y, noise_scale, offset, show_plots)
+
+
+    """
 
     for noise in noise_scale_arr:
 
@@ -349,7 +399,7 @@ if __name__ == "__main__":
             for i in range(n):
 
                 # Compute centroid and model coordinates
-                centroid_coordinates, model_coordinates = pointsCentroidAndModel(t_meteor, phi, omega_i, img_x, img_y, scale, multi_factor, sigma_x, sigma_y, noise, offset, show_plots)
+                centroid_coordinates, model_coordinates = pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega_i, img_x, img_y, scale, fps, sigma_x, sigma_y, noise, offset, show_plots)
                 
                 # Compute average distance
                 diff = averageDifference(centroid_coordinates, model_coordinates)
@@ -361,7 +411,7 @@ if __name__ == "__main__":
             diff_avg_avg.append(np.average(diff_avg))
 
         noise_diff_arr.append(diff_avg_avg)
-
+    """
 
     # Saving data
-    np.savez('data.npz', omega_arr, *noise_diff_arr)
+    # np.savez('data.npz', omega_arr, *noise_diff_arr)

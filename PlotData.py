@@ -3,7 +3,7 @@ import numpy as np
 
 
 # Loading .NPZ file
-data = np.load('data.npz')
+data = np.load('data_global_shutter.npz')
 
 # Setting variable names
 omega_arr = data['arr_0']
