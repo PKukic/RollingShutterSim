@@ -172,6 +172,12 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
         t_start = -t_meteor/2 + i*point_number*time_step
         t_finish = -t_meteor/2 + (i + 1)*point_number*time_step
 
+        if i == frame_number - 1:
+            t_finish = t_meteor - t_start
+
+        # Checking
+        print("time limits: {} {}",format(t_start, t_finish))
+
         # Array of points in time defined by time step
         t_arr_iter = np.arange(t_start, t_finish, time_step)
 
