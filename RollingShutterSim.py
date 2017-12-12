@@ -121,7 +121,7 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
 
     Arguments:
         rolling_shutter: [bool] True if rolling shutter is used, False otherwise. 
-        t_meteor: [int or float] Duration of meteor.         
+        t_meteor: [int or float] Duration of meteor.
         phi: [int or float] Meteor angle, counterclockwise from Y axis.
         omega: [int or float] Meteor angular velocity in deg.
         img_x: [int] Size of image X axis. 
@@ -176,7 +176,7 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
             t_finish = t_meteor - t_start
 
         # Checking
-        print("time limits: {} {}",format(t_start, t_finish))
+        print("time limits: {} {}".format(t_start, t_finish))
 
         # Array of points in time defined by time step
         t_arr_iter = np.arange(t_start, t_finish, time_step)

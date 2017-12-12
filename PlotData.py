@@ -3,7 +3,7 @@ import numpy as np
 
 
 # Loading .NPZ file
-data = np.load('data_global_shutter.npz')
+data = np.load('data.npz')
 
 # Setting variable names
 omega_arr = data['arr_0']
@@ -16,7 +16,7 @@ noise3 = data['arr_4']
 plt.plot(omega_arr, noise0, 'c-', label = 'No noise')
 plt.plot(omega_arr, noise1, 'r-', label = 'Noise level 5 $\sigma$')
 plt.plot(omega_arr, noise2, 'g-', label = 'Noise level 10 $\sigma$')
-plt.plot(omega_arr, noise2, 'b-', label = 'Noise level 20 $\sigma$')
+plt.plot(omega_arr, noise3, 'b-', label = 'Noise level 20 $\sigma$')
 plt.xlabel('Angular velocity [deg/s]')
 plt.ylabel('Average distance of meteor and centroid points')
 plt.legend(loc = 'lower right')
