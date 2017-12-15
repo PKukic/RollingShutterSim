@@ -228,10 +228,16 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
             # Initialize line counter
             line_counter = 0
 
-        array_size = np.size(t_arr_iter)
-        print("array size: {}".format(array_size))
 
-        """
+        # Delete element in time points array after img_y index
+        if np.size(t_arr_iter) > img_y:
+            t_arr_iter = np.delete(t_arr_iter, np.size(t_arr_iter) - 1)
+
+
+        # Debugging
+        print("array size: {}".format(np.size(t_arr_iter)))
+
+        
         # Draw two dimensional Gaussian function for each point in time
         for t in t_arr_iter:
             
@@ -289,7 +295,7 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
 
         # Add model coordinates to list
         model_coordinates.append((x_model, y_model))
-        """
+        
 
         # Show frame
         if show_plots:
@@ -374,7 +380,7 @@ if __name__ == "__main__":
     offset = 20
 
     # Plot individual frames?
-    show_plots = False
+    show_plots = True
 
 
     ### Average difference as a function of angular velocity ###
