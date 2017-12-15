@@ -176,7 +176,7 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
             t_finish = t_meteor - t_start
 
         # Checking
-        print("time limits: {} {}".format(t_start, t_finish))
+        print("time limits: {:.4f} {:.4f}".format(t_start, t_finish))
 
         # Array of points in time defined by time step
         t_arr_iter = np.arange(t_start, t_finish, time_step)
@@ -243,7 +243,7 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
             #plt.show()
 
             # Rolling shutter part 
-            if rolling_shutter:
+            if rolling_shutter and line_counter < 576:
                 
                 # Read a line from the sensor array, add it to the read image array and
                 # set the same line in the sensor array to 0
@@ -251,7 +251,7 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
                 sensor_array[line_counter] = np.zeros(shape = img_x, dtype = np.float_)
 
                 # Degugging
-                print(t, line_counter)
+                print("{:.5f} {}".format(t, line_counter))
                 line_counter += 1
 
                 #plt.imshow(read_image_array)
@@ -364,7 +364,7 @@ if __name__ == "__main__":
     sigma_y = 2
 
     # Scale of background noise
-    noise_scale = 0
+    noise_scale = 10
 
     # Scale of background noise array
     noise_scale_arr = [0, 5, 10, 20]
