@@ -3,6 +3,7 @@ from __future__ import print_function, division, absolute_import
 
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 
 
 def drawPoints(t, x_center, y_center, scale, phi, omega):
@@ -60,7 +61,7 @@ def twoDimensionalGaussian(x, y, x0, y0, sigma_x, sigma_y, amplitude):
 
 
 
-def meteorCentroid(img, x0, y0, x_start, x_finish, y_start, y_finish):
+def meteorCentroid(img, x_start, x_finish, y_start, y_finish):
     """
     Calculates the X and Y coordinates of a meteor centroid.
 
@@ -77,6 +78,9 @@ def meteorCentroid(img, x0, y0, x_start, x_finish, y_start, y_finish):
         (x_centr, y_centr): [tuple of floats] X and Y coordinates of the calculated centroid, 
     """
 
+    x0 = (x_start + x_finish)/2
+    y0 = (y_start + y_finish)/2
+
     # Calculate length of meteor
     r = np.sqrt((x_finish - x_start)**2 + (x_finish - x_start)**2)
 
@@ -86,12 +90,12 @@ def meteorCentroid(img, x0, y0, x_start, x_finish, y_start, y_finish):
     # Define intensity sums
     sum_x = 0
     sum_y = 0
-    sum_intens = 0
+    sum_intens = 1e-10
 
     # Background noise value
-    nx, ny = img.shape
+    ny, nx = img.shape
     y, x = np.ogrid[:ny, :nx]
-    img_mask = ((x - x0)**2 + (y - y0)**2 > r**2)
+    img_mask = ((x - x0)**2 + (y - y0)**2 < r**2)
     back_noise = np.ma.masked_array(img, mask = img_mask).mean()
 
     # Evaluate intensity sums
@@ -115,7 +119,60 @@ def meteorCentroid(img, x0, y0, x_start, x_finish, y_start, y_finish):
     return (x_centr, y_centr)
 
 
-def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, scale, fps, sigma_x, sigma_y, noise_scale, offset, show_plots):
+
+def calcSigmaWindowLimits(x_start, x_finish, sigma_x, y_start, y_finish, sigma_y, phi):
+    """ Given the beginning and ending coordinate of the simulated meteor, get the window size which will 
+        encompass the meteor with 3 sigma borders around edge points.
+
+    Arguments:
+        ...
+        phi: [int or float] Meteor angle, counterclockwise from Y axis.
+
+    Return:
+        (x_start, x_finish, y_start, y_finish): [tuple of ints] Image coords encompassing the meteor in the
+            given time interval.
+
+    """
+
+
+    # Make sure beginnings are smaller then the endings
+    x_start, x_finish = sorted([x_start, x_finish])
+    y_start, y_finish = sorted([y_start, y_finish])
+
+    # Calculate beginning end ending points of crop, making sure 3 sigma parts of the meteor will be 
+    #   included
+    if np.sin(np.radians(phi)) >= 0:
+        x_start -= 3*sigma_x
+        x_finish += 3*sigma_x
+
+    else:
+        x_start += 3*sigma_x
+        x_finish -= 3*sigma_x
+
+
+    if np.cos(np.radians(phi)) >= 0:
+        y_start -= 3*sigma_y
+        y_finish += 3*sigma_y
+
+    else:
+        y_start += 3*sigma_y
+        y_finish -= 3*sigma_y
+
+
+    # Crop borders to integer size
+    x_start = int(round(x_start))
+    x_finish = int(round(x_finish))
+    y_start = int(round(y_start))
+    y_finish = int(round(y_finish))
+
+
+    return x_start, x_finish, y_start, y_finish
+
+
+
+
+def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, scale, fps, sigma_x, \
+    sigma_y, noise_scale, offset, show_plots):
     """
     Returns coordinates of meteor center calculated by centroiding and from a meteor movement model.
 
@@ -139,23 +196,12 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
         model_coordinates: [list of tuples] X and Y coordinates of meteor center calculated by model.
 
     """
-    
-    # Different parameters depending on type of shutter used
-    if rolling_shutter:
 
-        time_step = 1/fps/img_y
-        amplitude = 255/img_y
-        point_number = img_y
+    # Calculate the amplitude and compensate for the movement loss
+    amplitude = 255/img_y*(2*omega/scale)
 
-    else:
-
-        multi_factor = 10
-        time_step = 1/fps/multi_factor
-        amplitude = 255/multi_factor
-        point_number = multi_factor
-
+    # Total number of frames of the duration of the meteor
     frame_number = int(round(t_meteor*fps))
-
 
     # X and Y coordinates of image center
     x_center = img_x/2
@@ -165,79 +211,56 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
     centroid_coordinates = []
     model_coordinates = []
 
+    first_run = True
+    read_x_encounter_prev = 0
+    read_y_encounter_prev = 0
 
+    # Go thorugh all frames
     for i in range(frame_number):
 
-        # Defining time limits
-        t_start = -t_meteor/2 + i*point_number*time_step
-        t_finish = -t_meteor/2 + (i + 1)*point_number*time_step
+        # Define time limits
+        t_start = -t_meteor/2 + i*(1/fps)
+        t_finish = -t_meteor/2 + (i + 1)*(1/fps)
 
-        # Checking
-        print("time limits: {:.4f} {:.4f}".format(t_start, t_finish))
+        # print("time limits: {:.4f} {:.4f}".format(t_start, t_finish))
 
         # Array of points in time defined by time step
-        t_arr_iter = np.arange(t_start, t_finish, time_step)
-
+        t_arr_iter = np.linspace(t_start, t_finish, img_y)
 
         # Calculate beginning and ending points of meteor
         x_start, y_start = drawPoints(t_start, x_center, y_center, scale, phi, omega)
         x_finish, y_finish = drawPoints(t_finish, x_center, y_center, scale, phi, omega)
 
-        # Make sure beginnings are smaller then endings
-        x_start, x_finish = sorted([x_start, x_finish])
-        y_start, y_finish = sorted([y_start, y_finish])
-
-        # Calculate beginning end ending points of crop
-        if np.sin(np.radians(phi)) >= 0:
-            x_start -= 3*sigma_x
-            x_finish += 3*sigma_x
-
-        else:
-            x_start += 3*sigma_x
-            x_finish -= 3*sigma_x
+        # Add 3 sigma border around them
+        x_start, x_finish, y_start, y_finish = calcSigmaWindowLimits(x_start, x_finish, sigma_x, y_start, \
+            y_finish, sigma_y, phi)
 
 
-        if np.cos(np.radians(phi)) >= 0:
-            y_start -= 3*sigma_y
-            y_finish += 3*sigma_y
-
-        else:
-            y_start += 3*sigma_y
-            y_finish -= 3*sigma_y
-
-
-        # Adjusting crop borders
-        x_start = int(round(x_start))
-        x_finish = int(round(x_finish))
-        y_start = int(round(y_start))
-        y_finish = int(round(y_finish))
-
-        # Two dimensional gaussian function crop window
+        # 2D Gaussian function crop window
         x_window = np.arange(x_start, x_finish)
         y_window = np.arange(y_start, y_finish)
         xx, yy = np.meshgrid(x_window, y_window)
 
-        # Sensor array
-        sensor_array = np.zeros(shape = (img_y, img_x), dtype = np.float_)
+
+        # Init the sensor array only during the first run of the rolling shutter
+        if (not rolling_shutter) or (rolling_shutter and first_run):
+
+            # Sensor array
+            sensor_array = np.zeros(shape=(img_y, img_x), dtype=np.float_)
+
 
         # Read image (output image) array
-        read_image_array = np.zeros(shape = (img_y, img_x), dtype = np.float_)
+        read_image_array = np.zeros(shape=(img_y, img_x), dtype=np.float_)
         
+
         if rolling_shutter:
             
             # Initialize line counter
             line_counter = 0
 
 
-        # Delete element in time points array after img_y index
-        if np.size(t_arr_iter) > img_y:
-            t_arr_iter = np.delete(t_arr_iter, np.size(t_arr_iter) - 1)
+        reader_first_encounter = True
 
-
-        # Debugging
-        print("array size: {}".format(np.size(t_arr_iter)))
-
-        
         # Draw two dimensional Gaussian function for each point in time
         for t in t_arr_iter:
             
@@ -255,15 +278,33 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
                 # Read a line from the sensor array, add it to the read image array and
                 # set the same line in the sensor array to 0
                 read_image_array[line_counter] = sensor_array[line_counter]
-                sensor_array[line_counter] = np.zeros(shape = img_x, dtype = np.float_)
+                sensor_array[line_counter] = np.zeros(shape=img_x, dtype=np.float_)
 
                 # Degugging
-                print("{:.5f} {}".format(t, line_counter))
+                # print("{:.5f} {}".format(t, line_counter))
                 line_counter += 1
+
+
+                # Check if the reader has encountered the position of the meteor
+                if reader_first_encounter:
+                    if line_counter > y:
+                        
+                        read_x_encounter = int(round(x))
+                        read_y_encounter = int(round(y))
+                        
+                        reader_first_encounter = False
 
                 #plt.imshow(read_image_array)
                 #plt.show()
 
+
+        # If this was the first run of the rolling shutter, repeat it
+        if rolling_shutter:
+            if first_run and (i == 0):
+                first_run = False
+                read_y_encounter_prev = read_y_encounter
+                read_x_encounter_prev = read_x_encounter
+                continue
 
         # ... 
         if not rolling_shutter:
@@ -272,7 +313,7 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
 
         # Add Gaussian noise and offset
         if noise_scale > 0:
-            gauss_noise = np.random.normal(loc = 0, scale = noise_scale, size = (img_y, img_x))
+            gauss_noise = np.random.normal(loc=0, scale=noise_scale, size=(img_y, img_x))
             read_image_array += abs(gauss_noise) + offset
 
         # Clip pixel levels
@@ -282,30 +323,62 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
         read_image_array = read_image_array.astype(np.uint8)
 
 
+        # Determine the crop window for the rolling shutter
+        if rolling_shutter:
+            
+            x_start = read_x_encounter_prev
+            x_finish = read_x_encounter
+
+            y_start = read_y_encounter_prev
+            y_finish = read_y_encounter
+
+            # Add 3 sigma borders around crop points
+            x_start, x_finish, y_start, y_finish = calcSigmaWindowLimits(x_start, x_finish, sigma_x, \
+                y_start, y_finish, sigma_y, phi)
+
+
         # Centroid coordinates
-        t_mid = (t_start + t_finish)/2
-        x_mid, y_mid = drawPoints(t_mid, x_center, y_center, scale, phi, omega)
-        x_centr, y_centr = meteorCentroid(read_image_array, x_mid, y_mid, x_start, x_finish, y_start, y_finish)
+        # x_mid, y_mid = drawPoints(t_mid, x_center, y_center, scale, phi, omega)
+        x_centr, y_centr = meteorCentroid(read_image_array, x_start, x_finish, y_start, y_finish)
 
         # Add centroid coordinates to list
         centroid_coordinates.append((x_centr, y_centr))
 
         # Model coordinates
+        t_mid = (t_start + t_finish)/2
         x_model, y_model = drawPoints(t_mid, x_center, y_center, scale, phi, omega)        
 
         # Add model coordinates to list
         model_coordinates.append((x_model, y_model))
         
 
+        if rolling_shutter:
+            
+            # Keep track where the reader enountered the meteor at the previous frame
+            read_y_encounter_prev = read_y_encounter
+            read_x_encounter_prev = read_x_encounter
+
+
         # Show frame
         if show_plots:
-            plt.imshow(read_image_array, cmap = 'gray', vmin = 0, vmax = 255)
-            plt.scatter(x_centr, y_centr, c = 'red', marker = 'o')
-            plt.scatter(x_model, y_model, c = 'blue', marker = 'o')
+            
+            plt.imshow(read_image_array, cmap='gray', vmin=0, vmax=255)
+            
+            # Plot crop window
+            plt.gca().add_patch(patches.Rectangle((x_start, y_start), x_finish - x_start, \
+                y_finish - y_start, fill=False, color='w'))
+
+            # Plot centroid
+            plt.scatter(x_centr, y_centr, c='red', marker='+')
+
+            # Plot model centre
+            plt.scatter(x_model, y_model, c='blue', marker='+')
             plt.show()
 
         
     return (centroid_coordinates, model_coordinates)
+
+
 
 def averageDifference(centroid_coordinates, model_coordinates):
     """
@@ -337,6 +410,7 @@ def averageDifference(centroid_coordinates, model_coordinates):
     return diff_avg
 
 
+
 if __name__ == "__main__":
 
     ### Defining function parameters ###
@@ -357,14 +431,14 @@ if __name__ == "__main__":
     omega_arr = np.arange(1, 50.5, 0.5)
 
     # Image size
-    img_x = 720
-    img_y = 576
+    img_x = 1280
+    img_y = 720
 
     # Pixel scale in px/deg
     scale = img_x/64
 
     #  Number of frames per second
-    fps = 30
+    fps = 25
 
     # Standard deviation along X and Y axis
     sigma_x = 2
