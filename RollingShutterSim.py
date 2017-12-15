@@ -172,9 +172,6 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
         t_start = -t_meteor/2 + i*point_number*time_step
         t_finish = -t_meteor/2 + (i + 1)*point_number*time_step
 
-        if i == frame_number - 1:
-            t_finish = t_meteor - t_start
-
         # Checking
         print("time limits: {:.4f} {:.4f}".format(t_start, t_finish))
 
@@ -231,6 +228,10 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
             # Initialize line counter
             line_counter = 0
 
+        array_size = np.size(t_arr_iter)
+        print("array size: {}".format(array_size))
+
+        """
         # Draw two dimensional Gaussian function for each point in time
         for t in t_arr_iter:
             
@@ -243,7 +244,7 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
             #plt.show()
 
             # Rolling shutter part 
-            if rolling_shutter and line_counter < 576:
+            if rolling_shutter:
                 
                 # Read a line from the sensor array, add it to the read image array and
                 # set the same line in the sensor array to 0
@@ -288,7 +289,7 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
 
         # Add model coordinates to list
         model_coordinates.append((x_model, y_model))
-
+        """
 
         # Show frame
         if show_plots:
@@ -373,7 +374,7 @@ if __name__ == "__main__":
     offset = 20
 
     # Plot individual frames?
-    show_plots = True
+    show_plots = False
 
 
     ### Average difference as a function of angular velocity ###
