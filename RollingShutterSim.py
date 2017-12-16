@@ -236,6 +236,11 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
             y_finish, sigma_y, phi)
 
 
+        # Plot gauss window
+        plt.gca().add_patch(patches.Rectangle((x_start, y_start), x_finish - x_start, \
+                y_finish - y_start, fill=False, color='r'))
+
+
         # 2D Gaussian function crop window
         x_window = np.arange(x_start, x_finish)
         y_window = np.arange(y_start, y_finish)
@@ -422,7 +427,7 @@ if __name__ == "__main__":
     t_meteor = 0.5
 
     # Meteor angle counterclockwise from the Y axis (deg)
-    phi = 45
+    phi = 120
 
     # Meteor's angular velocity (deg/s)
     omega = 50
