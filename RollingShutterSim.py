@@ -135,13 +135,9 @@ def calcSigmaWindowLimits(x_start, x_finish, sigma_x, y_start, y_finish, sigma_y
     """
 
 
-    # Make sure beginnings are smaller then the endings
-    x_start, x_finish = sorted([x_start, x_finish])
-    y_start, y_finish = sorted([y_start, y_finish])
-
     # Calculate beginning end ending points of crop, making sure 3 sigma parts of the meteor will be 
     #   included
-    if np.sin(np.radians(phi)) >= 0:
+    if np.sin(np.radians(phi)) < 0:
         x_start -= 3*sigma_x
         x_finish += 3*sigma_x
 
@@ -157,6 +153,12 @@ def calcSigmaWindowLimits(x_start, x_finish, sigma_x, y_start, y_finish, sigma_y
     else:
         y_start += 3*sigma_y
         y_finish -= 3*sigma_y
+
+
+
+    # Make sure beginnings are smaller then the endings
+    x_start, x_finish = sorted([x_start, x_finish])
+    y_start, y_finish = sorted([y_start, y_finish])
 
 
     # Crop borders to integer size
