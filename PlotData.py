@@ -1,3 +1,7 @@
+""" Plotting data obtained by the simulation.
+"""
+
+
 import matplotlib.pyplot as plt
 import numpy as np
 
