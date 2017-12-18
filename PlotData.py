@@ -4,7 +4,7 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
-
+from mpl_toolkits import mplot3d
 
 # Loading .NPZ file
 data = np.load('data_frame_angle_diff_rolling.npz')
@@ -14,8 +14,9 @@ phi_data = data['arr_0']
 frame_num_data = data['arr_1']
 diff_data = data['arr_2']
 
-
-plt.pcolor(phi_data, frame_num_data, diff_data)
+ax = plt.axes(projection='3d')
+ax.scatter3D(phi_data, frame_num_data, diff_data)
+plt.show()
 
 """
 # Loading .NPZ file
