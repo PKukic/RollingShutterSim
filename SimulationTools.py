@@ -300,7 +300,6 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
                 # print("{:.5f} {}".format(t, line_counter))
                 line_counter += 1
 
-
                 # Check if the reader has encountered the position of the meteor
                 if reader_first_encounter:
                     if line_counter > y:
@@ -395,8 +394,26 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
     return (centroid_coordinates, model_coordinates)
 
 
+def centroidDifference(centroid_coordinates, model_coordinates):
+    """Calculates difference between coordinates of centroid and model point.
+    
+    Arguments:
+        centroid coordinates: [tuple of floats or ints] Tuple that consists of X and Y centroid coordinates.
+        model coordinates: [tuple of floats or ints] Tuple that consists of X and Y model point coordinates.
 
-def averageDifference(centroid_coordinates, model_coordinates):
+    Return:
+        diff: [float] Difference (length) between the centroid and the model point. 
+    """
+    x_centr = centroid_coordinates[0]
+    y_centr = centroid_coordinates[1]
+
+    x_model = model_coordinates[0]
+    y_model = model_coordinates[1]
+
+    return np.sqrt((x_centr - x_model)**2 + (y_centr - y_model)**2)
+
+
+def centroidAverageDifference(centroid_coordinates, model_coordinates):
     """
     Calculates average distance between centroid coordinates and model coordinates for each frame.
     
@@ -411,14 +428,9 @@ def averageDifference(centroid_coordinates, model_coordinates):
     n = len(centroid_coordinates)
     diff_list = []
 
-    for c in range(n):
-        
-        x_centr = centroid_coordinates[c][0]
-        y_centr = centroid_coordinates[c][1]
-        x_model = model_coordinates[c][0]
-        y_model = model_coordinates[c][1]
-        
-        diff = np.sqrt((x_centr - x_model)**2 + (y_centr - y_model)**2)
+    for c_num in range(n):
+
+        diff = centroidDifference(centroid_coordinates[c_num], model_coordinates[c_num])
         diff_list.append(diff)
 
     diff_avg = np.average(diff_list)

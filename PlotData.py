@@ -7,6 +7,18 @@ import numpy as np
 
 
 # Loading .NPZ file
+data = np.load('data_frame_angle_diff_rolling.npz')
+
+# Setting variable names
+phi_data = data['arr_0']
+frame_num_data = data['arr_1']
+diff_data = data['arr_2']
+
+
+plt.pcolor(phi_data, frame_num_data, diff_data)
+
+"""
+# Loading .NPZ file
 data = np.load('data.npz')
 
 # Setting variable names
@@ -30,3 +42,4 @@ plt.xlim([0, np.amax(omega_arr)])
 plt.savefig('noise_difference_graph.png')
 
 plt.show()
+"""
