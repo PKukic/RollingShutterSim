@@ -85,6 +85,7 @@ if __name__ == "__main__":
             diff = centroidDifference(centroid_coordinates[frame_num], model_coordinates[frame_num])
             phi_num_diff_array.append((phi_iter, frame_num, diff))
 
+            # Checking parameters
             print("Meteor angle: {} frame number: {} difference: {:.2f}".format(phi_iter, frame_num, diff))
 
 
@@ -92,7 +93,6 @@ if __name__ == "__main__":
     phi_data = [point[0] for point in phi_num_diff_array]
     frame_num_data = [point[1] for point in phi_num_diff_array]
     diff_data = [point[2] for point in phi_num_diff_array]
-
 
     # Generate frame number array
     frame_num_size = len(frame_num_data)/phi_array.size
@@ -105,44 +105,11 @@ if __name__ == "__main__":
     diff_data = np.reshape(diff_data, (phi_array.size, frame_num_size))
 
     
-    # Checking
+    # Checking sizes
     print("Size of frame num array: {}".format(frame_array.size))
     print("Size of phi array: {}".format(phi_array.size))
     print("Shape of difference data: {}".format(diff_data.shape))
 
 
     # Saving data
-    np.savez('data_frame_angle_diff_rolling.npz', *[pp, ff, diff_data])
-    
-
-    """
-
-    ### Average difference as a function of angular velocity ###
-
-    # Array of average of averages
-    noise_diff_arr = []
-
-    # Number of runs
-    n = 10
-
-    for noise in noise_scale_arr:
-        # Average of averages difference array
-        diff_avg_avg = []
-        print("Noise level: {}".format(noise))
-    
-        for omega_i in omega_arr:
-            # Average differences array
-            diff_avg = []
-            for i in range(n):
-                # Compute centroid and model coordinates
-                centroid_coordinates, model_coordinates = pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega_i, img_x, img_y, scale, fps, sigma_x, sigma_y, noise, offset, show_plots)
-                
-                # Compute average distance
-                diff = averageDifference(centroid_coordinates, model_coordinates)
-                
-                print('{} Average difference: {:.4f}'.format(i, diff))
-                diff_avg.append(diff)
-            print('Angular velocity[deg/s]: {:.2f} Average of difference averages: {:.4f}'.format(omega_i, np.average(diff_avg)))
-            diff_avg_avg.append(np.average(diff_avg))
-        noise_diff_arr.append(diff_avg_avg)
-    """
+    np.savez('data_phi_frame_diff_rolling.npz', *[pp, ff, diff_data])
