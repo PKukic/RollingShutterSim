@@ -23,7 +23,7 @@ if __name__ == "__main__":
     phi = 120
 
     # Meteor angle array
-    phi_array = np.arange(1, 361)
+    phi_array = np.arange(0, 361)
 
     # Meteor's angular velocity (deg/s)
     omega = 50
@@ -58,8 +58,16 @@ if __name__ == "__main__":
     show_plots = False
 
 
-    ### Difference as a function of frame number and meteor angle on image ###
+    # List of all unified parameters
+    param = [rolling_shutter, t_meteor, phi, omega, img_x, img_y, scale, fps, sigma_x, sigma_y, noise_scale, offset, show_plots]
 
+
+    # Check time -- done!
+    # pointsCentroidAndModel(*param)
+
+
+    ### Difference as a function of frame number and meteor angle on image ###
+    
     # Final data array
     phi_num_diff_array = []
 
@@ -69,14 +77,15 @@ if __name__ == "__main__":
         # LIST of centroid and model coordinates
         centroid_coordinates, model_coordinates = pointsCentroidAndModel(rolling_shutter, t_meteor, phi_iter, omega, img_x, img_y, scale, fps, sigma_x, sigma_y, noise_scale, offset, show_plots)
         
-        # size of frame number array
+        # Size of frame number array
         frame_num_range = len(centroid_coordinates)
 
         # Generating and appending model-centroid points difference
         for frame_num in range(frame_num_range):
             diff = centroidDifference(centroid_coordinates[frame_num], model_coordinates[frame_num])
-            print("Meteor angle: {} frame number: {} difference: {:.2f}".format(phi_iter, frame_num, diff))
             phi_num_diff_array.append((phi_iter, frame_num, diff))
+
+            print("Meteor angle: {} frame number: {} difference: {:.2f}".format(phi_iter, frame_num, diff))
 
 
     # Variable arrays
@@ -85,11 +94,26 @@ if __name__ == "__main__":
     diff_data = [point[2] for point in phi_num_diff_array]
 
 
-    print(len(phi_data), len(frame_num_data), len(diff_data))
+    # Generate frame number array
+    frame_num_size = len(frame_num_data)/phi_array.size
+    frame_array = np.arange(frame_num_size)
+    
+    # Generate frame number/angle meshgrid
+    pp, ff = np.meshgrid(phi_array, frame_array)
+
+    # Reshape the difference array so that it is compatible with the meshgrid
+    diff_data = np.reshape(diff_data, (phi_array.size, frame_num_size))
+
+    
+    # Checking
+    print("Size of frame num array: {}".format(frame_array.size))
+    print("Size of phi array: {}".format(phi_array.size))
+    print("Shape of difference data: {}".format(diff_data.shape))
+
 
     # Saving data
-    np.savez('data_frame_angle_diff_rolling.npz', phi_data, *[frame_num_data, diff_data])
-
+    np.savez('data_frame_angle_diff_rolling.npz', *[pp, ff, diff_data])
+    
 
     """
 

@@ -4,19 +4,38 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
-from mpl_toolkits import mplot3d
 
 # Loading .NPZ file
 data = np.load('data_frame_angle_diff_rolling.npz')
 
 # Setting variable names
-phi_data = data['arr_0']
-frame_num_data = data['arr_1']
+pp = data['arr_0']
+ff = data['arr_1']
 diff_data = data['arr_2']
 
-ax = plt.axes(projection='3d')
-ax.scatter3D(phi_data, frame_num_data, diff_data)
+# Set plot
+fig, ax = plt.subplots()
+plot = ax.pcolor(pp, ff, diff_data.T)
+cbar = plt.colorbar(plot)
+cbar.ax.set_ylabel('Distance from model point [px]')
+
+# Plotting
+plt.xlabel('Meteor angle $\phi$ [deg]')
+plt.ylabel('Frame number')
+plt.axis('tight')
+
+# Saving plot
+plt.savefig('graph_phi_frame_diff_rolling')
+
 plt.show()
+
+"""
+from mpl_toolkits import mplot3d
+
+ax = plt.axes(projection='3d')
+plot = ax.scatter3D(phi_data, frame_num_data, diff_data, c = diff_data)
+plt.colorbar(plot)
+"""
 
 """
 # Loading .NPZ file
