@@ -7,27 +7,47 @@ import numpy as np
 from mpl_toolkits import mplot3d
 
 # Loading .NPZ file
-data = np.load('data_phi_frame_diff_rolling.npz')
+data = np.load('../Data/data_phi_ycentr_diff_rolling.npz')
 
 # Setting array names
-pp = data['arr_0']
-ff = data['arr_1']
+phi_data = data['arr_0']
+ycentr_data = data['arr_1']
 diff_data = data['arr_2']
+
+
+### 2D contour graph ###
 
 # Set plot
 fig, ax = plt.subplots()
-plot = ax.pcolor(pp, ff, diff_data.T, cmap = 'inferno')
+plot = ax.scatter(phi_data, ycentr_data, c=diff_data, cmap = 'inferno')
 cbar = plt.colorbar(plot)
 
-# Labels
-plt.xlabel('Meteor angle $\phi$ [deg]')
-plt.ylabel('Frame number')
-cbar.ax.set_ylabel('Distance from model point [px]')
+# Legends and labels
+cbar.set_label("Model-centroid point difference")
+ax.set_xlabel("Meteor angle $\phi$ [deg]")
+ax.set_ylabel("Centroid Y coordinate")
 
-# Axis configuration
+# Configure axis
 plt.axis('tight')
 
-# Saving plot
-plt.savefig('graph_phi_frame_diff_rolling')
+# Saving color plot
+plt.savefig("../Graphs/2DColor_phi_ycentr_diff_rolling.png")
+
+plt.show()
+
+### 3D plot ### 
+
+# Set plot
+fig = plt.figure()
+ax = plt.axes(projection='3d')
+ax.scatter3D(phi_data, ycentr_data, diff_data)
+
+# Legends and labels
+ax.set_xlabel("Meteor angle $\phi$")
+ax.set_ylabel("Centroid Y coordinate")
+ax.set_zlabel("Model-centroid point difference")
+
+# Saving 3D plot
+plt.savefig("../Graphs/3D_phi_ycentr_diff_rolling.png")
 
 plt.show()
