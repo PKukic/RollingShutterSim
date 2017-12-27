@@ -5,21 +5,25 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import os, os.path
-from mpl_toolkits import mplot3d
+# from mpl_toolkits import mplot3d
 
-file_num_range = len([name for name in os.listdir('.') if os.path.isfile(name)])
+# Getting file number
+DIR = '../Data/OPYD-R'
+file_num_range = len([name for name in os.listdir(DIR) if os.path.isfile(os.path.join(DIR, name))])
 
+#Checking
 print(file_num_range)
 
-for file_n in range(file_num_range-1):
+for file_n in range(file_num_range):
 
 	# Loading .NPZ file
-	data = np.load('../Data/APYD-R/data_apyd_rolling{}.npz'.format(file_n))
+	data = np.load('../Data/OPYD-R/data_opyd_rolling{}.npz'.format(file_n))
 
 	# Setting array names
-	phi_data = data['arr_0']
-	ycentr_data = data['arr_1']
-	diff_data = data['arr_2']
+	omega_arr = data['arr_0']
+	phi_data = data['arr_1']
+	ycentr_data = data['arr_2']
+	diff_data = data['arr_3']
 
 
 	### 2D contour graph ###
@@ -33,12 +37,13 @@ for file_n in range(file_num_range-1):
 	cbar.set_label("Model-centroid point difference")
 	ax.set_xlabel("Meteor angle $\phi$ [deg]")
 	ax.set_ylabel("Centroid Y coordinate")
+	plt.title('Angular velocity: {:.3f} [deg/s]'.format(omega_arr[file_n]))
 
 	# Configure axis
 	plt.axis('tight')
 
 	# Saving color plot
-	plt.savefig("../Graphs/APYD-R/graph_apyd_rolling{}.png".format(file_n))
+	plt.savefig("../Graphs/OPYD-R/graph_opyd_rolling{}.png".format(file_n))
 
 	plt.show()
 
