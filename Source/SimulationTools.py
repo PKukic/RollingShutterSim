@@ -101,7 +101,7 @@ def meteorCentroid(img, x_start, x_finish, y_start, y_finish):
     # Background noise value
     ny, nx = img.shape
     y, x = np.ogrid[:ny, :nx]
-    img_mask = ((x - x0)**2 + (y - y0)**2 < r**2)
+    img_mask = ((x - x0)**2 + (y - y0)**2 <  r**2)
     back_noise = np.ma.masked_array(img, mask = img_mask).mean()
 
     # Evaluate intensity sums
@@ -115,6 +115,10 @@ def meteorCentroid(img, x_start, x_finish, y_start, y_finish):
 
             sum_intens += value
     
+    # print("\t\tBack noise: {}".format(back_noise))
+    # print("\t\tIntensity sum: {}".format(sum_intens))
+    # print("\t\tX sum: {}".format(sum_x))
+    # print("\t\tY sum: {}".format(sum_y))
     
     # Calculate centroid coordinates
     x_centr = sum_x/sum_intens + x_start
@@ -210,7 +214,8 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
     """
 
     # Calculate the amplitude and compensate for the movement loss
-    amplitude = 255/img_y*(2*omega/scale)
+    # omegapxs = omega * scale
+    amplitude = 255/img_y*(2*omega*scale)
 
     # Total number of frames of the duration of the meteor
     frame_number = int(round(t_meteor*fps))
@@ -229,7 +234,6 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
     read_y_encounter_prev = 0
 
 
-
     # Go thorugh all frames
     for i in range(frame_number):
 
@@ -238,8 +242,8 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
         t_finish = -t_meteor/2 + (i + 1)*(1/fps)
 
         # Last frame case
-        if i == (frame_number - 1):
-           t_finish = t_meteor/2
+        #if i == (frame_number - 1):
+           #t_finish = t_meteor/2
 
         # print("time limits: {:.4f} {:.4f}".format(t_start, t_finish))
 
@@ -286,6 +290,11 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
             # Evaluate meteor point and 2D Gaussian
             x, y = drawPoints(t, x_center, y_center, scale, phi, omega)
             temp = twoDimensionalGaussian(xx, yy, x, y, sigma_x, sigma_y, amplitude)
+
+            # print("\t\t Y start: {:.2f}; Y finish {:.2f}; X start: {:.2f}; X finish: {:.2f}".format(y_start, y_finish, x_start, y_finish))
+            # print("\t\t", abs(y_start - y_finish), abs(x_start - x_finish))
+            #if((temp.shape) != (abs(y_start - y_finish), abs(x_start - x_finish))):
+                #print("\t\t", (temp.shape()), (abs(y_start - y_finish), abs(x_start - x_finish)))
 
             sensor_array[y_start:y_finish, x_start:x_finish] += temp
 
@@ -358,7 +367,7 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
 
 
         # Centroid coordinates
-        x_centr, y_centr = meteorCentroid(read_image_array, x_start, x_finish, y_start, y_finish)
+        x_centr, y_centr = meteorCentroid(read_image_array, x_start, x_finish, y_start, y_finish) 
         centroid_coordinates.append((x_centr, y_centr))
 
         # Model coordinates

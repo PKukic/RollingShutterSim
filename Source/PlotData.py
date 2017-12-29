@@ -30,14 +30,14 @@ for file_n in range(file_num_range):
 
 	# Set plot
 	fig, ax = plt.subplots()
-	plot = ax.scatter(phi_data, ycentr_data, c=diff_data, cmap = 'inferno')
+	plot = ax.scatter(phi_data, ycentr_data, c=diff_data, cmap = 'inferno', lw = 0)
 	cbar = plt.colorbar(plot)
 
 	# Legends and labels
-	cbar.set_label("Model-centroid point difference")
+	cbar.set_label("Model-centroid  point difference")
 	ax.set_xlabel("Meteor angle $\phi$ [deg]")
 	ax.set_ylabel("Centroid Y coordinate")
-	plt.title('Angular velocity: {:.3f} [deg/s]'.format(omega_arr[file_n]))
+	plt.title('Angular velocity: {:.2f} [px/s]'.format(omega_arr[file_n]))
 
 	# Configure axis
 	plt.axis('tight')
