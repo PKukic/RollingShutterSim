@@ -81,7 +81,7 @@ def meteorCentroid(img, x_start, x_finish, y_start, y_finish):
         y_finish: [float] Y coordinate of ending crop point.
 
     Return:
-        (x_centr, y_centr): [tuple of floats] X and Y coordinates of the calculated centroid, 
+        (x_centr, y_centr): [tuple of floats] X and Y coordinates of the calculated centroid
     """
 
     x0 = (x_start + x_finish)/2
@@ -254,9 +254,16 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
         x_start, y_start = drawPoints(t_start, x_center, y_center, scale, phi, omega)
         x_finish, y_finish = drawPoints(t_finish, x_center, y_center, scale, phi, omega)
 
+
         # Add 3 sigma border around them
         x_start, x_finish, y_start, y_finish = calcSigmaWindowLimits(x_start, x_finish, sigma_x, y_start, \
             y_finish, sigma_y, phi)
+
+        [x_start, x_finish] = np.clip([x_start, x_finish], 0, img_x)
+        [y_start, y_finish] = np.clip([y_start, y_finish], 0, img_y)
+
+        # print(x_start, x_finish)
+        # print(y_start, y_finish)
 
         # Make 2D Gaussian function crop window
         x_window = np.arange(x_start, x_finish)
@@ -293,9 +300,7 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
 
             # print("\t\t Y start: {:.2f}; Y finish {:.2f}; X start: {:.2f}; X finish: {:.2f}".format(y_start, y_finish, x_start, y_finish))
             # print("\t\t", abs(y_start - y_finish), abs(x_start - x_finish))
-            #if((temp.shape) != (abs(y_start - y_finish), abs(x_start - x_finish))):
-                #print("\t\t", (temp.shape()), (abs(y_start - y_finish), abs(x_start - x_finish)))
-
+            
             sensor_array[y_start:y_finish, x_start:x_finish] += temp
 
             # Rolling shutter part 
@@ -359,7 +364,7 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
             read_image_array += abs(gauss_noise) + offset
 
         # Clip pixel levels
-        np.clip(read_image_array, 0, 255)
+        read_image_array = np.clip(read_image_array, 0, 255)
 
         # Convert image to 8-bit unsigned integer
         read_image_array = read_image_array.astype(np.uint8)

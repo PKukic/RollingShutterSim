@@ -11,7 +11,7 @@ import os, os.path
 DIR = '../Data/OPYD-R'
 file_num_range = len([name for name in os.listdir(DIR) if os.path.isfile(os.path.join(DIR, name))])
 
-#Checking
+# Checking
 print(file_num_range)
 
 for file_n in range(file_num_range):
