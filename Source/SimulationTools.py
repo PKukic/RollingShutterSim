@@ -369,7 +369,8 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
         # Convert image to 8-bit unsigned integer
         read_image_array = read_image_array.astype(np.uint8)
 
-
+        # Rescale image
+        # read_image_array /= np.amax(read_image_array)
 
         # Centroid coordinates
         x_centr, y_centr = meteorCentroid(read_image_array, x_start, x_finish, y_start, y_finish) 

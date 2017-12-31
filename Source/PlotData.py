@@ -8,7 +8,7 @@ import os, os.path
 # from mpl_toolkits import mplot3d
 
 # Getting file number
-DIR = '../Data/OPYD-R'
+DIR = '../Data/Tests/OPYD-R'
 file_num_range = len([name for name in os.listdir(DIR) if os.path.isfile(os.path.join(DIR, name))])
 
 # Checking
@@ -17,7 +17,7 @@ print(file_num_range)
 for file_n in range(file_num_range):
 
 	# Loading .NPZ file
-	data = np.load('../Data/OPYD-R/data_opyd_rolling{}.npz'.format(file_n))
+	data = np.load('../Data/Tests/OPYD-R/data_opyd_rolling{}.npz'.format(file_n))
 
 	# Setting array names
 	omega_arr = data['arr_0']
@@ -43,7 +43,7 @@ for file_n in range(file_num_range):
 	plt.axis('tight')
 
 	# Saving color plot
-	plt.savefig("../Graphs/OPYD-R/graph_opyd_rolling{}.png".format(file_n))
+	plt.savefig("../Graphs/Tests/OPYD-R/graph_opyd_rolling{}.png".format(file_n))
 
 	plt.show()
 

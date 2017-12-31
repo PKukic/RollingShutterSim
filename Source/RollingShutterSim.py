@@ -11,7 +11,7 @@ from SimulationTools import *
 ### Defining function parameters ###
 
 # Using rolling shutter
-rolling_shutter = False
+rolling_shutter = True
 
 # Meteor duration
 t_meteor = 0.5
@@ -57,19 +57,20 @@ noise_scale_arr = [0, 5, 10, 20]
 offset = 20
 
 # Plot individual frames?
-show_plots = False
-
+show_plots = True
 
 # List of all unified parameters
 param = [rolling_shutter, t_meteor, phi, omega, img_x, img_y, scale, fps, sigma_x, sigma_y, noise_scale, offset, show_plots]
 
 
 # Check time -- done!
-# model_coordinates, centroid_coordinates = pointsCentroidAndModel(*param)
-# print(centroidAverageDifference(model_coordinates, centroid_coordinates))
+model_coordinates, centroid_coordinates = pointsCentroidAndModel(*param)
+print(centroidAverageDifference(model_coordinates, centroid_coordinates))
 
 
 ### Difference as a function of multiple parameters ###
+
+show_plots = False
 
 # Counter
 num_omega = 0
@@ -124,6 +125,6 @@ for omega_iter in omega_arr:
     print(len(phi_data), len(ycentr_data), len(diff_data))
 
     # Saving data
-    np.savez('../Data/OPYD-R/data_opyd_rolling{}.npz'.format(num_omega), *[omega_pxs, phi_data, ycentr_data, diff_data])
+    np.savez('../Data/Tests/OPYD-R/data_opyd_rolling{}.npz'.format(num_omega), *[omega_pxs, phi_data, ycentr_data, diff_data])
 
     num_omega += 1
