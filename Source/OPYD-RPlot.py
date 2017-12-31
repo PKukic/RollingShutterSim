@@ -5,7 +5,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import os, os.path
-# from mpl_toolkits import mplot3d
+
+### OPYD and ODYP graphs ###
 
 # Getting file number
 DIR = '../Data/Tests/OPYD-R'
@@ -26,7 +27,7 @@ for file_n in range(file_num_range):
 	diff_data = data['arr_3']
 
 
-	### 2D contour graph ###
+	### 2D contour graph; color = diff ###
 
 	# Set plot
 	fig, ax = plt.subplots()
@@ -47,20 +48,18 @@ for file_n in range(file_num_range):
 
 	plt.show()
 
-	### 3D plot ### 
-	"""
-	# Set plot
-	fig = plt.figure()
-	ax = plt.axes(projection='3d')
-	ax.scatter3D(phi_data, ycentr_data, diff_data)
+	### 2D contour plot; color = phi ###
+	fig, ax = plt.subplots()
+	plot = ax.scatter(diff_data, ycentr_data, c=phi_data, cmap = 'inferno', lw = 0)
+	cbar = plt.colorbar(plot)
 
-	# Legends and labels
-	ax.set_xlabel("Meteor angle $\phi$")
+	cbar.set_label("Meteor angle $\phi$ [deg]")
+	ax.set_xlabel("Model-centroid  point difference")
 	ax.set_ylabel("Centroid Y coordinate")
-	ax.set_zlabel("Model-centroid point difference")
+	plt.title('Angular velocity: {:.2f} [px/s]'.format(omega_arr[file_n]))
 
-	# Saving 3D plot
-	plt.savefig("../Graphs/3D_phi_ycentr_diff_rolling.png")
+	plt.axis('tight')
+
+	plt.savefig("../Graphs/Tests/ODYP-R/graph_odyp_rolling{}.png".format(file_n))
 
 	plt.show()
-	"""

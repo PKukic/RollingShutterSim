@@ -356,7 +356,9 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
         else:
             read_image_array = sensor_array
 
-
+        # Rescale image
+        read_image_array /= np.amax(read_image_array)
+        read_image_array *= 255
 
         # Add Gaussian noise and offset
         if noise_scale > 0:
@@ -369,18 +371,18 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
         # Convert image to 8-bit unsigned integer
         read_image_array = read_image_array.astype(np.uint8)
 
-        # Rescale image
-        # read_image_array /= np.amax(read_image_array)
-
         # Centroid coordinates
-        x_centr, y_centr = meteorCentroid(read_image_array, x_start, x_finish, y_start, y_finish) 
-        centroid_coordinates.append((x_centr, y_centr))
-
+        x_centr, y_centr = meteorCentroid(read_image_array, x_start, x_finish, y_start, y_finish)
+        
         # Model coordinates
         t_mid = (t_start + t_finish)/2
-        x_model, y_model = drawPoints(t_mid, x_center, y_center, scale, phi, omega)        
-        model_coordinates.append((x_model, y_model))
+        x_model, y_model = drawPoints(t_mid, x_center, y_center, scale, phi, omega) 
         
+
+        # Check if the meteor is located outside of the image
+        if x_model >= 0 and x_model <= img_x and y_model >= 0 and y_model <= img_y:
+            centroid_coordinates.append((x_centr, y_centr))
+            model_coordinates.append((x_model, y_model))
 
 
         # Keep track where the reader enountered the meteor at the previous frame
