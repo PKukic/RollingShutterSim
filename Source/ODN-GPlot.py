@@ -21,10 +21,13 @@ plt.plot(omega_arr, noise10_arr, 'g-', label = '$\sigma$ = 10')
 plt.plot(omega_arr, noise20_arr, 'b-', label = '$\sigma$ = 20')
 
 # Legends and labels
-plt.legend('lower right')
+plt.legend(loc = 'lower right')
 plt.xlabel("Angular velocity [deg/s]")
 plt.ylabel("Average model-centroid point difference")
 plt.title("Meteor angle 45 [deg]")
+
+# Configuring axis
+plt.axis('tight')
 
 plt.savefig('../Graphs/Tests/data_noise_diff_global2.png')
 

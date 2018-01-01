@@ -380,9 +380,10 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
         
 
         # Check if the meteor is located outside of the image
-        if x_model >= 0 and x_model <= img_x and y_model >= 0 and y_model <= img_y:
-            centroid_coordinates.append((x_centr, y_centr))
-            model_coordinates.append((x_model, y_model))
+        # if x_model >= 0 and x_model <= img_x and y_model >= 0 and y_model <= img_y:
+        
+        centroid_coordinates.append((x_centr, y_centr))
+        model_coordinates.append((x_model, y_model))
 
 
         # Keep track where the reader enountered the meteor at the previous frame

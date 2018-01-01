@@ -46,7 +46,7 @@ sigma_y = 2
 noise_scale = 10
 
 # Scale of background noise array
-noise_scale_arr = [5, 10, 20]
+noise_scale_arr = [0, 5, 10, 20]
 
 # Level of background offset
 offset = 20

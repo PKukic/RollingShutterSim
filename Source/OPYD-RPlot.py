@@ -12,7 +12,7 @@ import os, os.path
 DIR = '../Data/Tests/OPYD-R'
 file_num_range = len([name for name in os.listdir(DIR) if os.path.isfile(os.path.join(DIR, name))])
 
-# Checking
+# Checking file number
 print(file_num_range)
 
 for file_n in range(file_num_range):
@@ -43,21 +43,24 @@ for file_n in range(file_num_range):
 	# Configure axis
 	plt.axis('tight')
 
-	# Saving color plot
 	plt.savefig("../Graphs/Tests/OPYD-R/graph_opyd_rolling{}.png".format(file_n))
 
 	plt.show()
 
 	### 2D contour plot; color = phi ###
+
+	# Set plot
 	fig, ax = plt.subplots()
 	plot = ax.scatter(diff_data, ycentr_data, c=phi_data, cmap = 'inferno', lw = 0)
 	cbar = plt.colorbar(plot)
 
+	# Legends and labels
 	cbar.set_label("Meteor angle $\phi$ [deg]")
 	ax.set_xlabel("Model-centroid  point difference")
 	ax.set_ylabel("Centroid Y coordinate")
 	plt.title('Angular velocity: {:.2f} [px/s]'.format(omega_arr[file_n]))
 
+	# Configure axis
 	plt.axis('tight')
 
 	plt.savefig("../Graphs/Tests/ODYP-R/graph_odyp_rolling{}.png".format(file_n))
