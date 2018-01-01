@@ -30,7 +30,7 @@ fps = 25
 omega = 50
 
 # Angular velocity array in px/s #(logarithmic)
-omega_pxs = np.logspace(np.log10(1), np.log10(1500), 10)
+omega_pxs = np.logspace(np.log10(30), np.log10(1500), 10)
 
 # Angular velocity array in deg/s #(logarithmic)
 omega_arr = omega_pxs / scale
@@ -43,7 +43,7 @@ sigma_x = 2
 sigma_y = 2
 
 # Scale of background noise
-noise_scale = 10
+noise_scale = 0
 
 # Scale of background noise array
 noise_scale_arr = [0, 5, 10, 20]

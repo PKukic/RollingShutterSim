@@ -4,6 +4,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+### ODN plots ###
+
 # Loading NPZ file
 data = np.load('../Data/data_odn_global.npz')
 
@@ -23,7 +25,7 @@ plt.plot(omega_arr, noise20_arr, 'b-', label = '$\sigma$ = 20')
 # Legends and labels
 plt.legend(loc = 'lower right')
 plt.xlabel("Angular velocity [deg/s]")
-plt.ylabel("Average model-centroid point difference")
+plt.ylabel("Average model-centroid point difference [px]")
 plt.title("Meteor angle 45 [deg]")
 
 # Configuring axis

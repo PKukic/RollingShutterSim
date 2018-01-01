@@ -259,8 +259,11 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
         x_start, x_finish, y_start, y_finish = calcSigmaWindowLimits(x_start, x_finish, sigma_x, y_start, \
             y_finish, sigma_y, phi)
 
-        [x_start, x_finish] = np.clip([x_start, x_finish], 0, img_x)
-        [y_start, y_finish] = np.clip([y_start, y_finish], 0, img_y)
+        if set([x_start, x_finish]) != set(np.clip([x_start, x_finish], 0, img_x)):
+            return (-1, -1)
+        
+        elif set([y_start, y_finish]) != set(np.clip([y_start, y_finish], 0, img_y)):
+            return (-1, -1)
 
         # print(x_start, x_finish)
         # print(y_start, y_finish)

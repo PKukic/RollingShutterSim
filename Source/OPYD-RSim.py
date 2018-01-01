@@ -31,39 +31,42 @@ for omega_iter in par.omega_arr:
         centroid_coordinates, model_coordinates = st.pointsCentroidAndModel(rolling_shutter, par.t_meteor, phi_iter, \
             omega_iter, par.img_x, par.img_y, par.scale, par.fps, par.sigma_x, par.sigma_y, par.noise_scale, par.offset, par.show_plots)
 
-        # Size of frame number array
-        frame_num_range = len(centroid_coordinates)
-        print("Number of frames: {};".format(frame_num_range))
+        if centroid_coordinates != -1 and model_coordinates != -1:
 
-        # Generating and appending model-centroid points difference
-        for frame_num in range(frame_num_range):
+            # Size of frame number array
+            frame_num_range = len(centroid_coordinates)
+            print("Number of frames: {};".format(frame_num_range))
 
-            # Parameters
-            diff = st.centroidDifference(centroid_coordinates[frame_num], model_coordinates[frame_num])
+            # Generating and appending model-centroid points difference
+            for frame_num in range(frame_num_range):
 
-            # Model and centroid coordinates
-            x_centr = centroid_coordinates[frame_num][0]
-            y_centr = centroid_coordinates[frame_num][1]
+                # Parameters
+                diff = st.centroidDifference(centroid_coordinates[frame_num], model_coordinates[frame_num])
 
-            x_model = centroid_coordinates[frame_num][0]
-            y_model = centroid_coordinates[frame_num][1]
+                # Model and centroid coordinates
+                x_centr = centroid_coordinates[frame_num][0]
+                y_centr = centroid_coordinates[frame_num][1]
 
-            # Comparing the model coordinates before and after the check
-            print("Model coordinates: ({:.2f}, {:.2f})".format(x_model, y_model))
+                x_model = centroid_coordinates[frame_num][0]
+                y_model = centroid_coordinates[frame_num][1]
 
-            # Checking if the model coordinates are outside of the read image
-            if x_model >= 0 and y_model >= 0 and x_model <= par.img_x and y_model <= par.img_y:
-                
-                phi_ycentr_diff_array.append((phi_iter, y_centr, diff))
-                
-                # Checking parameters
-                print("Velocity: {:.2f} Angle: {:.2f}; Y coordinate: {:.2f}; Difference: {:.2f};".format(omega_iter, phi_iter, y_centr, diff))
-                
-                # Checking coordinates
-                print("\tCentroid coordinates: ({:.2f}, {:.2f})".format(x_centr, y_centr))
-                print("\tModel coordinates: ({:.2f}, {:.2f})".format(x_model, y_model))
-            else:
-                print("Model coordinates are outside of the read image")
+                # Comparing the model coordinates before and after the check
+                print("Model coordinates: ({:.2f}, {:.2f})".format(x_model, y_model))
+
+                # Checking if the model coordinates are outside of the read image
+                if x_model >= 0 and y_model >= 0 and x_model <= par.img_x and y_model <= par.img_y:
+                    
+                    phi_ycentr_diff_array.append((phi_iter, y_centr, diff))
+                    
+                    # Checking parameters
+                    print("Velocity: {:.2f} Angle: {:.2f}; Y coordinate: {:.2f}; Difference: {:.2f};".format(omega_iter, phi_iter, y_centr, diff))
+                    
+                    # Checking coordinates
+                    print("\tCentroid coordinates: ({:.2f}, {:.2f})".format(x_centr, y_centr))
+                    print("\tModel coordinates: ({:.2f}, {:.2f})".format(x_model, y_model))
+                    
+        else:
+            print("Model coordinates are outside of the read image")
 
 
     # Variable arrays

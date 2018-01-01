@@ -35,9 +35,9 @@ for file_n in range(file_num_range):
 	cbar = plt.colorbar(plot)
 
 	# Legends and labels
-	cbar.set_label("Model-centroid  point difference")
+	cbar.set_label("Model-centroid  point difference [px]")
 	ax.set_xlabel("Meteor angle $\phi$ [deg]")
-	ax.set_ylabel("Centroid Y coordinate")
+	ax.set_ylabel("Centroid Y coordinate [px]")
 	plt.title('Angular velocity: {:.2f} [px/s]'.format(omega_arr[file_n]))
 
 	# Configure axis
@@ -56,8 +56,8 @@ for file_n in range(file_num_range):
 
 	# Legends and labels
 	cbar.set_label("Meteor angle $\phi$ [deg]")
-	ax.set_xlabel("Model-centroid  point difference")
-	ax.set_ylabel("Centroid Y coordinate")
+	ax.set_xlabel("Model-centroid  point difference [px]")
+	ax.set_ylabel("Centroid Y coordinate [px]")
 	plt.title('Angular velocity: {:.2f} [px/s]'.format(omega_arr[file_n]))
 
 	# Configure axis
