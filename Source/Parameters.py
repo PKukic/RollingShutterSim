@@ -1,4 +1,4 @@
-''' A file that contains the simulation parameters
+''' A file that contains the simulation parameters.
 '''
 
 
