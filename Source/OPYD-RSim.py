@@ -75,6 +75,6 @@ for omega_iter in par.omega_arr:
     print(len(phi_data), len(ycentr_data), len(diff_data))
 
     # Saving data
-    np.savez('../Data/Tests/OPYD-R/data_opyd_rolling{}.npz'.format(num_omega), *[par.omega_pxs, phi_data, ycentr_data, diff_data])
+    np.savez('../Data/OPYD-R/data_opyd_rolling{}.npz'.format(num_omega), *[par.omega_pxs, phi_data, ycentr_data, diff_data])
 
     num_omega += 1

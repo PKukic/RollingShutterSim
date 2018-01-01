@@ -9,7 +9,7 @@ import os, os.path
 ### OPYD and ODYP graphs ###
 
 # Getting file number
-DIR = '../Data/Tests/OPYD-R'
+DIR = '../Data/OPYD-R'
 file_num_range = len([name for name in os.listdir(DIR) if os.path.isfile(os.path.join(DIR, name))])
 
 # Checking file number
@@ -18,7 +18,7 @@ print(file_num_range)
 for file_n in range(file_num_range):
 
 	# Loading .NPZ file
-	data = np.load('../Data/Tests/OPYD-R/data_opyd_rolling{}.npz'.format(file_n))
+	data = np.load('../Data/OPYD-R/data_opyd_rolling{}.npz'.format(file_n))
 
 	# Setting array names
 	omega_arr = data['arr_0']
@@ -43,7 +43,7 @@ for file_n in range(file_num_range):
 	# Configure axis
 	plt.axis('tight')
 
-	plt.savefig("../Graphs/Tests/OPYD-R/graph_opyd_rolling{}.png".format(file_n))
+	plt.savefig("../Graphs/OPYD-R/graph_opyd_rolling{}.png".format(file_n))
 
 	plt.show()
 
@@ -63,6 +63,6 @@ for file_n in range(file_num_range):
 	# Configure axis
 	plt.axis('tight')
 
-	plt.savefig("../Graphs/Tests/ODYP-R/graph_odyp_rolling{}.png".format(file_n))
+	plt.savefig("../Graphs/ODYP-R/graph_odyp_rolling{}.png".format(file_n))
 
 	plt.show()

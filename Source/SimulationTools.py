@@ -378,10 +378,8 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
         t_mid = (t_start + t_finish)/2
         x_model, y_model = drawPoints(t_mid, x_center, y_center, scale, phi, omega) 
         
-
-        # Check if the meteor is located outside of the image
-        # if x_model >= 0 and x_model <= img_x and y_model >= 0 and y_model <= img_y:
         
+        # Append model and centroid coordinates to list
         centroid_coordinates.append((x_centr, y_centr))
         model_coordinates.append((x_model, y_model))
 

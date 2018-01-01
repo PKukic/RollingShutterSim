@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Loading NPZ file
-data = np.load('../Data/Tests/data_noise_diff_global.npz')
+data = np.load('../Data/data_odn_global.npz')
 
 # Assign variables to .NPZ arrays
 omega_arr = data['arr_0']
@@ -29,7 +29,7 @@ plt.title("Meteor angle 45 [deg]")
 # Configuring axis
 plt.axis('tight')
 
-plt.savefig('../Graphs/Tests/data_noise_diff_global2.png')
+plt.savefig('../Graphs/graph_odn_global2.png')
 
 plt.show()
 

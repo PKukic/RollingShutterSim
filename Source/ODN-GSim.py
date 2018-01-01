@@ -63,4 +63,4 @@ noise2_arr = noise_arr[2]
 noise3_arr = noise_arr[3]
 
 # Saving file
-np.savez('../Data/data_noise_diff_global.npz', *[par.omega_odn_arr, noise0_arr, noise1_arr, noise2_arr, noise3_arr])
+np.savez('../Data/data_odn_global.npz', *[par.omega_odn_arr, noise0_arr, noise1_arr, noise2_arr, noise3_arr])
