@@ -5,13 +5,13 @@
 import numpy as np
 
 # Using rolling shutter
-rolling_shutter = False
+rolling_shutter = True
 
 # Meteor duration
 t_meteor = 0.5
 
 # Meteor angle counterclockwise from the Y axis (deg)
-phi = 120
+phi = 180
 
 # Meteor angle array
 phi_array = np.arange(0, 361)
@@ -41,6 +41,9 @@ omega_arr = omega_pxs / scale
 
 # Omega arr for ODN-G
 omega_odn_arr = np.arange(1, 51, 0.5)
+
+# Omega arr for OYD-R
+omega_oyd_arr = np.arange(30, 51, 0.1)
 
 # Standard deviation along X and Y axis
 sigma_x = 2

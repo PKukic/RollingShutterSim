@@ -15,7 +15,7 @@ import Parameters as par
 # Customised parameters
 rolling_shutter = True
 
-### Difference as a function of multiple parameters ###
+### Difference as a function of meteor angle, angular velocity and Y centroid coordinate ###
 
 # Counter
 num_omega = 0
@@ -54,21 +54,15 @@ for omega_iter in par.omega_arr:
 
                 x_model = centroid_coordinates[frame_num][0]
                 y_model = centroid_coordinates[frame_num][1]
-
-                # Comparing the model coordinates before and after the check
-                print("Model coordinates: ({:.2f}, {:.2f})".format(x_model, y_model))
-
-                # Checking if the model coordinates are outside of the read image
-                if x_model >= 0 and y_model >= 0 and x_model <= par.img_x and y_model <= par.img_y:
                     
-                    phi_ycentr_diff_array.append((phi_iter, y_centr, diff))
-                    
-                    # Checking parameters
-                    print("Velocity: {:.2f} Angle: {:.2f}; Y coordinate: {:.2f}; Difference: {:.2f};".format(omega_iter, phi_iter, y_centr, diff))
-                    
-                    # Checking coordinates
-                    print("\tCentroid coordinates: ({:.2f}, {:.2f})".format(x_centr, y_centr))
-                    print("\tModel coordinates: ({:.2f}, {:.2f})".format(x_model, y_model))
+                phi_ycentr_diff_array.append((phi_iter, y_centr, diff))
+                
+                # Checking parameters
+                print("Velocity: {:.2f} Angle: {:.2f}; Y coordinate: {:.2f}; Difference: {:.2f};".format(omega_iter, phi_iter, y_centr, diff))
+                
+                # Checking coordinates
+                print("\tCentroid coordinates: ({:.2f}, {:.2f})".format(x_centr, y_centr))
+                print("\tModel coordinates: ({:.2f}, {:.2f})".format(x_model, y_model))
 
         else:
             print("Model coordinates are outside of the read image")
