@@ -20,6 +20,10 @@ phi_array = np.arange(0, 361)
 img_x = 1280
 img_y = 720
 
+
+# Angle of the image diagonal [rad]
+diag_angle = np.arctan(img_y / img_x)
+
 # Pixel scale in px/deg
 scale = img_x/42
 

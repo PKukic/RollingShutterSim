@@ -437,8 +437,7 @@ def centroidDifference(centroid_coordinates, model_coordinates):
 
 
 def centroidAverageDifference(centroid_coordinates, model_coordinates):
-    """
-    Calculates average distance between centroid coordinates and model coordinates for each frame.
+    """ Calculates average distance between centroid coordinates and model coordinates for each frame.
     
     Arguments:
         centroid_coordinates: [list or of tuples] List of (X, Y) centroid coordinates for each frame. 
@@ -464,3 +463,80 @@ def centroidAverageDifference(centroid_coordinates, model_coordinates):
     diff_avg = np.average(diff_arr)
 
     return diff_avg
+
+
+def timeFromAngle(phi, omega, img_x, img_y, scale, fps):
+    """ Calculates the time it takes for the meteor to cross the whole image based on the meteor angle. 
+
+    Arguments:
+        phi: [int or float] Meteor angle, counterclockwise from Y axis.
+        img_x: [int] Size of image X axis. 
+        img_y: [int] Size of image Y axis.
+
+    Return:
+        t_meteor: [int or float] Duration of meteor.
+    """
+    
+    # Convert angle measure to value between 0 and 180
+    if phi >= 180:
+        phi -= 180
+
+    # Convert to radians
+    phi = np.radians(phi)
+    diag_angle = np.arctan(img_x / img_y)
+
+
+    # print("Phi: {:.2f} Diag angle: {:.2f}".format(np.rad2deg(phi), np.rad2deg(diag_angle)))
+    
+    # Image center coordinates (starting coordinates)
+    center_coordinates = (img_x / 2, img_y / 2)
+
+    # If the angle is 0 or 180 deg, the meteor is vertical
+    if phi == 0 or phi == np.pi:
+
+        # Form end point
+        end_coordinates = (center_coordinates[0], img_y)
+
+    # If the angle is 90 deg, the meteor is horizontal
+    elif phi == np.pi/2.:
+
+        end_coordinates = (img_x, center_coordinates[1])
+
+    else:
+
+        if phi <= diag_angle or phi >= 2 * diag_angle:
+            
+            # Calculate final X coordinate of meteor
+            x_end = np.tan(phi) * img_y / 2 + center_coordinates[0]
+            end_coordinates = (x_end, img_y)
+
+            # print("X coordinate: {:.2f}".format(x_end))
+
+        else:
+
+            # Calculate final Y coordinate of meteor
+            y_end = img_x / (2 * np.tan(phi)) + center_coordinates[1]
+            end_coordinates = (img_x, y_end)
+
+            # print("Y coordinate: {:.2f}".format(y_end))
+
+    # Clip end coordinates to image size
+    clipped_x = np.clip(end_coordinates[0], 0, img_x)
+    clipped_y = np.clip(end_coordinates[1], 0, img_y)
+    end_coordinates = (clipped_x, clipped_y)
+
+    # print("End coordinates: ({:.2f}, {:.2f})".format(end_coordinates[0], end_coordinates[1]))
+
+    # Calculate difference between the starting and ending points
+    r = centroidDifference(center_coordinates, end_coordinates)
+
+    # Convert omega [deg/s] to [px/s]
+    omega_pxs = omega * scale
+
+    # Calculate time from distance and velocity
+    t_meteor = r / omega_pxs
+
+    # Cut number to a multiple of image exposition
+    t_meteor -= t_meteor % (1 / fps)
+    
+    return t_meteor

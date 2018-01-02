@@ -27,8 +27,13 @@ for omega_iter in par.omega_arr:
 
     for phi_iter in par.phi_array:
 
+        # Get meteor duration (meteor is crossing the entire image)
+        t_meteor = st.timeFromAngle(phi_iter, omega_iter, par.img_x, par.img_y, par.scale, par.fps)
+
+        print("Meteor duration: {:.2f}".format(t_meteor))
+
         # LIST of centroid and model coordinates
-        centroid_coordinates, model_coordinates = st.pointsCentroidAndModel(rolling_shutter, par.t_meteor, phi_iter, \
+        centroid_coordinates, model_coordinates = st.pointsCentroidAndModel(rolling_shutter, t_meteor, phi_iter, \
             omega_iter, par.img_x, par.img_y, par.scale, par.fps, par.sigma_x, par.sigma_y, par.noise_scale, par.offset, par.show_plots)
 
         if centroid_coordinates != -1 and model_coordinates != -1:
@@ -64,7 +69,7 @@ for omega_iter in par.omega_arr:
                     # Checking coordinates
                     print("\tCentroid coordinates: ({:.2f}, {:.2f})".format(x_centr, y_centr))
                     print("\tModel coordinates: ({:.2f}, {:.2f})".format(x_model, y_model))
-                    
+
         else:
             print("Model coordinates are outside of the read image")
 
