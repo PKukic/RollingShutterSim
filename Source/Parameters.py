@@ -43,7 +43,7 @@ omega_arr = omega_pxs / scale
 omega_odn_arr = np.arange(1, 51, 0.5)
 
 # Omega arr for OYD-R
-omega_oyd_arr = np.arange(30, 51, 0.1)
+omega_oyd_arr = np.arange(1, 50.25, 0.25)
 
 # Standard deviation along X and Y axis
 sigma_x = 2
