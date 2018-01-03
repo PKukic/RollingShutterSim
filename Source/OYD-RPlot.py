@@ -6,7 +6,7 @@ import numpy as np
 import Parameters as par
 
 # Loading .NPZ file
-data = np.load('../Data/data_oyd_rolling.npz')
+data = np.load('../Data/OYD-R/data_oyd_rolling_90.npz')
 
 # Setting array names
 omega_arr = data['arr_0']
@@ -27,6 +27,6 @@ plt.title("Meteor angle fixed to: {} [deg]".format(par.phi))
 # Configure axis
 plt.axis('tight')
 
-plt.savefig("../Graphs/graph_oyd_rolling.png")
+plt.savefig("../Graphs/OYD-R/graph_oyd_rolling_90.png")
 
 plt.show()
