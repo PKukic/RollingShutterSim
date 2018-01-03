@@ -1,9 +1,10 @@
 """ Plotting data obtained by the simulation.
 """
 
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
 import numpy as np
 import Parameters as par
+
 
 # Loading .NPZ file
 data = np.load('../Data/OYD-R/data_oyd_rolling_90.npz')
