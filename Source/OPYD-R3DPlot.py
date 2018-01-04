@@ -19,7 +19,7 @@ diff_data = data['arr_2']
 # Set plot
 fig = plt.figure()
 ax = Axes3D(fig)
-ax.plot_wireframe(omega_arr, ycentr_data, diff_data, rstride = 1000, cstride = 1000)
+ax.scatter(omega_arr, ycentr_data, diff_data, c = diff_data, cmap = 'inferno', lw = 0)
 
 
 # Legends and labels
