@@ -11,7 +11,6 @@ import Parameters as par
 
 # Customised parameters
 rolling_shutter = True
-
 show_plots = False
 
 ### Difference as a function of angular velocity and Y centroid coordinate ###
@@ -58,4 +57,4 @@ ycentr_data = [point[1] for point in omega_ycentr_diff_arr]
 diff_data = [point[2] for point in omega_ycentr_diff_arr]
 
 # Saving data
-np.savez('../Data/OYD-R/data_oyd_rolling_90.npz', *[omega_data, ycentr_data, diff_data])
+np.savez('../Data/OYD-R/data_oyd_rolling_{}.npz'.format(par.phi), *[omega_data, ycentr_data, diff_data])

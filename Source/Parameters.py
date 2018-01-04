@@ -11,7 +11,7 @@ rolling_shutter = True
 t_meteor = 0.5
 
 # Meteor angle counterclockwise from the Y axis (deg)
-phi = 45
+phi = 135
 
 # Meteor angle array
 phi_array = np.arange(0, 361)
