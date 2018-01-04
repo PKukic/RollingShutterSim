@@ -11,7 +11,7 @@ import Parameters as par
 
 # Customized parameters
 show_plots = False
-rolling_shutter = True
+rolling_shutter = False
 
 ### Difference as a function of angular velocity and noise scale ###
 
@@ -34,6 +34,7 @@ for noise in par.noise_scale_arr:
 
 			t_meteor = st.timeFromAngle(par.phi, omega_iter, par.img_x, par.img_y, par.scale, par.fps)
 
+			print("{} t_meteor: {:.2f}".format(i, t_meteor))
 			rolling_shutter = not(rolling_shutter)
 
 			# Model and centroid coordinates for global shutter
@@ -56,6 +57,8 @@ for noise in par.noise_scale_arr:
 
 				# Average difference of the rolling shutter coordinates
 				diff_rolling = st.centroidAverageDifference(centroid_rolling_coord, model_rolling_coord)
+
+				print("{} Noise scale: {:.2f} Omega: {:.2f} Diff-R: {:.2f} Diff-G: {:.2f}".format(i, noise, omega_iter, diff_rolling, diff_global))
 
 				# Append the average differences to their lists
 				diff_global_arr.append(diff_global)

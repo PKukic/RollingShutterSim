@@ -575,7 +575,7 @@ def coordinateCorrection(t_meteor, centroid_coordinates_raw, img_y, fps):
     centroid_coordinates_corr = []
 
 
-    for coord in len(num_coord):
+    for coord in range(num_coord):
 
         x_centr = centroid_coordinates_raw[coord][0]
         y_centr = centroid_coordinates_raw[coord][1]
