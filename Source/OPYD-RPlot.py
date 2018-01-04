@@ -1,6 +1,7 @@
 """ Plotting data obtained by the simulation.
 """
-
+# Python 2/3 compatibility
+from __future__ import print_function, division, absolute_import
 
 import matplotlib.pyplot as plt
 import numpy as np

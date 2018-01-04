@@ -1,3 +1,6 @@
+# Python 2/3 compatibility
+from __future__ import print_function, division, absolute_import
+
 import numpy as np
 import matplotlib.pyplot as plt 
 from mpl_toolkits.mplot3d import Axes3D
@@ -75,3 +78,13 @@ plt.axis('tight')
 plt.savefig('../Graphs/Model graphs/graph_model_1_rep.png')
 
 plt.show()
+
+### Notes ###
+'''
+
+a = 1/fps
+b = 1/(img_y * FPS)
+
+==> diff = (1 - ycentr/ysize) * (omega/fps)
+
+'''

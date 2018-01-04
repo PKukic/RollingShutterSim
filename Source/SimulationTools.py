@@ -540,3 +540,52 @@ def timeFromAngle(phi, omega, img_x, img_y, scale, fps):
     t_meteor -= t_meteor % (1 / fps)
     
     return t_meteor
+
+def calculateCorrection(ycentr, img_y, omega_pxs, fps):
+    return (1 - ycentr / img_y) * (omega_pxs / fps)
+
+
+def coordinateCorrection(t_meteor, centroid_coordinates_raw, img_y, fps):
+
+    num_coord = len(centroid_coordinates_raw)
+
+    # Define starting and ending coordinates
+    x_start = centroid_coordinates_raw[0][0]
+    y_start = centroid_coordinates_raw[0][1]
+    x_finish = centroid_coordinates_raw[num_coord - 1][0]
+    y_finish = centroid_coordinates_raw[num_coord - 1][1]
+
+    # Total path
+    r = centroidDifference((x_start, y_start), (x_finish, y_finish))
+
+    # Calculate velocity
+    omega_pxs = r / t_meteor
+
+    # Calculate angle
+    delta_x = x_finish - x_start
+    delta_y = y_finish - y_start
+
+    phi = np.arctan(delta_x / delta_y)
+
+    if phi < 0:
+        phi = np.pi - phi
+
+
+    # List of corrected coordinates
+    centroid_coordinates_corr = []
+
+
+    for coord in len(num_coord):
+
+        x_centr = centroid_coordinates_raw[coord][0]
+        y_centr = centroid_coordinates_raw[coord][1]
+
+        corr = calculateCorrection(y_centr, img_y, omega_pxs, fps)
+
+        x_corr = x_centr + np.sin(phi) * corr
+        y_corr = y_centr + np.cos(phi) * corr
+
+        centroid_coordinates_corr.append((x_corr, y_corr))
+
+
+    return centroid_coordinates_corr

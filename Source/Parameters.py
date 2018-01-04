@@ -1,6 +1,7 @@
 ''' A file that contains the simulation parameters.
 '''
-
+# Python 2/3 compatibility
+from __future__ import print_function, division, absolute_import
 
 import numpy as np
 
@@ -31,7 +32,7 @@ scale = img_x/42
 fps = 25
 
 # Meteor's angular velocity (deg/s)
-omega = 50
+omega = 40
 
 # Angular velocity array in px/s #(logarithmic)
 omega_pxs = np.logspace(np.log10(30), np.log10(1500), 10)
