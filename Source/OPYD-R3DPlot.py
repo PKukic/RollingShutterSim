@@ -33,5 +33,5 @@ plt.title("Meteor angle fixed to: {} [deg]".format(phi))
 plt.axis('tight')
 
 # plt.savefig("../Graphs/OYD-R/graph_oyd_3D_rolling_{}.png".format(phi))
-
+#
 plt.show()
