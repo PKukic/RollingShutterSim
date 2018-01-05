@@ -21,17 +21,17 @@ noise2_rolling = data['arr_7']
 noise3_rolling = data['arr_8']
 
 # Plot four noise arrays for global shutter
-plt.plot(omega_arr, noise0_global, 'c-', label = '$\sigma$ = 0, glob.')
-plt.plot(omega_arr, noise0_global, 'c-', label = '$\sigma$ = 0, glob.')
-plt.plot(omega_arr, noise0_global, 'c-', label = '$\sigma$ = 0, glob.')
-plt.plot(omega_arr, noise0_global, 'c-', label = '$\sigma$ = 0, glob.')
+#plt.plot(omega_arr, noise0_global, 'c-', label = '$\sigma$ = 0, glob.')
+plt.plot(omega_arr, noise1_global, 'r-', label = '$\sigma$ = 5, glob.')
+plt.plot(omega_arr, noise2_global, 'g-', label = '$\sigma$ = 10, glob.')
+#plt.plot(omega_arr, noise3_global, 'b-', label = '$\sigma$ = 20, glob.')
 
 
 # Plot four noise arrays for rolling shutter
-plt.plot(omega_arr, noise0_rolling, 'c--', label = '$\sigma$ = 0, roll.')
-plt.plot(omega_arr, noise0_rolling, 'c--', label = '$\sigma$ = 0, roll.')
-plt.plot(omega_arr, noise0_rolling, 'c--', label = '$\sigma$ = 0, roll.')
-plt.plot(omega_arr, noise0_rolling, 'c--', label = '$\sigma$ = 0, roll.')
+#plt.plot(omega_arr, noise0_rolling, 'c--', label = '$\sigma$ = 0, roll.')
+#plt.plot(omega_arr, noise1_rolling, 'r--', label = '$\sigma$ = 5, roll.')
+#plt.plot(omega_arr, noise2_rolling, 'g--', label = '$\sigma$ = 10, roll.')
+#plt.plot(omega_arr, noise3_rolling, 'b--', label = '$\sigma$ = 20, roll.')
 
 # Legends and labels
 plt.legend(loc = 'lower right')

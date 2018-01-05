@@ -477,14 +477,13 @@ def timeFromAngle(phi, omega, img_x, img_y, scale, fps):
         t_meteor: [int or float] Duration of meteor.
     """
     
-    # Convert angle measure to value between 0 and 180
+    # Convert angle measure to a value between 0 and 180
     if phi >= 180:
         phi -= 180
 
     # Convert to radians
     phi = np.radians(phi)
-    diag_angle = np.arctan(img_x / img_y)
-
+    diag_angle = np.arctan2(img_x, img_y)
 
     # print("Phi: {:.2f} Diag angle: {:.2f}".format(np.rad2deg(phi), np.rad2deg(diag_angle)))
     
@@ -542,10 +541,34 @@ def timeFromAngle(phi, omega, img_x, img_y, scale, fps):
     return t_meteor
 
 def calculateCorrection(ycentr, img_y, omega_pxs, fps):
+    ''' Calculates the correction factor for the rolling shutter centroid
+        coordinates.
+
+        Arguments:
+            ycentr: [int or float] Y coordinate of the meteor centroid.
+            img_y: [int] Size of image Y coordinate [px].
+            omega_pxs: [int or float] Angular velocity of the meteor [px/s].
+            fps: [int] Number of frames taken per second by the camera.
+
+        Return:
+            corr: [float] Correction distance [px].
+    '''
+
     return (1 - ycentr / img_y) * (omega_pxs / fps)
 
 
 def coordinateCorrection(t_meteor, centroid_coordinates_raw, img_y, fps):
+    ''' Corrects the centroid coordinates of a given meteor.
+
+        Arguments:
+            t_meteor: [int or float] Duration of the meteor [s].
+            centroid_coordinates_raw: [array of tuples of floats] Uncorrected meteor coordinates. 
+            img_y:  [int] Size of image Y coordinate [px].
+            fps: [int] Number of frames taken per second by the camera.
+
+        Return:
+            centroid_coordinates_corr: [array of tuples of floats] Corrected meteor coordinates. 
+    '''
 
     num_coord = len(centroid_coordinates_raw)
 
@@ -561,15 +584,15 @@ def coordinateCorrection(t_meteor, centroid_coordinates_raw, img_y, fps):
     # Calculate velocity
     omega_pxs = r / t_meteor
 
+    print(omega_pxs)
+
     # Calculate angle
     delta_x = x_finish - x_start
     delta_y = y_finish - y_start
 
-    phi = np.arctan(delta_x / delta_y)
+    phi = np.arctan2(delta_x, delta_y)
 
-    if phi < 0:
-        phi = np.pi - phi
-
+    print(np.rad2deg(phi))
 
     # List of corrected coordinates
     centroid_coordinates_corr = []
@@ -577,15 +600,23 @@ def coordinateCorrection(t_meteor, centroid_coordinates_raw, img_y, fps):
 
     for coord in range(num_coord):
 
+        # Calculate correction
         x_centr = centroid_coordinates_raw[coord][0]
         y_centr = centroid_coordinates_raw[coord][1]
 
         corr = calculateCorrection(y_centr, img_y, omega_pxs, fps)
 
-        x_corr = x_centr + np.sin(phi) * corr
-        y_corr = y_centr + np.cos(phi) * corr
+        # print(corr)
+
+        # Correct the coordinates
+        x_corr = x_centr - np.sin(phi) * corr
+        y_corr = y_centr - np.cos(phi) * corr
+
+        # deltax = np.sin(phi) * corr
+        # deltay = np.cos(phi) * corr
+        # print((deltax, deltay))
 
         centroid_coordinates_corr.append((x_corr, y_corr))
 
-
+    # Return list of corrected coordinates
     return centroid_coordinates_corr
