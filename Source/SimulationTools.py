@@ -263,10 +263,10 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
             y_finish, sigma_y, phi)
 
         if set([x_start, x_finish]) != set(np.clip([x_start, x_finish], 0, img_x)):
-            return (-1, -1)
+            return (-1, -1, -1)
         
         elif set([y_start, y_finish]) != set(np.clip([y_start, y_finish], 0, img_y)):
-            return (-1, -1)
+            return (-1, -1, -1)
 
         # print(x_start, x_finish)
         # print(y_start, y_finish)
@@ -582,9 +582,11 @@ def coordinateCorrection(t_meteor, centroid_coordinates_raw, img_y, fps):
     y_start = centroid_coordinates_raw[0][1]
     x_finish = centroid_coordinates_raw[num_coord - 1][0]
     y_finish = centroid_coordinates_raw[num_coord - 1][1]
-
+ 
     # Total path
     r = centroidDifference((x_start, y_start), (x_finish, y_finish))
+
+    print('Distance: {:.2f} [px]'.format(r))
 
     # Calculate velocity
     omega_pxs = r / t_meteor
@@ -624,4 +626,4 @@ def coordinateCorrection(t_meteor, centroid_coordinates_raw, img_y, fps):
         centroid_coordinates_corr.append((x_corr, y_corr))
 
     # Return list of corrected coordinates
-    return centroid_coordinates_corr
+    return (centroid_coordinates_corr, omega_pxs)
