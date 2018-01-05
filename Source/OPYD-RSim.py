@@ -33,7 +33,7 @@ for omega_iter in par.omega_arr:
         print("Meteor duration: {:.2f}".format(t_meteor))
 
         # LIST of centroid and model coordinates
-        centroid_coordinates, model_coordinates = st.pointsCentroidAndModel(rolling_shutter, t_meteor, phi_iter, \
+        time_coordinates, centroid_coordinates, model_coordinates = st.pointsCentroidAndModel(rolling_shutter, t_meteor, phi_iter, \
             omega_iter, par.img_x, par.img_y, par.scale, par.fps, par.sigma_x, par.sigma_y, par.noise_scale, par.offset, par.show_plots)
 
         if centroid_coordinates != -1 and model_coordinates != -1:

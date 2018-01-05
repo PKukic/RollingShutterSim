@@ -40,14 +40,14 @@ for noise in par.noise_scale_arr:
 			print("{}, rolling: ".format(i), rolling_shutter)
 
 			# Model and centroid coordinates for global shutter
-			centroid_global_coord, model_global_coord = st.pointsCentroidAndModel(rolling_shutter, t_meteor, par.phi, \
+			time_global_coord, centroid_global_coord, model_global_coord = st.pointsCentroidAndModel(rolling_shutter, t_meteor, par.phi, \
             	omega_iter, par.img_x, par.img_y, par.scale, par.fps, par.sigma_x, par.sigma_y, noise, par.offset, show_plots)
 
 			rolling_shutter = True
 			print("{}, rolling: ".format(i), rolling_shutter)
 
 			# Rolling shutter model and centroid coordinates
-			centroid_rolling_coord, model_rolling_coord = st.pointsCentroidAndModel(rolling_shutter, t_meteor, par.phi, \
+			time_rolling_coord, centroid_rolling_coord, model_rolling_coord = st.pointsCentroidAndModel(rolling_shutter, t_meteor, par.phi, \
             	omega_iter, par.img_x, par.img_y, par.scale, par.fps, par.sigma_x, par.sigma_y, noise, par.offset, show_plots)
 
 			# should_be_corr = []

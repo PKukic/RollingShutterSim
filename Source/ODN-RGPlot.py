@@ -6,32 +6,32 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Loading .NPZ file
-data = np.load('../Data/data_odn_global_rolling.npz')
+data = np.load('../Data/ODN/data_odn_global_rolling.npz')
 
 # Assign array names to .NPZ arrays
 omega_arr = data['arr_0']
-noise0_global = data['arr_1']
-noise1_global = data['arr_2']
-noise2_global = data['arr_3']
-noise3_global = data['arr_4']
+noise0_rolling = data['arr_1']
+noise1_rolling = data['arr_2']
+noise2_rolling = data['arr_3']
+noise3_rolling = data['arr_4']
 
-noise0_rolling = data['arr_5']
-noise1_rolling = data['arr_6']
-noise2_rolling = data['arr_7']
-noise3_rolling = data['arr_8']
+noise0_global = data['arr_5']
+noise1_global = data['arr_6']
+noise2_global = data['arr_7']
+noise3_global = data['arr_8']
 
 # Plot four noise arrays for global shutter
-#plt.plot(omega_arr, noise0_global, 'c-', label = '$\sigma$ = 0, glob.')
+plt.plot(omega_arr, noise0_global, 'c-', label = '$\sigma$ = 0, glob.')
 plt.plot(omega_arr, noise1_global, 'r-', label = '$\sigma$ = 5, glob.')
-plt.plot(omega_arr, noise2_global, 'g-', label = '$\sigma$ = 10, glob.')
+#plt.plot(omega_arr, noise2_global, 'g-', label = '$\sigma$ = 10, glob.')
 #plt.plot(omega_arr, noise3_global, 'b-', label = '$\sigma$ = 20, glob.')
 
 
 # Plot four noise arrays for rolling shutter
-#plt.plot(omega_arr, noise0_rolling, 'c--', label = '$\sigma$ = 0, roll.')
-#plt.plot(omega_arr, noise1_rolling, 'r--', label = '$\sigma$ = 5, roll.')
-#plt.plot(omega_arr, noise2_rolling, 'g--', label = '$\sigma$ = 10, roll.')
-#plt.plot(omega_arr, noise3_rolling, 'b--', label = '$\sigma$ = 20, roll.')
+plt.plot(omega_arr, noise0_rolling, 'c--', label = '$\sigma$ = 0, roll.')
+plt.plot(omega_arr, noise1_rolling, 'r--', label = '$\sigma$ = 5, roll.')
+plt.plot(omega_arr, noise2_rolling, 'g--', label = '$\sigma$ = 10, roll.')
+plt.plot(omega_arr, noise3_rolling, 'b--', label = '$\sigma$ = 20, roll.')
 
 # Legends and labels
 plt.legend(loc = 'lower right')
@@ -42,6 +42,6 @@ plt.title("Meteor angle 45 [deg]")
 # Configuring axis
 plt.axis('tight')
 
-plt.savefig('../Graphs/graph_odn_global_rolling.png')
+plt.savefig('../Graphs/ODN/graph_odn_global_rolling.png')
 
 plt.show()

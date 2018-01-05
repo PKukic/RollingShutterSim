@@ -228,6 +228,9 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
     centroid_coordinates = []
     model_coordinates = []
 
+    # Array of time points
+    time_coordinates = []
+
     # Rolling shutter parameters
     first_run = True
     read_x_encounter_prev = 0
@@ -386,6 +389,8 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
         centroid_coordinates.append((x_centr, y_centr))
         model_coordinates.append((x_model, y_model))
 
+        # Append average time to list
+        time_coordinates.append(t_mid)
 
         # Keep track where the reader enountered the meteor at the previous frame
         if rolling_shutter:
@@ -411,7 +416,7 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
             plt.show()
 
         
-    return (centroid_coordinates, model_coordinates)
+    return (time_coordinates, centroid_coordinates, model_coordinates)
 
 
 def centroidDifference(centroid_coordinates, model_coordinates):
@@ -584,7 +589,7 @@ def coordinateCorrection(t_meteor, centroid_coordinates_raw, img_y, fps):
     # Calculate velocity
     omega_pxs = r / t_meteor
 
-    print(omega_pxs)
+    print('Omega: {:.2f} [px/s]'.format(omega_pxs))
 
     # Calculate angle
     delta_x = x_finish - x_start
@@ -592,7 +597,7 @@ def coordinateCorrection(t_meteor, centroid_coordinates_raw, img_y, fps):
 
     phi = np.arctan2(delta_x, delta_y)
 
-    print(np.rad2deg(phi))
+    print('Phi: {:.2f}'.format(np.rad2deg(phi)))
 
     # List of corrected coordinates
     centroid_coordinates_corr = []

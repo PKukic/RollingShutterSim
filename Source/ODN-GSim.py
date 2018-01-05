@@ -32,7 +32,7 @@ for noise in par.noise_scale_arr:
 		for i in range(n_iter):
 
 			# Get model and centroid coordinates
-			centroid_coordinates, model_coordinates = st.pointsCentroidAndModel(rolling_shutter, par.t_meteor, par.phi, \
+			time_coordinates, centroid_coordinates, model_coordinates = st.pointsCentroidAndModel(rolling_shutter, par.t_meteor, par.phi, \
             	omega_iter, par.img_x, par.img_y, par.scale, par.fps, par.sigma_x, par.sigma_y, noise, par.offset, par.show_plots)
 
 			# Compute difference
@@ -63,4 +63,4 @@ noise2_arr = noise_arr[2]
 noise3_arr = noise_arr[3]
 
 # Saving file
-np.savez('../Data/data_odn_global.npz', *[par.omega_odn_arr, noise0_arr, noise1_arr, noise2_arr, noise3_arr])
+np.savez('../Data/ODN/data_odn_global.npz', *[par.omega_odn_arr, noise0_arr, noise1_arr, noise2_arr, noise3_arr])

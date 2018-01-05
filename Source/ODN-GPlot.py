@@ -8,7 +8,7 @@ import numpy as np
 ### ODN plots ###
 
 # Loading NPZ file
-data = np.load('../Data/data_odn_global.npz')
+data = np.load('../Data/ODN/data_odn_global.npz')
 
 # Assign variables to .NPZ arrays
 omega_arr = data['arr_0']
@@ -32,7 +32,7 @@ plt.title("Meteor angle 45 [deg]")
 # Configuring axis
 plt.axis('tight')
 
-plt.savefig('../Graphs/graph_odn_global2.png')
+plt.savefig('../Graphs/ODN/graph_odn_global2.png')
 
 plt.show()
 
