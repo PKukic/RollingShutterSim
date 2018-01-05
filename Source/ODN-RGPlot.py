@@ -23,8 +23,8 @@ noise3_global = data['arr_8']
 # Plot four noise arrays for global shutter
 plt.plot(omega_arr, noise0_global, 'c-', label = '$\sigma$ = 0, glob.')
 plt.plot(omega_arr, noise1_global, 'r-', label = '$\sigma$ = 5, glob.')
-#plt.plot(omega_arr, noise2_global, 'g-', label = '$\sigma$ = 10, glob.')
-#plt.plot(omega_arr, noise3_global, 'b-', label = '$\sigma$ = 20, glob.')
+plt.plot(omega_arr, noise2_global, 'g-', label = '$\sigma$ = 10, glob.')
+plt.plot(omega_arr, noise3_global, 'b-', label = '$\sigma$ = 20, glob.')
 
 
 # Plot four noise arrays for rolling shutter
