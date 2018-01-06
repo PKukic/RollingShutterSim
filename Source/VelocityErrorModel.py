@@ -65,18 +65,18 @@ for phi in phi_array:
 
 	print("Generating D/T graph...")
 
-	plt.plot(delta_t, delta_r, 'ro--', label = 'regular coordinates')
-	plt.plot(delta_t, delta_rc, 'bo--', label = 'corrected coordinates')
+	# plt.plot(delta_t, delta_r, 'ro--', label = 'regular coordinates')
+	# plt.plot(delta_t, delta_rc, 'bo--', label = 'corrected coordinates')
 
-	plt.xlabel('Time [s]')
-	plt.ylabel('Distance [px]')
-	plt.title('Meteor angle $\phi$: {} [deg]'.format(phi))
-	plt.legend(loc = 'lower right')
-	plt.axis('tight')
+	# plt.xlabel('Time [s]')
+	# plt.ylabel('Distance [px]')
+	# plt.title('Meteor angle $\phi$: {} [deg]'.format(phi))
+	# plt.legend(loc = 'lower right')
+	# plt.axis('tight')
 
-	plt.savefig('../Graphs/Velocity error/plot_distance_time_{}'.format(phi))
+	# plt.savefig('../Graphs/Velocity error/Distance-time plots/plot_distance_time_{}'.format(phi))
 
-	plt.show()
+	# plt.show()
 
 	print('Generating V/T graph...')
 	
@@ -85,10 +85,11 @@ for phi in phi_array:
 
 	plt.xlabel('Time [s]')
 	plt.ylabel('Velocity [px/s]')
+	plt.title('Meteor angle $\phi$: {} [deg]'.format(phi))
 	plt.legend(loc = 'lower right')
 	plt.axis('tight')
 
-	plt.savefig('../Graphs/Velocity error/plot_velocity_time_{}'.format(phi))
+	plt.savefig('../Graphs/Velocity error/Velocity-time plots/plot_velocity_time_{}'.format(phi))
 
 	plt.show()
 
