@@ -40,8 +40,6 @@ for phi in phi_array:
 	delta_t.append(0)
 	delta_r.append(0)
 	delta_rc.append(0)
-	delta_v.append(0)
-	delta_vc.append(0)
 	
 	cnt_t = 0
 	cnt_r = 0
@@ -80,14 +78,14 @@ for phi in phi_array:
 
 	print('Generating V/T graph...')
 	
-	plt.plot(delta_t, delta_v, 'ro--', label = 'regular velocity')
-	plt.plot(delta_t, delta_vc, 'bo--', label = 'corrected velocity')
+	plt.plot(delta_t[1:], delta_v, 'ro--', label = 'regular velocity')
+	plt.plot(delta_t[1:], delta_vc, 'bo--', label = 'corrected velocity')
 
 	plt.xlabel('Time [s]')
 	plt.ylabel('Velocity [px/s]')
 	plt.title('Meteor angle $\phi$: {} [deg]'.format(phi))
-	plt.legend(loc = 'lower right')
-	plt.axis('tight')
+	plt.legend(loc = 'center right')
+	# plt.axis('tight')
 
 	plt.savefig('../Graphs/Velocity error/Velocity-time plots/plot_velocity_time_{}'.format(phi))
 
