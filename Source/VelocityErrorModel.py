@@ -18,7 +18,12 @@ for phi in phi_array:
 	t_meteor = st.timeFromAngle(phi, par.omega, par.img_x, par.img_y, par.scale, par.fps)
 
 	print("Simulating meteor...")
-	time_coordinates, centroid_coordinates, model_coordinates = st.pointsCentroidAndModel(par.rolling_shutter, t_meteor, phi, \
+	rolling_shutter = True
+	time_coordinates, centroid_coordinates, model_coordinates = st.pointsCentroidAndModel(rolling_shutter, t_meteor, phi, \
+    	par.omega, par.img_x, par.img_y, par.scale, par.fps, par.sigma_x, par.sigma_y, par.noise_scale, par.offset, show_plots)
+
+	rolling_shutter = False
+	time_global_coordinates, centroid_global_coordinates, model_global_coordinates = st.pointsCentroidAndModel(rolling_shutter, t_meteor, phi, \
     	par.omega, par.img_x, par.img_y, par.scale, par.fps, par.sigma_x, par.sigma_y, par.noise_scale, par.offset, show_plots)
 
 	print("Correcting coordinates...")
@@ -44,7 +49,7 @@ for phi in phi_array:
 
 	for i in range(len(time_coordinates) - 1):
 		dt = time_coordinates[i + 1] - time_coordinates[i]
-		dr = st.centroidDifference(centroid_coordinates[i + 1], centroid_coordinates[i])
+		dr = st.centroidDifference(centroid_global_coordinates[i + 1], centroid_global_coordinates[i])
 		d_rc = st.centroidDifference(centroid_coordinates_corr[i + 1], centroid_coordinates_corr[i])
 
 		delta_t.append(dt + cnt_t)
