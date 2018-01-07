@@ -1,14 +1,15 @@
 import SimulationTools as st 
 import Parameters as par
 import numpy as np
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 # Customized parameters
 show_plots = False
 
-# deltav_arr = []
+deltav_avg_arr = []
+deltav_true_arr = []
 
-phi_array = np.arange(0, 361, 10)
+phi_array = np.arange(0, 361)
 
 for phi in phi_array:
 
@@ -31,6 +32,29 @@ for phi in phi_array:
 
 	print('Generating data...')
 
+	n = len(time_coordinates)
+
+	total_time_rolling = time_coordinates[n - 1] - time_coordinates[0]
+	total_time_global = time_global_coordinates[n - 1] - time_global_coordinates[0]
+
+	total_r_rolling = st.centroidDifference(centroid_coordinates[n - 1], centroid_coordinates[0])
+	total_r_global = st.centroidDifference(centroid_global_coordinates[n - 1], centroid_coordinates[0])
+
+	avg_v_global = total_r_global / total_time_global
+	true_v_global = par.omega * par.scale
+	avg_v_rolling = total_r_rolling / total_time_rolling
+
+	print("Rolling avg. vel.: {:.2f}, global avg. vel.: {:.2f}, omega: {:.2f}".format(avg_v_rolling, avg_v_global, true_v_global))
+
+	delta_v_avg = avg_v_global - avg_v_rolling
+	delta_v_true = true_v_global - avg_v_rolling
+
+	deltav_avg_arr.append(delta_v_avg)
+	deltav_true_arr.append(delta_v_true)
+
+	print("Done!")
+
+	"""
 	delta_t = []
 	delta_r = []
 	delta_rc = []
@@ -60,8 +84,8 @@ for phi in phi_array:
 
 		delta_v.append(delta_r[i + 1] / delta_t[i + 1])
 		delta_vc.append(delta_rc[i + 1] / delta_t[i + 1])
-
-	print("Generating D/T graph...")
+	"""
+	# print("Generating D/T graph...")
 
 	# plt.plot(delta_t, delta_r, 'ro--', label = 'regular coordinates')
 	# plt.plot(delta_t, delta_rc, 'bo--', label = 'corrected coordinates')
@@ -76,21 +100,21 @@ for phi in phi_array:
 
 	# plt.show()
 
-	print('Generating V/T graph...')
+	# print('Generating V/T graph...')
 	
-	plt.plot(delta_t[1:], delta_v, 'ro--', label = 'regular velocity')
-	plt.plot(delta_t[1:], delta_vc, 'bo--', label = 'corrected velocity')
+	# plt.plot(delta_t[1:], delta_v, 'ro--', label = 'regular velocity')
+	# plt.plot(delta_t[1:], delta_vc, 'bo--', label = 'corrected velocity')
 
-	plt.xlabel('Time [s]')
-	plt.ylabel('Velocity [px/s]')
-	plt.title('Meteor angle $\phi$: {} [deg]'.format(phi))
-	plt.legend(loc = 'center right')
+	# plt.xlabel('Time [s]')
+	# plt.ylabel('Velocity [px/s]')
+	# plt.title('Meteor angle $\phi$: {} [deg]'.format(phi))
+	# plt.legend(loc = 'center right')
 	# plt.axis('tight')
 
-	plt.savefig('../Graphs/Velocity error/Velocity-time plots/plot_velocity_time_{}'.format(phi))
+	# plt.savefig('../Graphs/Velocity error/Velocity-time plots/plot_velocity_time_{}'.format(phi))
 
-	plt.show()
+	# plt.show()
 
 
 # Save data
-# np.savez('../Data/data_velocity_error.npz', *[par.phi_array, deltav_arr])
+np.savez('../Data/data_velocity_error.npz', *[par.phi_array, deltav_avg_arr, deltav_true_arr])
