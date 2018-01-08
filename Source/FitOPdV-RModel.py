@@ -14,7 +14,7 @@ phi_arr = data['arr_1']
 deltav_arr = data['arr_2']
 
 # Model function
-def correctionModel(par, c):
+def correctionModel(par):
 
     Y_SIZE = 720
     FPS = 25
@@ -30,11 +30,11 @@ def correctionModel(par, c):
 
 
 # Fit model to data
-param, pcov = opt.curve_fit(correctionModel, (omega_arr, phi_arr), deltav_arr)
-print(param)
+# param, pcov = opt.curve_fit(correctionModel, (omega_arr, phi_arr), deltav_arr)
+# print(param)
 
 # Calculate the difference between the model and the actual data
-fit = correctionModel((omega_arr, phi_arr), *param)
+fit = correctionModel((omega_arr, phi_arr))
 delta = deltav_arr - fit
 
 ### Fit and data plot ###
@@ -47,8 +47,7 @@ print('Maximum deviation from the data: {:.2f}'.format(deviation))
 fig = plt.figure()
 ax = Axes3D(fig)
 #ax.plot_wireframe(omega_arr, phi_arr, fit, rstride = 1000, cstride = 1000)
-ax.plot_wireframe(omega_arr, phi_arr, delta, rstride = 1000, cstride = 1000)
-
+ax.scatter(omega_arr, phi_arr, delta, c = delta, cmap = 'inferno', lw = 0)
 # Label and set plot title
 ax.set_xlabel('$\omega$ [px/s]')
 ax.set_ylabel('$\phi$ [deg]')
