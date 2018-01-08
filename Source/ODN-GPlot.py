@@ -1,39 +1,35 @@
-""" Plotting data obtained by the simulation.
+""" Plot data obtained by the omega-difference-noise simulation.
 """
 # Python 2/3 compatibility
 from __future__ import print_function, division, absolute_import
 import matplotlib.pyplot as plt
 import numpy as np
 
-### ODN plots ###
-
-# Loading NPZ file
+# Load data
 data = np.load('../Data/ODN/data_odn_global.npz')
 
-# Assign variables to .NPZ arrays
+# Unpack and set array names
 omega_arr = data['arr_0']
-noise0_arr = data['arr_1']
-noise5_arr = data['arr_2']
-noise10_arr = data['arr_3']
-noise20_arr = data['arr_4']
+noise0_data = data['arr_1']
+noise1_data = data['arr_2']
+noise2_data = data['arr_3']
+noise3_data = data['arr_4']
 
 # Plot all four noise arrays
-plt.plot(omega_arr, noise0_arr, 'c-', label = '$\sigma$ = 0')
-plt.plot(omega_arr, noise5_arr, 'r-', label = '$\sigma$ = 5')
-plt.plot(omega_arr, noise10_arr, 'g-', label = '$\sigma$ = 10')
-plt.plot(omega_arr, noise20_arr, 'b-', label = '$\sigma$ = 20')
+plt.plot(omega_arr, noise0_data, 'c-', label = '$\sigma$ = 0')
+plt.plot(omega_arr, noise1_data, 'r-', label = '$\sigma$ = 5')
+plt.plot(omega_arr, noise2_data, 'g-', label = '$\sigma$ = 10')
+plt.plot(omega_arr, noise3_data, 'b-', label = '$\sigma$ = 20')
 
-# Legends and labels
+# Label the plot, set plot title, set legend
 plt.legend(loc = 'lower right')
 plt.xlabel("Angular velocity [deg/s]")
 plt.ylabel("Average model-centroid point difference [px]")
 plt.title("Meteor angle 45 [deg]")
 
-# Configuring axis
+# Configure the plot axis
 plt.axis('tight')
 
+# Save and show plot
 plt.savefig('../Graphs/ODN/graph_odn_global2.png')
-
 plt.show()
-
-

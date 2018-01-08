@@ -1,11 +1,11 @@
 ''' A file that contains the simulation parameters.
 '''
+
 # Python 2/3 compatibility
 from __future__ import print_function, division, absolute_import
-
 import numpy as np
 
-# Using rolling shutter
+# Is a given simulation made using the rolling shutter camera?
 rolling_shutter = True
 
 # Meteor duration
@@ -21,14 +21,10 @@ phi_array = np.arange(0, 361)
 img_x = 1280
 img_y = 720
 
-
-# Angle of the image diagonal [rad]
-diag_angle = np.arctan(img_y / img_x)
-
 # Pixel scale in px/deg
 scale = img_x/42
 
-#  Number of frames per second
+#  Number of frames per second taken by the simulated camera
 fps = 25
 
 # Meteor's angular velocity (deg/s)
@@ -40,10 +36,10 @@ omega_pxs = np.logspace(np.log10(30), np.log10(1500), 10)
 # Angular velocity array in deg/s #(logarithmic)
 omega_arr = omega_pxs / scale
 
-# Omega arr for ODN-G
-omega_odn_arr = np.arange(5, 51, 0.5)
+# Meteor velocity array with step of 0.5
+omega_odn_arr = np.arange(5, 50.5, 0.5)
 
-# Omega arr for OYD-R
+# Meteor velocity array with step of 0.25
 omega_oyd_arr = np.arange(1, 50.25, 0.25)
 
 # Standard deviation along X and Y axis

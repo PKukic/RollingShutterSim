@@ -1,14 +1,16 @@
-""" Plotting data obtained by the simulation.
+""" Plot data obtained by the omega-difference-noise simulation, in which both rolling shutter
+	and global shutter are used
 """
+
 # Python 2/3 compatibility
 from __future__ import print_function, division, absolute_import
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Loading .NPZ file
+# Loading data
 data = np.load('../Data/ODN/data_odn_global_rolling.npz')
 
-# Assign array names to .NPZ arrays
+# Unpack daata and set array names
 omega_arr = data['arr_0']
 noise0_rolling = data['arr_1']
 noise1_rolling = data['arr_2']
@@ -33,15 +35,15 @@ plt.plot(omega_arr, noise1_rolling, 'r--', label = '$\sigma$ = 5, roll.')
 plt.plot(omega_arr, noise2_rolling, 'g--', label = '$\sigma$ = 10, roll.')
 plt.plot(omega_arr, noise3_rolling, 'b--', label = '$\sigma$ = 20, roll.')
 
-# Legends and labels
+# Set plot legends and labels, set plot title
 plt.legend(loc = 'lower right')
 plt.xlabel("Angular velocity [deg/s]")
 plt.ylabel("Average model-centroid point difference [px]")
 plt.title("Meteor angle 45 [deg]")
 
-# Configuring axis
+# Configure the plot axis
 plt.axis('tight')
 
+# Save and show plot
 plt.savefig('../Graphs/ODN/graph_odn_global_rolling.png')
-
 plt.show()
