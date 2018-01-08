@@ -41,7 +41,7 @@ omega_pxs = np.logspace(np.log10(30), np.log10(1500), 10)
 omega_arr = omega_pxs / scale
 
 # Omega arr for ODN-G
-omega_odn_arr = np.arange(1, 51, 0.5)
+omega_odn_arr = np.arange(5, 51, 0.5)
 
 # Omega arr for OYD-R
 omega_oyd_arr = np.arange(1, 50.25, 0.25)
