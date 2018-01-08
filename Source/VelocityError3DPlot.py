@@ -7,7 +7,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 
 # Loading NPZ file
-data = np.load('../Data//Velocity error/data_velocity_error3D.npz')
+data = np.load('../Data/Velocity error/data_velocity_error3D.npz')
 
 # Naming arrays for plotting
 omega_arr = data['arr_0']

@@ -1,49 +1,53 @@
 import numpy as np 
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 import scipy.optimize as opt
-import Parameters as par 
 
 # Loading .NPZ file
-data = np.load('../Data/data_velocity_error.npz')
+data = np.load('../Data/Velocity error/data_velocity_error3D.npz')
 
 # Naming arrays
-phi_array = data['arr_0']
+omega_arr = data['arr_0']
+phi_arr = data['arr_1']
 deltav_arr = data['arr_2']
 
-def correctionModel(phi, a, b):
+def correctionModel(var, a, b, c, d):
 
-	# Convert angle measure to radians
-	phi = np.deg2rad(phi)
+	# Define parameters
+	omega = var[0]
+	phi = np.deg2rad(var[1])
 
 	# Model
-	return a * np.sin(phi + np.pi/2) + b
+	return a * omega ** b * np.sin(phi + np.pi/2) + c * omega ** d
 
-param, pcov = opt.curve_fit(correctionModel, phi_array, deltav_arr)
+param, pcov = opt.curve_fit(correctionModel, (omega_arr, phi_arr), deltav_arr)
 print(param)
 
 # Checking plot
-fit = correctionModel(phi_array, *param)
+fit = correctionModel((omega_arr, phi_arr), *param)
 delta = deltav_arr - fit
 
 ### Fit and data plot ###
 
-plt.ioff()
+print(max(abs(min(delta)), max(delta)))
 
 # Set plot
-plt.scatter(phi_array, correctionModel(phi_array, *param), lw = 0, c = 'r')
-plt.scatter(phi_array, deltav_arr, lw = 0, c = 'b')
+fig = plt.figure()
+ax = Axes3D(fig)
+ax.plot_wireframe(omega_arr, phi_arr, fit, rstride = 1000, cstride = 1000)
 
 # Labels
-plt.xlabel('$\phi$ [deg]')
-plt.ylabel('Velocity error [px/s]')
-plt.title('Angular velocity fixed to: {} [deg/s]'.format(par.omega))
+ax.set_xlabel('$\omega$ [px/s]')
+ax.set_ylabel('$\phi$ [deg]')
+ax.set_zlabel('$\Delta$v [px/s]')
 
-plt.savefig('../Graphs/Model graphs/graph_correction_model_rep.png')
 
-plt.close()
+#plt.savefig('../Graphs/Model graphs/graph_correction_model_rep.png')
+
+plt.show()
 
 ### Delta plot ###
-
+'''
 # Set plot
 plt.scatter(phi_array, delta, lw = 0, c = 'r')
 
@@ -55,3 +59,4 @@ plt.title('Angular velocity fixed to: {} [deg/s]'.format(par.omega))
 plt.savefig('../Graphs/Model graphs/graph_correction_model_delta.png')
 
 plt.close()
+'''
