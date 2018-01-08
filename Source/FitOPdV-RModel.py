@@ -6,7 +6,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import scipy.optimize as opt
 
 # Load data
-data = np.load('../Data/Velocity error/data_velocity_error3D.npz')
+data = np.load('../Data/OPdV-R/data_velocity_error3D.npz')
 
 # Unpack and set array names
 omega_arr = data['arr_0']
@@ -14,14 +14,20 @@ phi_arr = data['arr_1']
 deltav_arr = data['arr_2']
 
 # Model function
-def correctionModel(par, a, b, c, d):
+def correctionModel(par, c):
 
-	# Define parameters and unpack from tuple
- 	omega = par[0]
-	phi = np.deg2rad(par[1])
+    Y_SIZE = 720
+    FPS = 25
 
-	# Model (exponentional)
-	return a * omega ** b * np.sin(phi + np.pi/2) + c * omega ** d
+    # Define parameters and unpack from tuple
+    omega = par[0]
+    phi = np.deg2rad(par[1])
+
+    a = -1.0/(Y_SIZE*FPS)
+    b = -1.0/(Y_SIZE*FPS**2)
+
+    return (a*omega**2)*np.sin(phi + np.pi/2) + (b*omega**2)*np.sin(2*phi + np.pi/2) + b*omega**2
+
 
 # Fit model to data
 param, pcov = opt.curve_fit(correctionModel, (omega_arr, phi_arr), deltav_arr)
@@ -40,7 +46,8 @@ print('Maximum deviation from the data: {:.2f}'.format(deviation))
 # Set the 3D wireframe plot displaying the model
 fig = plt.figure()
 ax = Axes3D(fig)
-ax.plot_wireframe(omega_arr, phi_arr, fit, rstride = 1000, cstride = 1000)
+#ax.plot_wireframe(omega_arr, phi_arr, fit, rstride = 1000, cstride = 1000)
+ax.plot_wireframe(omega_arr, phi_arr, delta, rstride = 1000, cstride = 1000)
 
 # Label and set plot title
 ax.set_xlabel('$\omega$ [px/s]')
