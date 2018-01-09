@@ -4,7 +4,6 @@
 
 # Python 2/3 compatibility
 from __future__ import print_function, division, absolute_import
-
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
@@ -627,18 +626,21 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, phi, img_y, fps
     for i in range(num_coord - 1):
         v_arr.append(r_arr[i + 1] / t_arr[i + 1])
 
+    print('Point to point velocity calculation done.')
 
     ### Smooth out velocity ###
 
     for i in range(num_coord - 2):
         v_arr[i + 1] = (v_arr[i] + v_arr[i + 2]) / 2
 
+    print('Velocity smoothened out.')
 
     ### Apply correction to velocity array ###
 
     for v in v_arr:
         v += velocityCorrection(v, phi, img_y, fps)
 
+    print('Velocity correction done. ')
 
     ### Calculate meteor angle from linear fit ###
 
@@ -647,25 +649,33 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, phi, img_y, fps
     y_coordinates = []
 
     for i in range(num_coord):
-        x_coordinates.append(centroid_coordinates[0])
-        y_coordinates.append(centroid_coordinates[1])
+        x_coordinates.append(centroid_coordinates[i][0])
+        y_coordinates.append(centroid_coordinates[i][1])
 
 
     # Linear fit function
-    def linFit(x, a):
-
-        b = img_y / 2
-
+    def linFit(x, a, b):
         return a * x + b
-
 
     # Fit to find slope
     param, pcov = opt.curve_fit(linFit, x_coordinates, y_coordinates)
+    a = param[0]
+    
+    # Check in which direction the meteor is going
+    dx = x_coordinates[num_coord - 1] - x_coordinates[0]
 
-    # Calculate angle
-    slope = param[0]
-    phi = np.arctan2(slope)
+    # Calculate meteor angle
+    if a < 0:
+        phi = -np.arctan(1 / a)
+    else:
+        phi = np.arctan(a) + np.pi/2
+    
+    if dx >= 0:
+        phi += np.pi
 
+    # print(np.rad2deg(phi))
+
+    print('Meteor slope fit finished.')
 
     ### Apply correction to centroid coordinate array ###
 
@@ -692,5 +702,7 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, phi, img_y, fps
 
         centroid_coordinates_corr.append((x_corr, y_corr))
 
+    print('Centroid coordinates corrected.')
+
     # Return list of corrected coordinates
-    return (centroid_coordinates_corr, omega_pxs)
+    return centroid_coordinates_corr
