@@ -35,7 +35,7 @@ time_global_coordinates, centroid_global_coordinates, model_global_coordinates =
 
 # Get time and centroid coordinates from rolling shutter
 print('Simulating rolling shutter meteor...')
-show_plots = True
+show_plots = False
 rolling_shutter = True
 time_rolling_coordinates, centroid_rolling_coordinates, model_rolling_coordinates = st.pointsCentroidAndModel(rolling_shutter, t_meteor, phi, \
 	omega, par.img_x, par.img_y, par.scale, par.fps, par.sigma_x, par.sigma_y, par.noise_scale, par.offset, show_plots)
