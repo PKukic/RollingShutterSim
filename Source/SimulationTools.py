@@ -613,13 +613,35 @@ def coordinateCorrection(t_meteor, centroid_coordinates_raw, img_y, fps):
 
     print('Omega: {:.2f} [px/s]'.format(omega_pxs))
 
-    # Calculate angle
-    delta_x = x_finish - x_start
-    delta_y = y_finish - y_start
+    # Extract data from existing coordinate array
+    x_coordinates = []
+    y_coordinates = []
 
-    phi = np.arctan2(delta_x, delta_y)
+    for i in range(num_coord):
+        x_coordinates.append(centroid_coordinates_raw[i][0])
+        y_coordinates.append(centroid_coordinates_raw[i][1])
 
-    print('Phi: {:.2f}'.format(np.rad2deg(phi)))
+    # Linear fit function
+    def linFit(x, a, b):
+        return a * x + b
+
+    # Fit to find slope
+    param, pcov = opt.curve_fit(linFit, x_coordinates, y_coordinates)
+    a = param[0]
+    
+    # Check in which direction the meteor is going
+    dx = x_coordinates[num_coord - 1] - x_coordinates[0]
+
+    # Calculate meteor angle
+    if a < 0:
+        phi = -np.arctan(1 / a)
+    else:
+        phi = np.arctan(a) + np.pi/2
+    
+    if dx >= 0:
+        phi += np.pi
+
+    print('Calculated angle: {:.2f}'.format(np.rad2deg(phi)))
 
     # List of corrected coordinates
     centroid_coordinates_corr = []

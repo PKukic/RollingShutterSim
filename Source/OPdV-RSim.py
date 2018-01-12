@@ -54,7 +54,7 @@ for omega in par.omega_odn_arr:
 			# Calculate velocity error
 			delta_v = true_v_global - avg_v_rolling
 
-			print("Velocity: {:.2f}; angle: {}; velocity error: {:.2f}".format(true_v_global, phi, delta_v))
+			print("Velocity: {:.2f}; angle: {}; velocity error: {:.2f}".format(avg_v_rolling, phi, delta_v))
 
 			omega_phi_deltav_arr.append((avg_v_rolling, phi, delta_v))
 			

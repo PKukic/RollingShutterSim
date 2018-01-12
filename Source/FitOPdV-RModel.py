@@ -14,7 +14,7 @@ phi_arr = data['arr_1']
 deltav_arr = data['arr_2']
 
 # Model function
-def correctionModel(par):
+def correctionModel(par, a, b):
 
     Y_SIZE = 720
     FPS = 25
@@ -23,18 +23,18 @@ def correctionModel(par):
     omega = par[0]
     phi = np.deg2rad(par[1])
 
-    a = -1.0/(Y_SIZE*FPS)
-    b = -1.0/(Y_SIZE*FPS**2)
+    # a = -1.0/(Y_SIZE*FPS)
+    # b = -1.0/(Y_SIZE*FPS**2)
 
     return (a*omega**2)*np.sin(phi + np.pi/2) + (b*omega**2)*np.sin(2*phi + np.pi/2) + b*omega**2
 
 
 # Fit model to data
-# param, pcov = opt.curve_fit(correctionModel, (omega_arr, phi_arr), deltav_arr)
-# print(param)
+param, pcov = opt.curve_fit(correctionModel, (omega_arr, phi_arr), deltav_arr)
+print(param)
 
 # Calculate the difference between the model and the actual data
-fit = correctionModel((omega_arr, phi_arr))
+fit = correctionModel((omega_arr, phi_arr), *param)
 delta = deltav_arr - fit
 
 ### Fit and data plot ###
