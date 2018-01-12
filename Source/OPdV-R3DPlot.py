@@ -21,7 +21,7 @@ ax = Axes3D(fig)
 ax.scatter(omega_arr, phi_arr, deltav_arr, c = deltav_arr, cmap = 'inferno', lw = 0)
 
 # Set plot legends and labels
-ax.set_xlabel('$\omega$ [px/s]')
+ax.set_xlabel('$\omega_r$ [px/s]')
 ax.set_ylabel('$\phi$ [deg]')
 ax.set_zlabel('$\Delta$v [px/s]')
 
