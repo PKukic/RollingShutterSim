@@ -579,7 +579,7 @@ def velocityCorrection(omega, phi, img_y, fps):
     b = -1.0/(img_y * fps ** 2)
 
     # Correct velocity using found model
-    v_corr = (a*omega**2)*np.sin(phi + np.pi/2) + (b*omega**2)*np.sin(2*phi + np.pi/2) + (b)*omega**2
+    v_corr = (a*omega**2)*np.sin(phi + np.pi/2) + (b*omega**2)*np.sin(2*phi + np.pi/2) + b*omega**2
 
     return v_corr
 
