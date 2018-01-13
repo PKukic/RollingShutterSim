@@ -16,6 +16,7 @@ deltav_arr = data['arr_2']
 # Model function
 def correctionModel(par, c):
 
+	# Define constants
     Y_SIZE = 720
     FPS = 25
 
@@ -26,7 +27,8 @@ def correctionModel(par, c):
     a = -1.0/(Y_SIZE*FPS)
     b = -1.0/(Y_SIZE*FPS**2)
 
-    return (a*omega**2)*np.sin(phi + np.pi/2) + (b*omega**2)*np.sin(2*phi + np.pi/2) + (b)*omega**2
+    # Model
+    return (a*omega**2)*np.sin(phi + np.pi/2) + (b*omega**2)*np.sin(2*phi + np.pi/2) + b*omega**2
 
 
 # Fit model to data
@@ -46,8 +48,8 @@ print('Maximum deviation from the data: {:.2f}'.format(deviation))
 # Set the 3D wireframe plot displaying the model
 fig = plt.figure()
 ax = Axes3D(fig)
-#ax.plot_wireframe(omega_arr, phi_arr, fit, rstride = 1000, cstride = 1000)
-ax.scatter(omega_arr, phi_arr, abs(delta), c = delta, cmap = 'inferno', lw = 0)
+ax.plot_wireframe(omega_arr, phi_arr, fit, rstride = 1000, cstride = 1000)
+
 # Label and set plot title
 ax.set_xlabel('$\omega$ [px/s]')
 ax.set_ylabel('$\phi$ [deg]')

@@ -12,13 +12,13 @@ import Parameters as par
 omega = 40
 
 # Fixed meteor angle, used for testing
-phi = 315
+phi = 40
 
 # Used for testing
 show_plots = False
 
+# Check the meteor's initial parameters
 print('Meteor velocity: {:.2f}'.format(omega * par.scale))
-
 print('Meteor angle: {}'.format(phi))
 
 # Get duration of meteor (the meteor is crossing the entire image)
@@ -26,12 +26,11 @@ print('Getting time from angle...')
 t_meteor = st.timeFromAngle(phi, omega, par.img_x, par.img_y, par.scale, par.fps)
 
 # Get time and centroid coordinates from global shutter
-'''
 print('Simulating global shutter meteor...')
 rolling_shutter = False
 time_global_coordinates, centroid_global_coordinates, model_global_coordinates = st.pointsCentroidAndModel(rolling_shutter, t_meteor, phi, \
 	omega, par.img_x, par.img_y, par.scale, par.fps, par.sigma_x, par.sigma_y, par.noise_scale, par.offset, show_plots)
-'''
+
 
 # Get time and centroid coordinates from rolling shutter
 print('Simulating rolling shutter meteor...')
@@ -40,20 +39,11 @@ rolling_shutter = True
 time_rolling_coordinates, centroid_rolling_coordinates, model_rolling_coordinates = st.pointsCentroidAndModel(rolling_shutter, t_meteor, phi, \
 	omega, par.img_x, par.img_y, par.scale, par.fps, par.sigma_x, par.sigma_y, par.noise_scale, par.offset, show_plots)
 
-# Delete first two frames of global shutter meteor simulation - first frame in the rolling shutter simulation
-# is skipped, and all arrays must have the same size
-'''
-del time_global_coordinates[0]
-del centroid_global_coordinates[0]
-del model_global_coordinates[0]
-
-del time_global_coordinates[1]
-del centroid_global_coordinates[1]
-del model_global_coordinates[1]
-'''
-print('Correction factor for each centroid point (estimated):')
-for i in range(len(centroid_rolling_coordinates)):
-	print(st.centroidDifference(model_rolling_coordinates[i], centroid_rolling_coordinates[i]))
+# Delete first two frames of global shutter meteor simulation - the first frame in the rolling shutter simulation
+# are skipped, the second is skipped while correcting the coordinates, and all arrays must have the same size
+del time_global_coordinates[:2]
+del centroid_global_coordinates[:2]
+del model_global_coordinates[:2]
 
 # Check if meteor is outside of the image
 if (time_rolling_coordinates, centroid_rolling_coordinates, model_rolling_coordinates) != (-1, -1, -1):
@@ -63,18 +53,15 @@ if (time_rolling_coordinates, centroid_rolling_coordinates, model_rolling_coordi
 	centroid_rolling_coordinates = st.coordinateCorrection(time_rolling_coordinates, centroid_rolling_coordinates, \
 		par.img_y, par.fps)
 
-	# print(len(centroid_global_coordinates), len(centroid_rolling_coordinates))
+	print('Calculating average difference...')
+	# Calculate average difference between the centroid global and rolling shutter coordinates
+	diff_avg = st.centroidAverageDifference(centroid_global_coordinates, centroid_rolling_coordinates)
 
-	# print('Calculating average difference...')
-
-	# Calculate average difference between centroid global and rolling shutter coordinates
-	# diff_avg = st.centroidAverageDifference(centroid_global_coordinates, centroid_rolling_coordinates)
-
-	# print('Average difference: {:.2f} [px]'.format(diff_avg))
+	print('Average difference between centroid global and centroid rolling shutter points: {:.2f} [px]'.format(diff_avg))
 	
-	print('Difference between model and centroid rolling shutter points for each frame: ')
+	print('Difference between centroid global and centroid rolling shutter points for each frame: ')
 	for i in range(len(centroid_rolling_coordinates)):
-		print(st.centroidDifference(centroid_rolling_coordinates[i], model_rolling_coordinates[i]))
+		print(st.centroidDifference(centroid_rolling_coordinates[i], centroid_global_coordinates[i]))
 
 else:
 	print("Meteor is outside of the image!")

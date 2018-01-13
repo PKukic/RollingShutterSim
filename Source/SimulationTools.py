@@ -561,7 +561,7 @@ def calculateCorrection(ycentr, img_y, omega_pxs, fps):
 
     return (1 - ycentr / img_y) * (omega_pxs / fps)
 
-def velocityCorrection(omega_pxs, phi, img_y, fps):
+def velocityCorrection(omega, phi, img_y, fps):
     ''' Corrects the velocity of a given point.
 
         Arguments:
@@ -579,7 +579,7 @@ def velocityCorrection(omega_pxs, phi, img_y, fps):
     b = -1.0/(img_y * fps ** 2)
 
     # Correct velocity using found model
-    v_corr = (a * omega_pxs ** 2) * np.sin(phi + np.pi/2) + (b * omega_pxs ** 2) * np.sin(2 * phi + np.pi/2) + b * omega_pxs ** 2
+    v_corr = (a*omega**2)*np.sin(phi + np.pi/2) + (b*omega**2)*np.sin(2*phi + np.pi/2) + (b)*omega**2
 
     return v_corr
 
@@ -601,7 +601,7 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps):
 
     ### Calculate meteor angle from linear fit ###
 
-    # Extract data from existing coordinate array
+    # Extract data from the existing coordinate array
     x_coordinates = []
     y_coordinates = []
 
@@ -630,15 +630,10 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps):
     if dx >= 0:
         phi += np.pi
 
+    print('Meteor slope fit finished.')
     print('Calculated angle: {:.2f}'.format(np.rad2deg(phi)))
 
-    print('Meteor slope fit finished.')
-
     ### Calculate point to point velocity ###
-
-    # Define starting time and displacement coordinates
-    # t_start = time_coordinates[0]
-    # coord_start = centroid_coordinates[0]
 
     # Arrays of time and position displacement
     r_arr = []
@@ -647,19 +642,13 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps):
     # Velocity array
     v_arr = []
 
-
     # Form delta distance, time and velocity arrays
-
     for i in range(num_coord - 1):
         t_arr.append(time_coordinates[i + 1] - time_coordinates[i])
         r_arr.append(centroidDifference(centroid_coordinates[i + 1], centroid_coordinates[i]))
     
     for i in range(num_coord - 1):
         v_arr.append(r_arr[i] / t_arr[i])
-
-    # print(len(t_arr), len(r_arr), len(v_arr))
-
-    # print(v_arr)
 
     print('Point to point velocity calculation done.')
 
@@ -675,17 +664,13 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps):
     for i in range(num_coord - 1):
         v_arr[i] += velocityCorrection(v_arr[i], phi, img_y, fps)
 
-    print('Calculated average velocity: {:.2f}'.format(np.average(v_arr)))
-
     print('Velocity correction done. ')
+    print('Calculated average velocity: {:.2f}'.format(np.average(v_arr)))
 
     ### Apply correction to centroid coordinate array ###
 
     # List of corrected coordinates
     centroid_coordinates_corr = []
-
-    # List of correction values
-    corr_arr = []
 
     for i in range(num_coord - 1):
 
@@ -698,22 +683,12 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps):
 
         # Calculate the correction for the given set of parameters
         corr = calculateCorrection(y_centr, img_y, omega_pxs, fps)
-        corr_arr.append(corr)
-
-        #print(corr)
 
         # Correct the coordinates
-        x_corr = x_centr + np.sin(phi) * corr
-        y_corr = y_centr - np.cos(phi) * corr
-
-        # print('Corrected coordinates: ({:.2f}, {:.2f})'.format(x_corr, y_corr))
+        x_corr = x_centr - np.sin(phi) * corr
+        y_corr = y_centr + np.cos(phi) * corr
 
         centroid_coordinates_corr.append((x_corr, y_corr))
-
-
-    print('Correction factor for each centroid point (calculated):')
-    for i in range(len(corr_arr)):
-        print(corr_arr[i]) 
 
     print('Centroid coordinates corrected.')
 
