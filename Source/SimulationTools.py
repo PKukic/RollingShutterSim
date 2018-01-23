@@ -10,7 +10,7 @@ import matplotlib.patches as patches
 import scipy.optimize as opt
 
 
-def drawPoints(t, x_center, y_center, scale, phi, omega):
+def drawPoints(t, x_center, y_center, scale, phi, omega, fit_param):
     """ Calculate position of a meteor on image with the given simulation parameters. 
 
     Arguments:
@@ -24,12 +24,15 @@ def drawPoints(t, x_center, y_center, scale, phi, omega):
     Return:
         (x_meteor, y_meteor): [tuple of floats] X and Y coordinate of the meteor.
     """
+    # Unpack values from array
+    a = fit_param[0]
+    b = fit_param[1]
 
     # Convert angle to radians
     phi = np.radians(phi)
 
     # Calculate distance from centre in pixels
-    z = omega*t*scale
+    z = (omega*t - a*np.exp(b*t))*scale
 
     # Calculate position of meteor on the image
     x_meteor = x_center - np.sin(phi)*z
@@ -188,7 +191,7 @@ def calcSigmaWindowLimits(x_start, x_finish, sigma_x, y_start, y_finish, sigma_y
 
 
 def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, scale, fps, sigma_x, \
-    sigma_y, noise_scale, offset, show_plots):
+    sigma_y, noise_scale, offset, fit_param, show_plots):
     """
     Returns coordinates of meteor center calculated by centroiding and from a meteor movement model.
 
@@ -244,6 +247,11 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
         t_start = -t_meteor/2 + i*(1/fps)
         t_finish = -t_meteor/2 + (i + 1)*(1/fps)
 
+        # Check if the meteor is decelerating
+        if set(fit_param) != set([0, 0]):
+            t_start += t_meteor/2
+            t_finish += t_meteor/2
+
         # Last frame case
         #if i == (frame_number - 1):
            #t_finish = t_meteor/2
@@ -254,8 +262,8 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
         t_arr_iter = np.linspace(t_start, t_finish, img_y)
 
         # Calculate beginning and ending points of meteor
-        x_start, y_start = drawPoints(t_start, x_center, y_center, scale, phi, omega)
-        x_finish, y_finish = drawPoints(t_finish, x_center, y_center, scale, phi, omega)
+        x_start, y_start = drawPoints(t_start, x_center, y_center, scale, phi, omega, fit_param)
+        x_finish, y_finish = drawPoints(t_finish, x_center, y_center, scale, phi, omega, fit_param)
 
 
         # Add 3 sigma border around them
@@ -301,7 +309,7 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
         for t in t_arr_iter:
 
             # Evaluate meteor point and 2D Gaussian
-            x, y = drawPoints(t, x_center, y_center, scale, phi, omega)
+            x, y = drawPoints(t, x_center, y_center, scale, phi, omega, fit_param)
             temp = twoDimensionalGaussian(xx, yy, x, y, sigma_x, sigma_y, amplitude)
 
             # print("\t\t Y start: {:.2f}; Y finish {:.2f}; X start: {:.2f}; X finish: {:.2f}".format(y_start, y_finish, x_start, y_finish))
@@ -382,7 +390,7 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
         
         # Model coordinates
         t_mid = (t_start + t_finish)/2
-        x_model, y_model = drawPoints(t_mid, x_center, y_center, scale, phi, omega) 
+        x_model, y_model = drawPoints(t_mid, x_center, y_center, scale, phi, omega, fit_param) 
         
         
         # Append model and centroid coordinates to list
@@ -601,6 +609,7 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps):
 
     ### Calculate meteor angle from linear fit ###
 
+
     # Extract data from the existing coordinate array
     x_coordinates = []
     y_coordinates = []
@@ -609,17 +618,24 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps):
         x_coordinates.append(centroid_coordinates[i][0])
         y_coordinates.append(centroid_coordinates[i][1])
 
+    
+    # Starting coordinates
+    x_start = x_coordinates[0]
+    y_start = y_coordinates[0]
+
+    # Check in which direction the meteor is going
+    dx = x_coordinates[num_coord - 1] - x_start
+    dy = y_coordinates[num_coord - 1] - y_start
 
     # Linear fit function
     def linFit(x, a, b):
         return a * x + b
-
+    
+    ### First method ###
+    
     # Fit to find slope
     param, pcov = opt.curve_fit(linFit, x_coordinates, y_coordinates)
     a = param[0]
-    
-    # Check in which direction the meteor is going
-    dx = x_coordinates[num_coord - 1] - x_coordinates[0]
 
     # Calculate meteor angle
     if a < 0:
@@ -627,7 +643,22 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps):
     else:
         phi = np.arctan(a) + np.pi/2
     
-    if dx >= 0:
+
+    # Just a quick fix
+    # When the meteor is vertical, the slope of the line approaches +/- infinity,
+    # so if the calculated slope diverges from the real value in a small amount, 
+    # the final results are greatly impacted.
+
+    # Define precision factor -- the exact dx or dy will not be exactly 0
+    precision = 1e-5
+
+    if dx <= precision and dx >= -precision:
+        if dy >= -precision:
+            phi = 0
+        else:
+            phi = np.pi
+    
+    elif dx >= -precision:
         phi += np.pi
 
     print('Meteor slope fit finished.')

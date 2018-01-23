@@ -8,7 +8,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 
 # Load data
-data = np.load('../Data/NOPGD-R/data_nopgd_rolling_0.npz')
+data = np.load('../Data/data_nopgd_rolling.npz')
 
 # Unpack and set array names
 omega_arr = data['arr_0']
@@ -39,7 +39,7 @@ def filter():
 	avg_diff_arr = np.delete(avg_diff_arr, del_arr)
 
 
-# filter()
+filter()
 
 ### Plot filtered data ###
 
