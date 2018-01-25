@@ -8,7 +8,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 
 # Load data
-data = np.load('../Data/NOPGD-R/data_nopgd_rolling_0.npz')
+data = np.load('../Data/NOPGD-R/data_nopgd_rolling_20.npz')
 
 # Unpack and set array names
 omega_arr = data['arr_0']
@@ -24,7 +24,7 @@ def filter():
 	global avg_diff_arr
 
 	del_arr = []
-
+ 
 	# Find outliers (phi == 360/0 deg)
 	for i in range(len(phi_arr)):
 		if phi_arr[i] == 0 or phi_arr[i] == 360 or phi_arr[i] == 180:
@@ -40,6 +40,8 @@ def filter():
 
 
 # filter()
+
+np.savez('../Data/NOPGD-R/data_nopgd_rolling_20.npz', *[omega_arr, phi_arr, avg_diff_arr])
 
 ### Plot filtered data ###
 
