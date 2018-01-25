@@ -31,7 +31,7 @@ for noise in par.noise_scale_arr:
 
 			# Get duration of meteor (the meteor is crossing the entire image)
 			print('Getting time from angle...')
-			t_meteor = st.timeFromAngle(phi, omega, par.img_x, par.img_y, par.scale, par.fps)
+			t_meteor = st.timeFromAngle	(phi, omega, par.img_x, par.img_y, par.scale, par.fps)
 
 			# Get time and centroid coordinates from global shutter
 			print('Simulating global shutter meteor...')
