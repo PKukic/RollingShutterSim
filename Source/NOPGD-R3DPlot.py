@@ -30,8 +30,8 @@ def filter():
 		if phi_arr[i] == 0 or phi_arr[i] == 360 or phi_arr[i] == 180:
 			del_arr.append(i)
 
-		if phi_arr[i] == 45:
-			print(omega_arr[i], avg_diff_arr[i])
+		# if phi_arr[i] == 45:
+			# print(omega_arr[i], avg_diff_arr[i])
 
 	# Delete outliers
 	omega_arr = np.delete(omega_arr, del_arr)
@@ -39,7 +39,7 @@ def filter():
 	avg_diff_arr = np.delete(avg_diff_arr, del_arr)
 
 
-# filter()
+filter()
 
 np.savez('../Data/NOPGD-R/data_nopgd_rolling_20.npz', *[omega_arr, phi_arr, avg_diff_arr])
 

@@ -652,6 +652,8 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps):
     # Define precision factor -- the exact dx or dy will not be exactly 0
     precision = 1e-5
 
+    print(dx)
+
     if dx <= precision and dx >= -precision:
         if dy >= -precision:
             phi = 0

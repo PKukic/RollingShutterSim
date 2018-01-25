@@ -53,7 +53,7 @@ noise_scale = 0
 noise_scale_arr = [0, 5, 10, 20]
 
 # Temporary
-del noise_scale_arr[:3]
+# del noise_scale_arr[:3]
 
 print(noise_scale_arr)
 
