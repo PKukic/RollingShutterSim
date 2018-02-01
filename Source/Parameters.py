@@ -55,7 +55,7 @@ noise_scale_arr = [0, 5, 10, 20]
 # Temporary
 # del noise_scale_arr[:3]
 
-print(noise_scale_arr)
+# print(noise_scale_arr)
 
 # Level of background offset
 offset = 20

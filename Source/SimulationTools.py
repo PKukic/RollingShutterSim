@@ -32,7 +32,9 @@ def drawPoints(t, x_center, y_center, scale, phi, omega, fit_param):
     phi = np.radians(phi)
 
     # Calculate distance from centre in pixels
-    z = (omega*t - a*np.exp(b*t))*scale
+    z = (omega-a*b*np.exp(b*t))*scale*t
+
+    #print(t)
 
     # Calculate position of meteor on the image
     x_meteor = x_center - np.sin(phi)*z
@@ -643,6 +645,7 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps):
     else:
         phi = np.arctan(a) + np.pi/2
     
+    #print(np.rad2deg(phi))
 
     # Just a quick fix
     # When the meteor is vertical, the slope of the line approaches +/- infinity,
@@ -652,16 +655,19 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps):
     # Define precision factor -- the exact dx or dy will not be exactly 0
     precision = 1e-5
 
-    print(dx)
+    # print(dx)
 
     if dx <= precision and dx >= -precision:
         if dy >= -precision:
             phi = 0
         else:
             phi = np.pi
-    
+
+
     elif dx >= -precision:
         phi += np.pi
+
+    #print(dx)
 
     print('Meteor slope fit finished.')
     print('Calculated angle: {:.2f}'.format(np.rad2deg(phi)))
@@ -672,14 +678,26 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps):
     r_arr = []
     t_arr = []
 
+    # Absolute position displacement array
+    r_abs_arr = []
+    r_abs_arr.append(0)
+
     # Velocity array
     v_arr = []
+
+    coord_start = centroid_coordinates[0]
 
     # Form delta distance, time and velocity arrays
     for i in range(num_coord - 1):
         t_arr.append(time_coordinates[i + 1] - time_coordinates[i])
         r_arr.append(centroidDifference(centroid_coordinates[i + 1], centroid_coordinates[i]))
-    
+        r_abs_arr.append(centroidDifference(centroid_coordinates[i + 1], coord_start))
+
+    plt.plot(time_coordinates, r_abs_arr)
+    plt.xlabel('time')
+    plt.ylabel('displacement')
+    plt.show()
+
     for i in range(num_coord - 1):
         v_arr.append(r_arr[i] / t_arr[i])
 
@@ -687,10 +705,10 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps):
 
     ### Smooth out velocity ###
     
-    for i in range(num_coord - 3):
-        v_arr[i + 1] = (v_arr[i] + v_arr[i + 2]) / 2
+    #for i in range(num_coord - 3):
+        #v_arr[i + 1] = (v_arr[i] + v_arr[i + 2]) / 2
 
-    print('Velocity smoothened out.')
+    #print('Velocity smoothened out.')
     
     ### Apply correction to velocity array ###
 
@@ -713,6 +731,8 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps):
 
         # Centroid velocity
         omega_pxs = v_arr[i]
+
+        print(omega_pxs)
 
         # Calculate the correction for the given set of parameters
         corr = calculateCorrection(y_centr, img_y, omega_pxs, fps)
