@@ -811,6 +811,7 @@ def getparam(a, v_start, v_finish, t):
     Return:
         b: [float] The second parameter of the exponentional function. 
     '''
+    
     b = sp.lambertw((v_start - v_finish) / a * t).real / t
     
     return b
