@@ -5,25 +5,30 @@
 from __future__ import print_function, division, absolute_import
 import SimulationTools as st 
 import Parameters as par
-# import numpy as np 
+# import numpy as np
 
 # Used for testing
 show_plots = False
-dec_arr = [1, 2.65]
 rolling_shutter = True
 noise = 0
-t_meteor = 0.5
 
 # Initial parameters of the meteor
 omega = 10
 phi = 50
+t_meteor = 0.5
+
+# Deceleration parameters of the meteor
+a = 1
+v_start = 10
+v_finish = 2
+
+# Form deceleration parameters array
+dec_arr = [a, st.getparam(a, v_start, v_finish, t_meteor)]
+print(dec_arr)
 
 # Check the meteor's initial parameters
 print('Meteor velocity: {:.2f}'.format(omega))
 print('Meteor angle: {}'.format(phi))
-
-print('Getting time from angle...')
-#t_meteor = st.timeFromAngle(phi, omega, par.img_x, par.img_y, par.scale, par.fps)
 
 # Get centroid coordinates from rolling shutter simulation
 print('Simulating rolling shutter meteor...')
@@ -47,6 +52,3 @@ if (time_rolling_coordinates, centroid_rolling_coordinates, model_rolling_coordi
 	print('Average difference between centroid global and centroid rolling shutter points: {:.2f} [px]'.format(diff_avg))
 
 	print('Average difference: {:.2f}'.format(diff_avg))
-
-#def model(t):
-	#return par.scale * (omega)

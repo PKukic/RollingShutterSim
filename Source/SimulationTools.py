@@ -8,6 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import scipy.optimize as opt
+import scipy.special as sp
 
 
 def drawPoints(t, x_center, y_center, scale, phi, omega, fit_param):
@@ -32,8 +33,7 @@ def drawPoints(t, x_center, y_center, scale, phi, omega, fit_param):
     phi = np.radians(phi)
 
     # Calculate distance from centre in pixels
-    z = (omega-a*b*np.exp(b*t))*scale*t
-
+    z = omega*t - a*np.exp(b*t)
     #print(t)
 
     # Calculate position of meteor on the image
@@ -705,10 +705,10 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps):
 
     ### Smooth out velocity ###
     
-    #for i in range(num_coord - 3):
-        #v_arr[i + 1] = (v_arr[i] + v_arr[i + 2]) / 2
+    for i in range(num_coord - 3):
+        v_arr[i + 1] = (v_arr[i] + v_arr[i + 2]) / 2
 
-    #print('Velocity smoothened out.')
+    print('Velocity smoothened out.')
     
     ### Apply correction to velocity array ###
 
@@ -776,3 +776,6 @@ def timeCorrection(centroid_coordinates, img_y, fps, t_meteor, fit_param):
         time_coordinates_corr.append(t_start)
 
     return time_coordinates_corr
+
+def getparam(a, v_start, v_finish, t):
+    return sp.lambertw((v_start-v_finish)/a*t).real/t
