@@ -9,13 +9,14 @@ import Parameters as par
 
 # Used for testing
 show_plots = False
-nul_arr = [0, 0]
 rolling_shutter = True
 noise = 0
 
 # Initial parameters of the meteor
 omega = 40
 phi = 45
+dec_arr = [0, 0]
+#t_meteor = 0.5
 
 # Check the meteor's initial parameters
 print('Meteor velocity: {:.2f}'.format(omega))
@@ -27,14 +28,14 @@ t_meteor = st.timeFromAngle(phi, omega, par.img_x, par.img_y, par.scale, par.fps
 # Get centroid coordinates from rolling shutter simulation
 print('Simulating rolling shutter meteor')
 time_rolling_coordinates, centroid_rolling_coordinates, model_rolling_coordinates = st.pointsCentroidAndModel(rolling_shutter, t_meteor, phi, \
-	omega, par.img_x, par.img_y, par.scale, par.fps, par.sigma_x, par.sigma_y, noise, par.offset, nul_arr, show_plots)
+	omega, par.img_x, par.img_y, par.scale, par.fps, par.sigma_x, par.sigma_y, noise, par.offset, dec_arr, show_plots)
 
 # Check if the meteor is outside of the image
 if (time_rolling_coordinates, centroid_rolling_coordinates, model_rolling_coordinates) != (-1, -1, -1):
 
 	# Correct the rolling shutter time coordinates
 	print('Correcting time coordinates...')
-	time_rolling_coordinates = st.timeCorrection(centroid_rolling_coordinates, par.img_y, par.fps, par.t_meteor, nul_arr)
+	time_rolling_coordinates = st.timeCorrection(centroid_rolling_coordinates, par.img_y, par.fps, t_meteor, dec_arr)
 
 	# Calculate the model points' coordinates
 	print('Getting model coordinates...')
@@ -46,7 +47,7 @@ if (time_rolling_coordinates, centroid_rolling_coordinates, model_rolling_coordi
 
 	for i in range(len(time_rolling_coordinates)):
 
-		x_model, y_model = st.drawPoints(time_rolling_coordinates[i], x_center, y_center, par.scale, phi, omega, nul_arr)
+		x_model, y_model = st.drawPoints(time_rolling_coordinates[i], x_center, y_center, par.scale, phi, omega, dec_arr)
 		model_rolling_coordinates.append((x_model, y_model))
 
 		print(st.centroidDifference(model_rolling_coordinates[i], centroid_rolling_coordinates[i]))

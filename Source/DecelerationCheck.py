@@ -19,7 +19,7 @@ t_meteor = 0.5
 
 # Deceleration parameters of the meteor
 a = 1
-v_start = 10
+v_start = omega
 v_finish = 2
 
 # Form deceleration parameters array
@@ -51,4 +51,4 @@ if (time_rolling_coordinates, centroid_rolling_coordinates, model_rolling_coordi
 
 	print('Average difference between centroid global and centroid rolling shutter points: {:.2f} [px]'.format(diff_avg))
 
-	print('Average difference: {:.2f}'.format(diff_avg))
+	print('Average difference: {:.2f}'.format(diff_avg))	

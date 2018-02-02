@@ -760,12 +760,12 @@ def timeCorrection(centroid_coordinates, img_y, fps, t_meteor, fit_param):
         # Define starting time for each frame
         t_start = -t_meteor/2 + i * (1/fps)
 
-        # Row of the measurement (Y centroid coordinate)
-        y_centr = centroid_coordinates[i][1]
-
         # Check if the meteor is decelerating
         if set(fit_param) != set([0, 0]):
             t_start += t_meteor/2
+            
+        # Row of the measurement (Y centroid coordinate)
+        y_centr = centroid_coordinates[i][1]
 
         # Calculate the time assignment change
         delta_t = y_centr * (1/fps) / img_y
