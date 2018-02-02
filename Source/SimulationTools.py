@@ -21,6 +21,7 @@ def drawPoints(t, x_center, y_center, scale, phi, omega, fit_param):
         scale: [float] Image scale in px/deg.
         phi: [int or float] Meteor angle, counterclockwise from Y axis.
         omega: [int or float] Meteor angular velocity in deg/s.
+        fit_param: [array of floats] Parameters of the exponentional meteor deceleration function.
 
     Return:
         (x_meteor, y_meteor): [tuple of floats] X and Y coordinate of the meteor.
@@ -210,11 +211,13 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
         sigma_y: [float] Standard deviation along the Y axis.
         noise scale [float] The standard deviation of a probability density function. 
         offset: [int or float] Offset of pixel levels for the entire image.
+        fit_param: [array of floats] Parameters of the exponentional meteor deceleration function.
         show_plots: [bool] Argument for showing individual frame plots.
 
     Return:
-        centroid_coordinates: [list of tuples] X and Y coordinates of meteor center calculated by centroiding.
-        model_coordinates: [list of tuples] X and Y coordinates of meteor center calculated by model.
+        time_coordinates: [list of tuples of floats] Time coordinates of the meteor center.
+        centroid_coordinates: [list of tuples of floats] X and Y coordinates of the meteor center calculated by centroiding.
+        model_coordinates: [list of tuples of floats] X and Y coordinates of the meteor center calculated by model.
 
     """
 
@@ -455,8 +458,8 @@ def centroidAverageDifference(centroid_coordinates, model_coordinates):
     """ Calculates average distance between centroid coordinates and model coordinates for each frame.
     
     Arguments:
-        centroid_coordinates: [list or of tuples] List of (X, Y) centroid coordinates for each frame. 
-        model_coordinates: [list or of tuples] List of (X, Y) model coordinates for each frame.
+        centroid_coordinates: [list of tuples of floats] List of (X, Y) centroid coordinates for each frame. 
+        model_coordinates: [list of tuples of floats] List of (X, Y) model coordinates for each frame.
 
     Return:
         diff_avg: [float] Average distance of centroid and model points for a given set of frames. 
@@ -655,8 +658,6 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps):
     # Define precision factor -- the exact dx or dy will not be exactly 0
     precision = 1e-5
 
-    # print(dx)
-
     if dx <= precision and dx >= -precision:
         if dy >= -precision:
             phi = 0
@@ -666,8 +667,6 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps):
 
     elif dx >= -precision:
         phi += np.pi
-
-    #print(dx)
 
     print('Meteor slope fit finished.')
     print('Calculated angle: {:.2f}'.format(np.rad2deg(phi)))
@@ -696,7 +695,7 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps):
     plt.plot(time_coordinates, r_abs_arr)
     plt.xlabel('time')
     plt.ylabel('displacement')
-    plt.show()
+    # plt.show()
 
     for i in range(num_coord - 1):
         v_arr.append(r_arr[i] / t_arr[i])
@@ -748,7 +747,23 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps):
     # Return list of corrected coordinates
     return centroid_coordinates_corr
 
-def timeCorrection(centroid_coordinates, img_y, fps, t_meteor, fit_param):
+
+def timeCorrection(centroid_coordinates, img_y, fps, t_meteor, fit_param, time_mark):
+    ''' Corrects the time coordinates of a given meteor, changes the time assignment for each frame.
+
+        Arguments:
+            centroid_coordinates: [array of floats] Centroid coordinates of the meteor.
+            img_y: [int] Y axis image size.
+            fps: [int] Number of frames per second captured by the camera.
+            t_meteor: [float] Duration of the meteor.
+            fit_param: [array of floats] Parameters of the exponentional meteor deceleration function.
+            time_mark: [string] Indicates the position of the time mark for each frame. 'start' if the time mark is
+                at the start of the frame, 'end' if it is on the end of the frame.
+
+        return:
+            time_coordinates_corr: [array of floats] Corrected time coordinates of the meteor.
+    '''
+
 
     num_coord = len(centroid_coordinates)
 
@@ -760,10 +775,17 @@ def timeCorrection(centroid_coordinates, img_y, fps, t_meteor, fit_param):
         # Define starting time for each frame
         t_start = -t_meteor/2 + i * (1/fps)
 
+        # Set time offset for different frame time marks
+        if time_mark == 'start':
+            t_start += 0.5 * (1/fps)
+
+        elif time_mark == 'end':
+            t_start -= 0.5 * (1/fps)
+
         # Check if the meteor is decelerating
         if set(fit_param) != set([0, 0]):
             t_start += t_meteor/2
-            
+
         # Row of the measurement (Y centroid coordinate)
         y_centr = centroid_coordinates[i][1]
 
@@ -777,5 +799,18 @@ def timeCorrection(centroid_coordinates, img_y, fps, t_meteor, fit_param):
 
     return time_coordinates_corr
 
+
 def getparam(a, v_start, v_finish, t):
-    return sp.lambertw((v_start-v_finish)/a*t).real/t
+    ''' Calculates the second parameter of the exponentional meteor deceleration function. 
+    Arugments:
+        a: [float or int] First parameter of the exponentional function. 
+        v_start: [float or int] Initial velocity of the meteor [deg/s]. 
+        v_finish: [float or int] Ending velocity of the meteor [deg/s].
+        t: [float or int] Meteor duration [s].
+
+    Return:
+        b: [float] The second parameter of the exponentional function. 
+    '''
+    b = sp.lambertw((v_start - v_finish) / a * t).real / t
+    
+    return b

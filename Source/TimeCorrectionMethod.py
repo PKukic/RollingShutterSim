@@ -16,6 +16,7 @@ noise = 0
 omega = 40
 phi = 45
 dec_arr = [0, 0]
+time_mark = 'start'
 #t_meteor = 0.5
 
 # Check the meteor's initial parameters
@@ -35,7 +36,7 @@ if (time_rolling_coordinates, centroid_rolling_coordinates, model_rolling_coordi
 
 	# Correct the rolling shutter time coordinates
 	print('Correcting time coordinates...')
-	time_rolling_coordinates = st.timeCorrection(centroid_rolling_coordinates, par.img_y, par.fps, t_meteor, dec_arr)
+	time_rolling_coordinates = st.timeCorrection(centroid_rolling_coordinates, par.img_y, par.fps, t_meteor, dec_arr, time_mark)
 
 	# Calculate the model points' coordinates
 	print('Getting model coordinates...')
