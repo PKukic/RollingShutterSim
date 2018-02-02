@@ -11,7 +11,7 @@ import scipy.optimize as opt
 import scipy.special as sp
 
 
-def drawPoints(t, x_center, y_center, scale, phi, omega, fit_param):
+def drawPoints(t, x_center, y_center, scale, phi, omega, fit_param, t_meteor):
     """ Calculate position of a meteor on image with the given simulation parameters. 
 
     Arguments:
@@ -34,12 +34,12 @@ def drawPoints(t, x_center, y_center, scale, phi, omega, fit_param):
     phi = np.radians(phi)
 
     # Calculate distance from centre in pixels
-    z = omega*t - a*np.exp(b*t)
+    z = omega * t - a * np.exp(b * (t + t_meteor / 2))
     #print(t)
 
     # Calculate position of meteor on the image
-    x_meteor = x_center - np.sin(phi)*z
-    y_meteor = y_center + np.cos(phi)*z
+    x_meteor = x_center - np.sin(phi) * z
+    y_meteor = y_center + np.cos(phi) * z
 
     return (x_meteor, y_meteor)
 
@@ -252,14 +252,9 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
         t_start = -t_meteor/2 + i*(1/fps)
         t_finish = -t_meteor/2 + (i + 1)*(1/fps)
 
-        # Check if the meteor is decelerating
-        if set(fit_param) != set([0, 0]):
-            t_start += t_meteor/2
-            t_finish += t_meteor/2
-
         # Last frame case
-        #if i == (frame_number - 1):
-           #t_finish = t_meteor/2
+        if i == (frame_number - 1):
+           t_finish = t_meteor/2
 
         # print("time limits: {:.4f} {:.4f}".format(t_start, t_finish))
 
@@ -267,8 +262,8 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
         t_arr_iter = np.linspace(t_start, t_finish, img_y)
 
         # Calculate beginning and ending points of meteor
-        x_start, y_start = drawPoints(t_start, x_center, y_center, scale, phi, omega, fit_param)
-        x_finish, y_finish = drawPoints(t_finish, x_center, y_center, scale, phi, omega, fit_param)
+        x_start, y_start = drawPoints(t_start, x_center, y_center, scale, phi, omega, fit_param, t_meteor)
+        x_finish, y_finish = drawPoints(t_finish, x_center, y_center, scale, phi, omega, fit_param, t_meteor)
 
 
         # Add 3 sigma border around them
@@ -314,7 +309,7 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
         for t in t_arr_iter:
 
             # Evaluate meteor point and 2D Gaussian
-            x, y = drawPoints(t, x_center, y_center, scale, phi, omega, fit_param)
+            x, y = drawPoints(t, x_center, y_center, scale, phi, omega, fit_param, t_meteor)
             temp = twoDimensionalGaussian(xx, yy, x, y, sigma_x, sigma_y, amplitude)
 
             # print("\t\t Y start: {:.2f}; Y finish {:.2f}; X start: {:.2f}; X finish: {:.2f}".format(y_start, y_finish, x_start, y_finish))
@@ -395,7 +390,7 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
         
         # Model coordinates
         t_mid = (t_start + t_finish)/2
-        x_model, y_model = drawPoints(t_mid, x_center, y_center, scale, phi, omega, fit_param) 
+        x_model, y_model = drawPoints(t_mid, x_center, y_center, scale, phi, omega, fit_param, t_meteor) 
         
         
         # Append model and centroid coordinates to list
@@ -697,21 +692,28 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps):
     plt.ylabel('displacement')
     # plt.show()
 
-    for i in range(num_coord - 1):
-        v_arr.append(r_arr[i] / t_arr[i])
+    #print(len(r_arr))
+    #print(len(t_arr))
+    #print(num_coord)
+
+    for i in range(num_coord):
+        if i == 0:
+            v_arr.append(r_arr[i + 1] / t_arr[i])
+        else:
+            v_arr.append(r_arr[i - 1] / t_arr[i - 1])
 
     print('Point to point velocity calculation done.')
 
     ### Smooth out velocity ###
     
-    for i in range(num_coord - 3):
+    for i in range(num_coord - 2):
         v_arr[i + 1] = (v_arr[i] + v_arr[i + 2]) / 2
 
     print('Velocity smoothened out.')
     
     ### Apply correction to velocity array ###
 
-    for i in range(num_coord - 1):
+    for i in range(num_coord):
         v_arr[i] += velocityCorrection(v_arr[i], phi, img_y, fps)
 
     print('Velocity correction done. ')
@@ -722,16 +724,16 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps):
     # List of corrected coordinates
     centroid_coordinates_corr = []
 
-    for i in range(num_coord - 1):
+    for i in range(num_coord):
 
         # Centroid coordinates
-        x_centr = x_coordinates[i + 1]
-        y_centr = y_coordinates[i + 1]
+        x_centr = x_coordinates[i]
+        y_centr = y_coordinates[i]
 
         # Centroid velocity
         omega_pxs = v_arr[i]
 
-        print(omega_pxs)
+        # print(omega_pxs)
 
         # Calculate the correction for the given set of parameters
         corr = calculateCorrection(y_centr, img_y, omega_pxs, fps)
@@ -748,14 +750,13 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps):
     return centroid_coordinates_corr
 
 
-def timeCorrection(centroid_coordinates, img_y, fps, t_meteor, fit_param, time_mark):
+def timeCorrection(centroid_coordinates, img_y, fps, t_meteor, time_mark):
     ''' Corrects the time coordinates of a given meteor, changes the time assignment for each frame.
 
         Arguments:
             centroid_coordinates: [array of floats] Centroid coordinates of the meteor.
             img_y: [int] Y axis image size.
             fps: [int] Number of frames per second captured by the camera.
-            t_meteor: [float] Duration of the meteor.
             fit_param: [array of floats] Parameters of the exponentional meteor deceleration function.
             time_mark: [string] Indicates the position of the time mark for each frame. 'start' if the time mark is
                 at the start of the frame, 'end' if it is on the end of the frame.
@@ -763,7 +764,6 @@ def timeCorrection(centroid_coordinates, img_y, fps, t_meteor, fit_param, time_m
         return:
             time_coordinates_corr: [array of floats] Corrected time coordinates of the meteor.
     '''
-
 
     num_coord = len(centroid_coordinates)
 
@@ -776,15 +776,11 @@ def timeCorrection(centroid_coordinates, img_y, fps, t_meteor, fit_param, time_m
         t_start = -t_meteor/2 + i * (1/fps)
 
         # Set time offset for different frame time marks
-        if time_mark == 'start':
+        if time_mark == 'beginning':
             t_start += 0.5 * (1/fps)
 
         elif time_mark == 'end':
             t_start -= 0.5 * (1/fps)
-
-        # Check if the meteor is decelerating
-        if set(fit_param) != set([0, 0]):
-            t_start += t_meteor/2
 
         # Row of the measurement (Y centroid coordinate)
         y_centr = centroid_coordinates[i][1]
@@ -793,11 +789,40 @@ def timeCorrection(centroid_coordinates, img_y, fps, t_meteor, fit_param, time_m
         delta_t = y_centr * (1/fps) / img_y
         t_start += delta_t
 
-        print(delta_t)
+        # print(delta_t)
 
         time_coordinates_corr.append(t_start)
 
+    print('Time coordinate correction done.')
+
     return time_coordinates_corr
+
+
+def meteorCorrection(time_coordinates, centroid_coordinates, img_y, fps, correction_type, frame_timestamp):
+
+    # Define number of coordinates
+    num_coord = len(time_coordinates)
+
+    # Define meteor duration
+    t_meteor = abs(time_coordinates[num_coord - 1] - time_coordinates[0])
+    t_meteor += abs(time_coordinates[0] - time_coordinates[1]) + abs(time_coordinates[num_coord - 1] - time_coordinates[num_coord - 2])
+
+    print('Calculated meteor duration: {:.2f}'.format(t_meteor))
+
+    # Correct temporal or spatial coordinates
+    if correction_type == 'temporal':
+
+        time_coordinates_corr = timeCorrection(centroid_coordinates, img_y, fps, t_meteor, frame_timestamp)
+        # print(len(time_coordinates_corr))
+        
+        return time_coordinates_corr
+    
+    elif correction_type == 'spatial':
+    
+        centroid_coordinates_corr = coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps)
+        # print(len(centroid_coordinates_corr))
+    
+        return centroid_coordinates_corr
 
 
 def getparam(a, v_start, v_finish, t):
