@@ -84,4 +84,4 @@ for noise in par.noise_scale_arr:
 	phi_data = [point[1] for point in omega_phi_avg_diff_arr]
 	diff_avg_data = [point[2] for point in omega_phi_avg_diff_arr]
 
-	np.savez('../Data/NOPGD-R/data_nopgd_rolling_{}.npz'.format(noise), *[omega_data, phi_data, diff_avg_data])
+	np.savez('../Data/TemporalNOPGD-R/data_tnopgd_rolling_{}.npz'.format(noise), *[omega_data, phi_data, diff_avg_data])
