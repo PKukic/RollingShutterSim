@@ -63,5 +63,8 @@ offset = 20
 # Plot individual frames?
 show_plots = False
 
+# Deceleration parameters
+fit_param = [0, 0]
+
 # List of all unified parameters
 param = [rolling_shutter, t_meteor, phi, omega, img_x, img_y, scale, fps, sigma_x, sigma_y, noise_scale, offset, show_plots]

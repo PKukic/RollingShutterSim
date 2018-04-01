@@ -13,7 +13,7 @@ for noise in par.noise_scale_arr:
 	print(noise)
 
 	# Load data
-	data = np.load('../Data/TemporalNOPGD-R/data_tnopgd_rolling_{}.npz'.format(noise))
+	data = np.load('../Data/NOPGD-R/data_nopgd_rolling_{}.npz'.format(noise))
 
 	# Unpack and set array names
 	omega_arr = data['arr_0']
@@ -46,7 +46,7 @@ for noise in par.noise_scale_arr:
 
 	#filter()
 
-	#np.savez('../Data/NOPGD-R/data_nopgd_rolling_{}.npz',format(noise), *[omega_arr, phi_arr, avg_diff_arr])
+	#np.savez('../Data/NOPGD-R/data_nopgd_rolling_{}.npz'.format(noise), *[omega_arr, phi_arr, avg_diff_arr])
 
 	### Plot filtered data ###
 

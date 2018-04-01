@@ -34,7 +34,7 @@ def drawPoints(t, x_center, y_center, scale, phi, omega, fit_param, t_meteor):
     phi = np.radians(phi)
 
     # Calculate distance from centre in pixels
-    z = omega * t - a * np.exp(b * (t + t_meteor / 2))
+    z = (omega * t - a * np.exp(b * (t + t_meteor / 2)))*scale
     #print(t)
 
     # Calculate position of meteor on the image
@@ -92,6 +92,7 @@ def meteorCentroid(img, x_start, x_finish, y_start, y_finish):
 
     x0 = (x_start + x_finish)/2
     y0 = (y_start + y_finish)/2
+
 
     # Calculate length of meteor
     r = np.sqrt((x_finish - x_start)**2 + (x_finish - x_start)**2)
@@ -777,7 +778,7 @@ def timeCorrection(centroid_coordinates, img_y, fps, t_meteor, time_mark):
 
         # Set time offset for different frame time marks
         if time_mark == 'beginning':
-            t_start += 0.5 * (1/fps)
+            t_start += 0.5 * (  1/fps)
 
         elif time_mark == 'end':
             t_start -= 0.5 * (1/fps)
