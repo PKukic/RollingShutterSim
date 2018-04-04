@@ -6,7 +6,7 @@ from __future__ import print_function, division, absolute_import
 import numpy as np
 
 # Is a given simulation made using the rolling shutter camera?
-rolling_shutter = True
+rolling_shutter = True	
 
 # Meteor duration
 t_meteor = 0.5

@@ -224,7 +224,7 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
 
     # Calculate the amplitude and compensate for the movement loss
     # omegapxs = omega * scale
-    amplitude = 255/img_y*(2*omega*scale)
+    amplitude = 255
 
     # Total number of frames of the duration of the meteor
     frame_number = int(round(t_meteor*fps))
@@ -418,11 +418,11 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
                 y_finish - y_start, fill=False, color='w'))
 
             # Plot centroid
-            plt.scatter(x_centr, y_centr, c='red', marker='+')
+            plt.scatter(x_centr, y_centr, c='red', marker = 'o')
 
             # Plot model centre
-            plt.scatter(x_model, y_model, c='blue', marker='+')
-            plt.show()
+            plt.scatter(x_model, y_model, c='blue', marker = 'o')
+            plt.show()  
 
         
     return (time_coordinates, centroid_coordinates, model_coordinates)
@@ -614,35 +614,40 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps):
     # Extract data from the existing coordinate array
     x_coordinates = []
     y_coordinates = []
+    r_coordinates = []
 
     for i in range(num_coord):
         x_coordinates.append(centroid_coordinates[i][0])
         y_coordinates.append(centroid_coordinates[i][1])
 
-    
     # Starting coordinates
     x_start = x_coordinates[0]
     y_start = y_coordinates[0]
 
+    for i in range(num_coord):
+        r_coordinates.append(centroidDifference((x_start, y_start), (x_coordinates[i], y_coordinates[i])))
+
     # Check in which direction the meteor is going
-    dx = x_coordinates[num_coord - 1] - x_start
-    dy = y_coordinates[num_coord - 1] - y_start
+    # dx = x_coordinates[num_coord - 1] - x_start
+    # dy = y_coordinates[num_coord - 1] - y_start
+
+
 
     # Linear fit function
-    def linFit(x, a, b):
-        return a * x + b
+    def linFit(r, phi, b):
+        return r * np.cos(phi) + b
     
     ### First method ###
     
     # Fit to find slope
-    param, pcov = opt.curve_fit(linFit, x_coordinates, y_coordinates)
-    a = param[0]
+    param, pcov = opt.curve_fit(linFit, r_coordinates, y_coordinates)
+    phi = param[0]
 
     # Calculate meteor angle
-    if a < 0:
-        phi = -np.arctan(1 / a)
-    else:
-        phi = np.arctan(a) + np.pi/2
+    # if a < 0:
+        # phi = -np.arctan(1 / a)
+    # else:
+        # phi = np.arctan(a) + np.pi/2
     
     #print(np.rad2deg(phi))
 
@@ -652,17 +657,17 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps):
     # the final results are greatly impacted.
 
     # Define precision factor -- the exact dx or dy will not be exactly 0
-    precision = 1e-5
+    # precision = 1e-5
 
-    if dx <= precision and dx >= -precision:
-        if dy >= -precision:
-            phi = 0
-        else:
-            phi = np.pi
+    # if dx <= precision and dx >= -precision:
+        # if dy >= -precision:
+            # phi = 0
+        # else:
+            # phi = np.pi
 
 
-    elif dx >= -precision:
-        phi += np.pi
+    # elif dx >= -precision:
+        # phi += np.pi
 
     print('Meteor slope fit finished.')
     print('Calculated angle: {:.2f}'.format(np.rad2deg(phi)))
@@ -778,7 +783,7 @@ def timeCorrection(centroid_coordinates, img_y, fps, t_meteor, time_mark):
 
         # Set time offset for different frame time marks
         if time_mark == 'beginning':
-            t_start += 0.5 * (  1/fps)
+            t_start += 0.5 * (1/fps)
 
         elif time_mark == 'end':
             t_start -= 0.5 * (1/fps)
@@ -787,7 +792,7 @@ def timeCorrection(centroid_coordinates, img_y, fps, t_meteor, time_mark):
         y_centr = centroid_coordinates[i][1]
 
         # Calculate the time assignment change
-        delta_t = y_centr * (1/fps) / img_y
+        delta_t = y_centr * (1/fps) / img_y 
         t_start += delta_t
 
         # print(delta_t)
