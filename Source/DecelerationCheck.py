@@ -11,6 +11,7 @@ import Parameters as par
 show_plots = False
 rolling_shutter = True
 noise = 0
+time_mark = 'beginning'
 
 # Initial parameters of the meteor
 omega = 10
@@ -32,22 +33,35 @@ print('Meteor angle: {}'.format(phi))
 
 # Get centroid coordinates from rolling shutter simulation
 print('Simulating rolling shutter meteor...')
-time_rolling_coordinates, centroid_rolling_coordinates, model_rolling_coordinates = st.pointsCentroidAndModel(rolling_shutter, t_meteor, phi, \
+time_rolling_coordinates, centroid_rolling_coordinates, model_rolling_coordinates_spat = st.pointsCentroidAndModel(rolling_shutter, t_meteor, phi, \
 	omega, par.img_x, par.img_y, par.scale, par.fps, par.sigma_x, par.sigma_y, noise, par.offset, dec_arr, show_plots)
 
-# Check if the meteor is outside of the image 
-if (time_rolling_coordinates, centroid_rolling_coordinates, model_rolling_coordinates) != (-1, -1, -1):
+# Correct the rolling shutter centroid coordinates
+print('Correcting centroid coordinates...')
+centroid_rolling_coordinates_corr = st.coordinateCorrection(time_rolling_coordinates, centroid_rolling_coordinates, \
+	par.img_y, par.fps, version = 'v_corr')
 
-	# Correct the rolling shutter centroid coordinates
-	print('Correcting centroid coordinates...')
-	centroid_rolling_coordinates = st.coordinateCorrection(time_rolling_coordinates, centroid_rolling_coordinates, \
-		par.img_y, par.fps, version = 'v_corr')
+# Correct the rolling shutter temporal coordinates
+print('Correcting temporal coordinates...')
+time_rolling_coordinates_corr = st.timeCorrection(centroid_rolling_coordinates, par.img_y, par.fps, t_meteor, time_mark)
+
+# Calculate the model points' coordinates
+print('Getting model coordinates...')
+model_rolling_coordinates_temp = []
+
+for i in range(len(time_rolling_coordinates)):
+
+	x_model, y_model = st.drawPoints(time_rolling_coordinates_corr[i], par.img_x/2, par.img_y/2, par.scale, phi, omega, dec_arr, t_meteor)
+	model_rolling_coordinates_temp.append((x_model, y_model))
 
 
-	print('Calculating average difference...')
-	# Calculate average difference between the centroid global and rolling shutter coordinates
-	diff_avg = st.centroidAverageDifference(model_rolling_coordinates, centroid_rolling_coordinates)
 
-	print('Average difference between centroid global and centroid rolling shutter points: {:.2f} [px]'.format(diff_avg))
+print('Calculating average difference...')
+diff_avg_spat = st.centroidAverageDifference(centroid_rolling_coordinates_corr, model_rolling_coordinates_spat)
 
-	print('Average difference: {:.2f}'.format(diff_avg))	
+print('Average difference (spatial correction): {:.2f} [px]'.format(diff_avg_spat))
+
+print('Calculating average difference...')
+diff_avg_temp = st.centroidAverageDifference(model_rolling_coordinates_temp, centroid_rolling_coordinates)
+
+print('Average difference (temporal correction): {:.2f} [px]'.format(diff_avg_temp))

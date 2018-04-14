@@ -80,4 +80,3 @@ plt.title('Model representation')
 plt.axis('tight')
 
 plt.show()
-
