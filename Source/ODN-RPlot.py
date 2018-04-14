@@ -1,4 +1,4 @@
-""" Plot data obtained by the omega-difference-noise simulation.
+""" Plot data obtained by the omega-difference-noise simulation for the rolling shutter camera
 """
 # Python 2/3 compatibility
 from __future__ import print_function, division, absolute_import
@@ -7,7 +7,7 @@ import numpy as np
 import Parameters as par
 
 # Load data
-data = np.load('../Data/ODN/data_odn_global.npz')
+data = np.load('../Data/ODN/data_odn_rolling.npz')
 
 # Unpack and set array names
 omega_arr = data['arr_0']
@@ -26,11 +26,12 @@ plt.plot(omega_arr, noise3_data, 'b-', label = '$\sigma$ = {}'.format(par.noise_
 plt.legend(loc = 'lower right')
 plt.xlabel("Angular velocity [deg/s]")
 plt.ylabel("Average model-centroid point difference [px]")
-plt.title("Meteor angle {} [deg] (global shutter)".format(par.phi))
+plt.title("Meteor angle {} [deg] (rolling shutter)".format(par.phi))
+
 
 # Configure the plot axis
 plt.axis('tight')
 
 # Save and show plot
-plt.savefig('../Graphs/ODN/graph_odn_global.png')
+plt.savefig('../Graphs/ODN/graph_odn_rolling.png')
 plt.show()

@@ -13,6 +13,9 @@ import Parameters as par
 rolling_shutter = True
 show_plots = False
 
+# Meteor angle
+phi = 45
+
 # Final data array
 omega_ycentr_diff_arr = []
 
@@ -25,8 +28,8 @@ for omega_iter in par.omega_oyd_arr:
 	print("Meteor duration: {:.2f}".format(t_meteor))
 
 	# Get centroid and model coordinates
-	time_coordinates, centroid_coordinates, model_coordinates = st.pointsCentroidAndModel(rolling_shutter, t_meteor, par.phi, \
-        omega_iter, par.img_x, par.img_y, par.scale, par.fps, par.sigma_x, par.sigma_y, par.noise_scale, par.offset, show_plots)
+	time_coordinates, centroid_coordinates, model_coordinates = st.pointsCentroidAndModel(rolling_shutter, t_meteor, phi, \
+        omega_iter, par.img_x, par.img_y, par.scale, par.fps, par.sigma_x, par.sigma_y, par.noise_scale, par.offset, par.fit_param, show_plots)
 
 	# Check if the meteor is outside of the image
 	if (time_coordinates, centroid_coordinates, model_coordinates) != (-1, -1, -1):
@@ -59,4 +62,4 @@ ycentr_data = [point[1] for point in omega_ycentr_diff_arr]
 diff_data = [point[2] for point in omega_ycentr_diff_arr]
 
 # Save the data as a file
-np.savez('../Data/OYD-R/data_oyd_rolling_{}.npz'.format(par.phi), *[omega_data, ycentr_data, diff_data])
+np.savez('../Data/OYD-R/data_oyd_rolling_{}.npz'.format(phi), *[omega_data, ycentr_data, diff_data])

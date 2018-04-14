@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Fixed meteor angle (parameters that change are the meteor's velocity and the Y coordinate of the centroid point)
-phi = 135
+phi = 45
 
 # Load data
 data = np.load('../Data/OYD-R/data_oyd_rolling_{}.npz'.format(phi))

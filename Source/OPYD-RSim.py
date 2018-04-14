@@ -29,11 +29,11 @@ for omega in par.omega_arr:
 
         # LIST of centroid and model coordinates for that angle
         time_coordinates, centroid_coordinates, model_coordinates = st.pointsCentroidAndModel(rolling_shutter, t_meteor, phi, \
-            omega, par.img_x, par.img_y, par.scale, par.fps, par.sigma_x, par.sigma_y, par.noise_scale, par.offset, par.show_plots)
+            omega, par.img_x, par.img_y, par.scale, par.fps, par.sigma_x, par.sigma_y, par.noise_scale, par.offset, par.fit_param, par.show_plots)
 
 
         # Check if the meteor is outside of the image
-        if centroid_coordinates != -1 and model_coordinates != -1:
+        if (time_coordinates, centroid_coordinates, model_coordinates) != (-1, -1, -1):
 
             # Size of the frame array
             frame_num_range = len(centroid_coordinates)
@@ -49,23 +49,17 @@ for omega in par.omega_arr:
                 x_centr = centroid_coordinates[frame_num][0]
                 y_centr = centroid_coordinates[frame_num][1]
 
-                x_model = centroid_coordinates[frame_num][0]
-                y_model = centroid_coordinates[frame_num][1]
+                x_model = model_coordinates[frame_num][0]
+                y_model = model_coordinates[frame_num][1]
 
-                # Compare the model coordinates before and after the check
-                print("Model coordinates: ({:.2f}, {:.2f})".format(x_model, y_model))
-
-                # Check if the model coordinates are outside of the read image
-                if x_model >= 0 and y_model >= 0 and x_model <= par.img_x and y_model <= par.img_y:
-                    
-                    phi_ycentr_diff_array.append((phi, y_centr, diff))
-                    
-                    # Check all the parameters parameters
-                    print("Velocity: {:.2f} Angle: {:.2f}; Y coordinate: {:.2f}; Difference: {:.2f};".format(omega, phi, y_centr, diff))
-                    
-                    # Check all the coordinates
-                    print("\tCentroid coordinates: ({:.2f}, {:.2f})".format(x_centr, y_centr))
-                    print("\tModel coordinates: ({:.2f}, {:.2f})".format(x_model, y_model))
+                phi_ycentr_diff_array.append((phi, y_centr, diff))
+                
+                # Check all the parameters
+                print("Velocity: {:.2f} Angle: {:.2f}; Y coordinate: {:.2f}; Difference: {:.2f};".format(omega, phi, y_centr, diff))
+                
+                # Check all the coordinates
+                print("\tCentroid coordinates: ({:.2f}, {:.2f})".format(x_centr, y_centr))
+                print("\tModel coordinates: ({:.2f}, {:.2f})".format(x_model, y_model))
 
         else:
             print("Model coordinates are outside of the read image")

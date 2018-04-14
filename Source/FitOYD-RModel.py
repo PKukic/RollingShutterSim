@@ -44,19 +44,17 @@ delta = diff - rollingModel((omega, ycentr), *param)
 # Set 3D scatter plot
 fig = plt.figure()
 ax = Axes3D(fig)
-ax.scatter(omega, ycentr, delta, lw = 0)
+ax.scatter(omega, ycentr, delta, c = delta, lw = 0)
 
 # Label and set title
 ax.set_xlabel("Angular velocity $\omega$ [px/s]")
 ax.set_ylabel("Centroid Y coordinate [px]")
 ax.set_zlabel("Difference between model and data")
-plt.title("Meteor angle fixed to: {} [deg]".format(phi))
+plt.title("Model error; angle fixed to: {} [deg]".format(phi))
 
 # Configure plot axis
 plt.axis('tight')
 
-# Save and show
-plt.savefig('../Graphs/Model graphs/graph_model_1_delta.png')
 plt.show()
 
 
@@ -73,13 +71,11 @@ ax.scatter(omega, ycentr, diff, c = diff, lw = 0)
 ax.set_zlabel("Model-centroid  point difference [px]")
 ax.set_xlabel("Angular velocity $\omega$ [px/s]")
 ax.set_ylabel("Centroid Y coordinate [px]")
-plt.title("Meteor angle fixed to: {} [deg]".format(phi))
+plt.title("Model representation; angle fixed to: {} [deg]".format(phi))
 
 # Configure plot axis
 plt.axis('tight')
 
-# Save and show
-plt.savefig('../Graphs/Model graphs/graph_model_1_rep.png')
 plt.show()
 
 ### Notes ###

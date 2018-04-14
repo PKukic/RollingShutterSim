@@ -69,4 +69,4 @@ for file_n in range(file_num_range):
 
 	# Save the plot and close it
 	plt.savefig("../Graphs/ODYP-R/graph_odyp_rolling{}.png".format(file_n))
-	plt.show()
+	plt.close()

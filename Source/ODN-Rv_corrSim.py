@@ -1,5 +1,5 @@
-""" Simulate the difference of the model and centroid points for the global shutter camera, depending on meteor velocity
-	and background noise value.
+""" Simulate the difference of the model and centroid points for the rolling shutter camera, depending on meteor velocity
+	and background noise value. The centroid coordinates and the velocity of the meteor at any given time are corrected.
 """
 
 # Python 2/3 compatibility
@@ -9,7 +9,7 @@ import SimulationTools as st
 import Parameters as par
 
 # Parameters that are used only for this simulation
-rolling_shutter = False
+rolling_shutter = True
 show_plots = True
 
 # Number of iterations for each angular velocity value - 
@@ -35,6 +35,13 @@ for noise in par.noise_scale_arr:
 			# Get model and centroid coordinates
 			time_coordinates, centroid_coordinates, model_coordinates = st.pointsCentroidAndModel(rolling_shutter, par.t_meteor, par.phi, \
             	omega_iter, par.img_x, par.img_y, par.scale, par.fps, par.sigma_x, par.sigma_y, noise, par.offset, par.fit_param, par.show_plots)
+
+			# print(centroid_coordinates)
+
+			# Apply coordinate correction (2nd version, with velocity correction)
+			centroid_coordinates = st.coordinateCorrection(time_coordinates, centroid_coordinates, par.img_y, par.fps, version = 'v_corr')
+			
+			# print(centroid_coordinates)
 
 			# Compute difference
 			diff = st.centroidAverageDifference(centroid_coordinates, model_coordinates)
@@ -63,5 +70,5 @@ noise1_arr = noise_arr[1]
 noise2_arr = noise_arr[2]
 noise3_arr = noise_arr[3]
 
-# Save data from the simylation as a file
-np.savez('../Data/ODN/data_odn_global.npz', *[par.omega_odn_arr, noise0_arr, noise1_arr, noise2_arr, noise3_arr])
+# Save data from the simulation as a file
+np.savez('../Data/ODN/data_odn_v_corr_rolling.npz', *[par.omega_odn_arr, noise0_arr, noise1_arr, noise2_arr, noise3_arr])

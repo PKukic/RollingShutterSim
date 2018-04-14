@@ -63,5 +63,7 @@ for noise in par.noise_scale_arr:
 	# Configure axis
 	plt.axis('tight')
 
+	plt.savefig('../Graphs/NOPGD-R/graph_nopgd_r_3D_{}'.format(noise))
+
 	# Show plot
 	plt.show()

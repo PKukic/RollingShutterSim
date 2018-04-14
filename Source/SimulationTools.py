@@ -10,7 +10,6 @@ import matplotlib.patches as patches
 import scipy.optimize as opt
 import scipy.special as sp
 
-
 def drawPoints(t, x_center, y_center, scale, phi, omega, fit_param, t_meteor):
     """ Calculate position of a meteor on image with the given simulation parameters. 
 
@@ -22,11 +21,13 @@ def drawPoints(t, x_center, y_center, scale, phi, omega, fit_param, t_meteor):
         phi: [int or float] Meteor angle, counterclockwise from Y axis.
         omega: [int or float] Meteor angular velocity in deg/s.
         fit_param: [array of floats] Parameters of the exponentional meteor deceleration function.
+        t_meteor: [int or float] Duration of meteor.
 
     Return:
         (x_meteor, y_meteor): [tuple of floats] X and Y coordinate of the meteor.
     """
-    # Unpack values from array
+
+    # Unpack variables from tuple
     a = fit_param[0]
     b = fit_param[1]
 
@@ -34,12 +35,11 @@ def drawPoints(t, x_center, y_center, scale, phi, omega, fit_param, t_meteor):
     phi = np.radians(phi)
 
     # Calculate distance from centre in pixels
-    z = (omega * t - a * np.exp(b * (t + t_meteor / 2)))*scale
-    #print(t)
+    z = omega*t*scale - a*np.exp(b*(t+t_meteor/2))*scale
 
     # Calculate position of meteor on the image
-    x_meteor = x_center - np.sin(phi) * z
-    y_meteor = y_center + np.cos(phi) * z
+    x_meteor = x_center - np.sin(phi)*z
+    y_meteor = y_center + np.cos(phi)*z
 
     return (x_meteor, y_meteor)
 
@@ -92,7 +92,6 @@ def meteorCentroid(img, x_start, x_finish, y_start, y_finish):
 
     x0 = (x_start + x_finish)/2
     y0 = (y_start + y_finish)/2
-
 
     # Calculate length of meteor
     r = np.sqrt((x_finish - x_start)**2 + (x_finish - x_start)**2)
@@ -212,18 +211,15 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
         sigma_y: [float] Standard deviation along the Y axis.
         noise scale [float] The standard deviation of a probability density function. 
         offset: [int or float] Offset of pixel levels for the entire image.
-        fit_param: [array of floats] Parameters of the exponentional meteor deceleration function.
         show_plots: [bool] Argument for showing individual frame plots.
 
     Return:
-        time_coordinates: [list of tuples of floats] Time coordinates of the meteor center.
-        centroid_coordinates: [list of tuples of floats] X and Y coordinates of the meteor center calculated by centroiding.
-        model_coordinates: [list of tuples of floats] X and Y coordinates of the meteor center calculated by model.
+        centroid_coordinates: [list of tuples] X and Y coordinates of meteor center calculated by centroiding.
+        model_coordinates: [list of tuples] X and Y coordinates of meteor center calculated by model.
 
     """
 
     # Calculate the amplitude and compensate for the movement loss
-    # omegapxs = omega * scale
     amplitude = 255
 
     # Total number of frames of the duration of the meteor
@@ -418,11 +414,11 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
                 y_finish - y_start, fill=False, color='w'))
 
             # Plot centroid
-            plt.scatter(x_centr, y_centr, c='red', marker = 'o')
+            plt.scatter(x_centr, y_centr, c='red', marker='+')
 
             # Plot model centre
-            plt.scatter(x_model, y_model, c='blue', marker = 'o')
-            plt.show()  
+            plt.scatter(x_model, y_model, c='blue', marker='+')
+            plt.show()
 
         
     return (time_coordinates, centroid_coordinates, model_coordinates)
@@ -454,8 +450,8 @@ def centroidAverageDifference(centroid_coordinates, model_coordinates):
     """ Calculates average distance between centroid coordinates and model coordinates for each frame.
     
     Arguments:
-        centroid_coordinates: [list of tuples of floats] List of (X, Y) centroid coordinates for each frame. 
-        model_coordinates: [list of tuples of floats] List of (X, Y) model coordinates for each frame.
+        centroid_coordinates: [list or of tuples] List of (X, Y) centroid coordinates for each frame. 
+        model_coordinates: [list or of tuples] List of (X, Y) model coordinates for each frame.
 
     Return:
         diff_avg: [float] Average distance of centroid and model points for a given set of frames. 
@@ -593,7 +589,7 @@ def velocityCorrection(omega, phi, img_y, fps):
     return v_corr
 
 
-def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps):
+def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps, version):
     ''' Corrects the centroid coordinates of a given meteor.
 
         Arguments:
@@ -601,6 +597,8 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps):
             centroid_coordinates_raw: [array of tuples of floats] Uncorrected meteor coordinates. 
             img_y:  [int] Size of image Y coordinate [px].
             fps: [int] Number of frames taken per second by the camera.
+            version: [string] The version of the function to be implemented (with or without velocity correction):
+                possible values: 'v' or 'v_corr'
 
         Return:
             centroid_coordinates_corr: [array of tuples of floats] Corrected meteor coordinates. 
@@ -610,64 +608,30 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps):
 
     ### Calculate meteor angle from linear fit ###
 
-
     # Extract data from the existing coordinate array
     x_coordinates = []
     y_coordinates = []
     r_coordinates = []
 
+
     for i in range(num_coord):
         x_coordinates.append(centroid_coordinates[i][0])
         y_coordinates.append(centroid_coordinates[i][1])
 
-    # Starting coordinates
-    x_start = x_coordinates[0]
-    y_start = y_coordinates[0]
+    start_coord = (x_coordinates[0], y_coordinates[0])
 
     for i in range(num_coord):
-        r_coordinates.append(centroidDifference((x_start, y_start), (x_coordinates[i], y_coordinates[i])))
-
-    # Check in which direction the meteor is going
-    # dx = x_coordinates[num_coord - 1] - x_start
-    # dy = y_coordinates[num_coord - 1] - y_start
-
-
+        ind_coord = (x_coordinates[i], y_coordinates[i])
+        r_coordinates.append(centroidDifference(start_coord, ind_coord))
 
     # Linear fit function
     def linFit(r, phi, b):
         return r * np.cos(phi) + b
-    
-    ### First method ###
-    
+
     # Fit to find slope
     param, pcov = opt.curve_fit(linFit, r_coordinates, y_coordinates)
     phi = param[0]
-
-    # Calculate meteor angle
-    # if a < 0:
-        # phi = -np.arctan(1 / a)
-    # else:
-        # phi = np.arctan(a) + np.pi/2
     
-    #print(np.rad2deg(phi))
-
-    # Just a quick fix
-    # When the meteor is vertical, the slope of the line approaches +/- infinity,
-    # so if the calculated slope diverges from the real value in a small amount, 
-    # the final results are greatly impacted.
-
-    # Define precision factor -- the exact dx or dy will not be exactly 0
-    # precision = 1e-5
-
-    # if dx <= precision and dx >= -precision:
-        # if dy >= -precision:
-            # phi = 0
-        # else:
-            # phi = np.pi
-
-
-    # elif dx >= -precision:
-        # phi += np.pi
 
     print('Meteor slope fit finished.')
     print('Calculated angle: {:.2f}'.format(np.rad2deg(phi)))
@@ -678,35 +642,19 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps):
     r_arr = []
     t_arr = []
 
-    # Absolute position displacement array
-    r_abs_arr = []
-    r_abs_arr.append(0)
-
     # Velocity array
     v_arr = []
-
-    coord_start = centroid_coordinates[0]
 
     # Form delta distance, time and velocity arrays
     for i in range(num_coord - 1):
         t_arr.append(time_coordinates[i + 1] - time_coordinates[i])
         r_arr.append(centroidDifference(centroid_coordinates[i + 1], centroid_coordinates[i]))
-        r_abs_arr.append(centroidDifference(centroid_coordinates[i + 1], coord_start))
+    
+    for i in range(num_coord - 1):
+        v_arr.append(r_arr[i] / t_arr[i])
 
-    plt.plot(time_coordinates, r_abs_arr)
-    plt.xlabel('time')
-    plt.ylabel('displacement')
-    # plt.show()
-
-    #print(len(r_arr))
-    #print(len(t_arr))
-    #print(num_coord)
-
-    for i in range(num_coord):
-        if i == 0:
-            v_arr.append(r_arr[i + 1] / t_arr[i])
-        else:
-            v_arr.append(r_arr[i - 1] / t_arr[i - 1])
+    # Assume that the first velocity is equal to the subsequent velocity
+    v_arr.insert(0, v_arr[0])
 
     print('Point to point velocity calculation done.')
 
@@ -719,10 +667,22 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps):
     
     ### Apply correction to velocity array ###
 
-    for i in range(num_coord):
-        v_arr[i] += velocityCorrection(v_arr[i], phi, img_y, fps)
+    if version == 'v_corr':
 
-    print('Velocity correction done. ')
+        for i in range(num_coord):
+            v_arr[i] += velocityCorrection(v_arr[i], phi, img_y, fps)
+
+        print('Velocity correction done. ')
+
+    elif version == 'v':
+
+        print('Skipping velocity correction')
+
+    else:
+        
+        print('Invalid version flag!')
+
+    
     print('Calculated average velocity: {:.2f}'.format(np.average(v_arr)))
 
     ### Apply correction to centroid coordinate array ###
@@ -738,8 +698,6 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps):
 
         # Centroid velocity
         omega_pxs = v_arr[i]
-
-        # print(omega_pxs)
 
         # Calculate the correction for the given set of parameters
         corr = calculateCorrection(y_centr, img_y, omega_pxs, fps)
@@ -787,6 +745,9 @@ def timeCorrection(centroid_coordinates, img_y, fps, t_meteor, time_mark):
 
         elif time_mark == 'end':
             t_start -= 0.5 * (1/fps)
+
+        else:
+            print('Invalid time mark flag!')
 
         # Row of the measurement (Y centroid coordinate)
         y_centr = centroid_coordinates[i][1]

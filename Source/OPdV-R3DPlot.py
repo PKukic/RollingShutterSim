@@ -8,7 +8,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 
 # Load data
-data = np.load('../Data/OPdV-R/data_velocity_error3D.npz')
+data = np.load('../Data/OPdV-R/data_velocity_error_rolling.npz')
 
 # Unpack and set array names
 omega_arr = data['arr_0']

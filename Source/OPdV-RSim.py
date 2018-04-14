@@ -26,18 +26,17 @@ for omega in par.omega_odn_arr:
 		print("Simulating meteor...")
 		rolling_shutter = True
 		time_coordinates, centroid_coordinates, model_coordinates = st.pointsCentroidAndModel(rolling_shutter, t_meteor, phi, \
-	    	omega, par.img_x, par.img_y, par.scale, par.fps, par.sigma_x, par.sigma_y, par.noise_scale, par.offset, show_plots)
+	    	omega, par.img_x, par.img_y, par.scale, par.fps, par.sigma_x, par.sigma_y, par.noise_scale, par.offset, par.fit_param, show_plots)
 
 		print('Simulation done!')
 
 		# Check if meteor is outside of the image
 		if (time_coordinates, centroid_coordinates, model_coordinates) != (-1, -1, -1):
 
-
 			# Correct the centroid coordinates, assuming the meteor velocity obtained from the centroid coordinates
 			# is constant
 			print("Correcting coordinates...")
-			centroid_coordinates_corr, omega_pxs = st.coordinateCorrection(t_meteor, centroid_coordinates, par.img_y, par.fps)
+			centroid_coordinates_corr = st.coordinateCorrection(time_coordinates, centroid_coordinates, par.img_y, par.fps, version = 'v')
 
 			print('Generating data...')
 			
@@ -65,4 +64,4 @@ phi_data = [point[1] for point in omega_phi_deltav_arr]
 deltav_data = [point[2] for point in omega_phi_deltav_arr]
 
 # Save data
-np.savez('../Data/OPdV-R/data_velocity_error3D.npz', *[omega_data, phi_data, deltav_data])
+np.savez('../Data/OPdV-R/data_velocity_error_rolling.npz', *[omega_data, phi_data, deltav_data])

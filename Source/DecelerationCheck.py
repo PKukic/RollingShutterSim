@@ -6,7 +6,7 @@ from __future__ import print_function, division, absolute_import
 import SimulationTools as st 
 import Parameters as par
 # import numpy as np
-
+		
 # Used for testing
 show_plots = False
 rolling_shutter = True
@@ -20,7 +20,7 @@ t_meteor = 0.5
 # Deceleration parameters of the meteor
 a = 1
 v_start = omega
-v_finish = 2
+v_finish = omega/5
 
 # Form deceleration parameters array
 dec_arr = [a, st.getparam(a, v_start, v_finish, t_meteor)]
@@ -40,10 +40,9 @@ if (time_rolling_coordinates, centroid_rolling_coordinates, model_rolling_coordi
 
 	# Correct the rolling shutter centroid coordinates
 	print('Correcting centroid coordinates...')
-	centroid_rolling_coordinates = st.coordinateCorrection(time_rolling_coordinates, model_rolling_coordinates, \
-		par.img_y, par.fps)
+	centroid_rolling_coordinates = st.coordinateCorrection(time_rolling_coordinates, centroid_rolling_coordinates, \
+		par.img_y, par.fps, version = 'v_corr')
 
-	del model_rolling_coordinates[:1]
 
 	print('Calculating average difference...')
 	# Calculate average difference between the centroid global and rolling shutter coordinates
