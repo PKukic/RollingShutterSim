@@ -285,6 +285,7 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
         # plt.gca().add_patch(patches.Rectangle((x_start, y_start), x_finish - x_start, \
             # y_finish - y_start, fill=False, color='r'))
 
+        # print(x_start, y_start, x_finish, y_finish)
 
 
         # Init the sensor array only during the first run of the rolling shutter
@@ -386,7 +387,7 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
         x_centr, y_centr = meteorCentroid(read_image_array, x_start, x_finish, y_start, y_finish)
         
         # Model coordinates
-        t_mid = (t_start + t_finish)/2
+        t_mid = t_start
         x_model, y_model = drawPoints(t_mid, x_center, y_center, scale, phi, omega, fit_param, t_meteor) 
         
         
@@ -408,16 +409,30 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
             
             # Show frame
             plt.imshow(read_image_array, cmap='gray', vmin=0, vmax=255)
+
+            plt.title('Frame number: {}'.format(i))
             
+            # print(x_start, y_start, x_finish, y_finish)
+
+            #plt.xkcd()
+
             # Plot crop window
             plt.gca().add_patch(patches.Rectangle((x_start, y_start), x_finish - x_start, \
                 y_finish - y_start, fill=False, color='w'))
 
             # Plot centroid
-            plt.scatter(x_centr, y_centr, c='red', marker='+')
+            plt.scatter(x_centr, y_centr, c='red', marker='o', label = 'centroid', s = 70)
 
             # Plot model centre
-            plt.scatter(x_model, y_model, c='blue', marker='+')
+            plt.scatter(x_model, y_model, c='blue', marker='o', label = 'model', s = 70)
+
+            plt.axhline(y=y_model, c='b')
+
+            (x_st, x_fin, y_st, y_fin) = calcSigmaWindowLimits(x_model, x_model, sigma_x*10, y_model, y_model, sigma_y*10, phi)
+            plt.xlim([x_st, x_fin])
+            plt.ylim([y_fin, y_st])
+
+            plt.legend(loc='upper right')
             plt.show()
 
         
@@ -721,7 +736,7 @@ def timeCorrection(centroid_coordinates, img_y, fps, t_meteor, time_mark):
             centroid_coordinates: [array of floats] Centroid coordinates of the meteor.
             img_y: [int] Y axis image size.
             fps: [int] Number of frames per second captured by the camera.
-            fit_param: [array of floats] Parameters of the exponentional meteor deceleration function.
+            t_meteor: [int or float] Duration of meteor.
             time_mark: [string] Indicates the position of the time mark for each frame. 'start' if the time mark is
                 at the start of the frame, 'end' if it is on the end of the frame.
 

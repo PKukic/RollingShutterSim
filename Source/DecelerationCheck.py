@@ -32,7 +32,7 @@ print('Meteor velocity: {:.2f}'.format(omega))
 print('Meteor angle: {}'.format(phi))
 
 # Get centroid coordinates from rolling shutter simulation
-print('Simulating rolling shutter meteor...')
+print('Simulating rolling  shutter meteor...')
 time_rolling_coordinates, centroid_rolling_coordinates, model_rolling_coordinates_spat = st.pointsCentroidAndModel(rolling_shutter, t_meteor, phi, \
 	omega, par.img_x, par.img_y, par.scale, par.fps, par.sigma_x, par.sigma_y, noise, par.offset, dec_arr, show_plots)
 
