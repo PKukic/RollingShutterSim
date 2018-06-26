@@ -56,7 +56,7 @@ noise_scale_arr = [0, 5, 10, 20]
 offset = 20
 
 # Plot individual frames?
-show_plots = False
+show_plots = True
 
 # Deceleration parameters
 fit_param = [0, 0]

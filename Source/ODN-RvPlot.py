@@ -10,7 +10,7 @@ import Parameters as par
 data = np.load('../Data/ODN/data_odn_v_rolling.npz')
 
 # Unpack and set array names
-omega_arr = data['arr_0']
+omega_arr = data['arr_0'] * par.fps
 noise0_data = data['arr_1']
 noise1_data = data['arr_2']
 noise2_data = data['arr_3']
@@ -24,9 +24,9 @@ plt.plot(omega_arr, noise3_data, 'b-', label = '$\sigma$ = {}'.format(par.noise_
 
 # Label the plot, set plot title, set legend
 plt.legend(loc = 'lower right')
-plt.xlabel("Angular velocity [deg/s]")
+plt.xlabel("Angular velocity [px/s]")
 plt.ylabel("Average model-centroid point difference [px]")
-plt.title("Meteor angle {} [deg] (rolling shutter with corrected coordinates)".format(par.phi))
+plt.title("Meteor angle {} [deg] (uncorrected velocity)".format(par.phi))
 
 
 # Configure the plot axis
