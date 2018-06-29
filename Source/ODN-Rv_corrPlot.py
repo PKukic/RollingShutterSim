@@ -10,7 +10,7 @@ import Parameters as par
 data = np.load('../Data/ODN/data_odn_v_corr_rolling.npz')
 
 # Unpack and set array names
-omega_arr = data['arr_0'] * par.fps
+omega_arr = data['arr_0'] * par.scale
 noise0_data = data['arr_1']
 noise1_data = data['arr_2']
 noise2_data = data['arr_3']

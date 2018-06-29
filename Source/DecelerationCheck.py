@@ -26,6 +26,8 @@ v_finish = omega/5
 # Form deceleration parameters array
 dec_arr = [a, st.getparam(a, v_start, v_finish, t_meteor)]
 print(dec_arr)
+# dec_arr = (0, 0)
+print(dec_arr)
 
 # Check the meteor's initial parameters
 print('Meteor velocity: {:.2f}'.format(omega))
@@ -40,6 +42,9 @@ time_rolling_coordinates, centroid_rolling_coordinates, model_rolling_coordinate
 print('Correcting centroid coordinates...')
 centroid_rolling_coordinates_corr = st.coordinateCorrection(time_rolling_coordinates, centroid_rolling_coordinates, \
 	par.img_y, par.fps, version = 'v_corr')
+
+for i in range(len(centroid_rolling_coordinates)):
+	print(centroid_rolling_coordinates[i], centroid_rolling_coordinates_corr[i])
 
 # Correct the rolling shutter temporal coordinates
 print('Correcting temporal coordinates...')

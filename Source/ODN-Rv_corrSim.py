@@ -10,7 +10,7 @@ import Parameters as par
 
 # Parameters that are used only for this simulation
 rolling_shutter = True
-show_plots = True
+show_plots = False
 
 # Number of iterations for each angular velocity value - 
 # used to have a better representatin of the actual difference value
@@ -34,7 +34,7 @@ for noise in par.noise_scale_arr:
 
 			# Get model and centroid coordinates
 			time_coordinates, centroid_coordinates, model_coordinates = st.pointsCentroidAndModel(rolling_shutter, par.t_meteor, par.phi, \
-            	omega_iter, par.img_x, par.img_y, par.scale, par.fps, par.sigma_x, par.sigma_y, noise, par.offset, par.fit_param, par.show_plots)
+            	omega_iter, par.img_x, par.img_y, par.scale, par.fps, par.sigma_x, par.sigma_y, noise, par.offset, par.fit_param, show_plots)
 
 			# print(centroid_coordinates)
 

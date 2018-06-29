@@ -387,7 +387,7 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
         x_centr, y_centr = meteorCentroid(read_image_array, x_start, x_finish, y_start, y_finish)
         
         # Model coordinates
-        t_mid = t_start
+        t_mid = (t_start + t_finish) / 2
         x_model, y_model = drawPoints(t_mid, x_center, y_center, scale, phi, omega, fit_param, t_meteor) 
         
         
