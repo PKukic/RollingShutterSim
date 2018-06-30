@@ -26,8 +26,6 @@ v_finish = omega/5
 # Form deceleration parameters array
 dec_arr = [a, st.getparam(a, v_start, v_finish, t_meteor)]
 print(dec_arr)
-# dec_arr = (0, 0)
-print(dec_arr)
 
 # Check the meteor's initial parameters
 print('Meteor velocity: {:.2f}'.format(omega))
