@@ -1,16 +1,17 @@
-import SimulationTools as st 
+import SimulationTools as st
+import Parameters as par
 import numpy as np 
 import matplotlib.pyplot as plt
 
 
 start = 0
-fin = 10
+fin = 11
 step = 1
 delta_omega = np.arange(start, fin, step)
 
 
 a = 1
-omega_start = 50
+omega_start = 20
 b_arr = []
 
 fin_t = 0.5
@@ -30,17 +31,17 @@ for i in range(len(delta_omega)):
 
 	for t in time_arr:
 
-		omega_arr_iter.append(omega_start + a*b_iter*np.exp(b_iter*t))
+		omega_arr_iter.append((omega_start - a*b_iter*np.exp(b_iter*t))*par.scale)
 
 	omega_arr.append(omega_arr_iter)
 
 
 for i in range(len(delta_omega)):
 
-	plt.plot(time_arr, omega_arr[i], label = r'$\Delta \omega = {}$'.format(delta_omega[i]))
+	plt.plot(time_arr, omega_arr[i], label = r'$\Delta \omega = {}$ [deg/s]'.format(delta_omega[i]))
 
 
-plt.title('Angular velocity [deg/s] with respect to time')
+plt.title('Meteor deceleration')
 plt.xlabel('Time [s]')
 plt.ylabel('Angular velocity [deg/s]')
 plt.legend(loc = 'best')
