@@ -637,7 +637,8 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps, ver
 
     for i in range(num_coord):
         ind_coord = (x_coordinates[i], y_coordinates[i])
-        r_coordinates.append(centroidDifference(start_coord, ind_coord))
+        r = centroidDifference(start_coord, ind_coord)
+        r_coordinates.append(r)
 
     # Linear fit function
     def linFit(r, phi, b):

@@ -14,14 +14,14 @@ noise = 0
 time_mark = 'beginning'
 
 # Initial parameters of the meteor
-omega = 10
+omega = 50
 phi = 50
 t_meteor = 0.5
 
 # Deceleration parameters of the meteor
 a = 1
 v_start = omega
-v_finish = omega/5
+v_finish = omega*0.1
 
 # Form deceleration parameters array
 dec_arr = [a, st.getparam(a, v_start, v_finish, t_meteor)]

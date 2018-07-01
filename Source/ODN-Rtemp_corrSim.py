@@ -12,7 +12,6 @@ import numpy as np
 show_plots = False
 
 # Initial meteor parameters
-dec_arr = [0, 0]
 time_mark = 'beginning'
 
 # Image center (required for executing the drawPoints function)
@@ -38,6 +37,10 @@ for noise in par.noise_scale_arr:
 		# Get duration of meteor (the meteor is crossing the entire image)
 		print('Getting time from angle...')
 		t_meteor = st.timeFromAngle	(phi, omega, par.img_x, par.img_y, par.scale, par.fps)
+
+		# Find the deceleration parameters
+		dec_arr = [1, st.getparam(1, omega, 0.9*omega, t_meteor)]
+		print('Deceleration parameters: ', dec_arr)
 
 		# Get time and centroid coordinates from rolling shutter
 		print('Simulating rolling shutter meteor...')

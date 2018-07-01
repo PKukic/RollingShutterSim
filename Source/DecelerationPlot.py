@@ -3,15 +3,15 @@ import Parameters as par
 import numpy as np 
 import matplotlib.pyplot as plt
 
+omega_start = 50
 
 start = 0
-fin = 11
-step = 1
+fin = omega_start*0.11
+step = omega_start*0.01
 delta_omega = np.arange(start, fin, step)
 
 
 a = 1
-omega_start = 20
 b_arr = []
 
 fin_t = 0.5
@@ -38,12 +38,12 @@ for i in range(len(delta_omega)):
 
 for i in range(len(delta_omega)):
 
-	plt.plot(time_arr, omega_arr[i], label = r'$\Delta \omega = {}$ [deg/s]'.format(delta_omega[i]))
+	plt.plot(time_arr, omega_arr[i], label = r'$\Delta \omega = {:.0f}$ %'.format(100*delta_omega[i]/omega_start))
 
 
 plt.title('Meteor deceleration')
 plt.xlabel('Time [s]')
-plt.ylabel('Angular velocity [deg/s]')
+plt.ylabel('Velocity [px/s]')
 plt.legend(loc = 'best')
 
 plt.savefig('../Figures/Images/deceleration/dec_rep.png')
