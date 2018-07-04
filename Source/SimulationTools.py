@@ -194,7 +194,7 @@ def calcSigmaWindowLimits(x_start, x_finish, sigma_x, y_start, y_finish, sigma_y
 
 
 def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, scale, fps, sigma_x, \
-    sigma_y, noise_scale, offset, fit_param, show_plots):
+    sigma_y, noise_scale, offset, fit_param, show_plots, corr_coord=None):
     """
     Returns coordinates of meteor center calculated by centroiding and from a meteor movement model.
 
@@ -244,6 +244,9 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
 
     # Go thorugh all frames
     for i in range(frame_number):
+
+        if corr_coord != None:
+            corrx, corry = corr_coord[i]
 
         # Define time limits
         t_start = -t_meteor/2 + i*(1/fps)
@@ -426,11 +429,14 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
             # Plot model centre
             plt.scatter(x_model, y_model, c='blue', marker='o', label = 'model', s = 70)
 
-            plt.axhline(y=y_model, c='b')
+            if corr_coord != None:
+                plt.scatter(corrx, corry, c = 'green', marker = 'o', label = 'corrected', s = 70)
 
-            (x_st, x_fin, y_st, y_fin) = calcSigmaWindowLimits(x_model, x_model, sigma_x*10, y_model, y_model, sigma_y*10, phi)
-            plt.xlim([x_st, x_fin])
-            plt.ylim([y_fin, y_st])
+            #  plt.axhline(y=y_model, c='b')
+
+            # (x_st, x_fin, y_st, y_fin) = calcSigmaWindowLimits(x_model, x_model, sigma_x*10, y_model, y_model, sigma_y*10, phi)
+            # plt.xlim([x_st, x_fin])
+            # plt.ylim([y_fin, y_st])
 
             plt.legend(loc='upper right')
             plt.show()
