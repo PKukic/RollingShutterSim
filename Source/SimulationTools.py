@@ -700,8 +700,8 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps, ver
 
     ### Smooth out velocity ###
     
-    # for i in range(num_coord - 2):
-        # v_arr[i + 1] = (v_arr[i] + v_arr[i + 2]) / 2
+    for i in range(num_coord - 2):
+        v_arr[i + 1] = (v_arr[i] + v_arr[i + 2]) / 2
 
     print('Velocity smoothened out.')
     
