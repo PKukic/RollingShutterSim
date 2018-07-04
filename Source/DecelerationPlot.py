@@ -1,51 +1,64 @@
-import SimulationTools as st
+''' Check if the coordinateCorrection function works OK for decelerating meteors 
+'''
+
+# Python 2/3 compatibility
+from __future__ import print_function, division, absolute_import
+import SimulationTools as st 
 import Parameters as par
-import numpy as np 
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt 
+import numpy as np
+		
+# Used for testing
+show_plots = False
+rolling_shutter = True
+noise = 0
 
-omega_start = 50
+# Initial parameters of the meteor
+omega = 50
+phi = 45
 
-start = 0
-fin = omega_start*0.11
-step = omega_start*0.01
-delta_omega = np.arange(start, fin, step)
-
-
+# Deceleration parameters of the meteor
 a = 1
-b_arr = []
+v_start = omega
+v_finish = omega*0.9
 
-fin_t = 0.5
-dt = 0.005
-time_arr = np.arange(0, fin_t, dt)
+t_arr = np.arange(5/par.fps, 15/par.fps, 5/par.fps/30)
 
-for i in range(len(delta_omega)):
-	b_arr.append(st.getparam(a, omega_start, omega_start - delta_omega[i], fin_t))
+diff_avg_arr = []
+
+for i in range(len(t_arr)):
+
+	t_meteor = t_arr[i]
+
+	print('{:.4f}'.format(t_meteor))
+
+	# Form deceleration parameters array
+	dec_arr = [a, st.getparam(a, v_start, v_finish, t_meteor)]
+	print(dec_arr)
+
+	# Get centroid coordinates from rolling shutter simulation
+	print('Simulating rolling  shutter meteor...')
+	time_rolling_coordinates, centroid_rolling_coordinates, model_rolling_coordinates_spat = st.pointsCentroidAndModel(rolling_shutter, t_meteor, phi, \
+		omega, par.img_x, par.img_y, par.scale, par.fps, par.sigma_x, par.sigma_y, noise, par.offset, dec_arr, show_plots)
+	
+
+	centroid_rolling_coordinates_vcorr = st.coordinateCorrection(time_rolling_coordinates, centroid_rolling_coordinates, \
+		par.img_y, par.fps, version = 'v_corr')
+
+	diff_vcorr_arr = []
+
+	for i in range(len(centroid_rolling_coordinates_vcorr)):
+
+		diff_vcorr_arr.append(st.centroidDifference(model_rolling_coordinates_spat[i], centroid_rolling_coordinates_vcorr[i]))
 
 
-omega_arr = []
+	diff_avg = np.average(diff_vcorr_arr)
 
-for i in range(len(delta_omega)):
+	diff_avg_arr.append(diff_avg)
 
-	b_iter = b_arr[i]
-	omega_arr_iter = []
+plt.plot(t_arr, diff_avg_arr, 'bo-')
 
-	for t in time_arr:
-
-		omega_arr_iter.append((omega_start - a*b_iter*np.exp(b_iter*t))*par.scale)
-
-	omega_arr.append(omega_arr_iter)
-
-
-for i in range(len(delta_omega)):
-
-	plt.plot(time_arr, omega_arr[i], label = r'$\Delta \omega = {:.0f}$ %'.format(100*delta_omega[i]/omega_start))
-
-
-plt.title('Meteor deceleration')
-plt.xlabel('Time [s]')
-plt.ylabel('Velocity [px/s]')
-plt.legend(loc = 'best')
-
-plt.savefig('../Figures/Images/deceleration/dec_rep.png')
+plt.xlabel('Meteor duration [s]')
+plt.ylabel('Centroid offset [px]')
 
 plt.show()

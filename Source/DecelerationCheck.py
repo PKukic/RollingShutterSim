@@ -17,7 +17,7 @@ time_mark = 'beginning'
 # Initial parameters of the meteor
 omega = 50
 phi = 45
-t_meteor = 0.5
+t_meteor = 10/par.fps
 
 # Deceleration parameters of the meteor
 a = 1
