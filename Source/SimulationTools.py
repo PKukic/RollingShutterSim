@@ -604,6 +604,30 @@ def velocityCorrection(omega, phi, img_y, fps):
     return v_corr
 
 
+def getVelocity(time_coordinates, centroid_coordinates):
+
+    num_coord = len(centroid_coordinates)
+
+    r_arr = []
+    t_arr = []
+    v_arr = []
+
+    for i in range(num_coord - 1):
+        r = centroidDifference(centroid_coordinates[i + 1], centroid_coordinates[i])
+        r_arr.append(r)
+
+        t = time_coordinates[i + 1] - time_coordinates[i]
+        t_arr.append(t)
+
+    for i in range(num_coord - 1):
+        v_arr.append(r_arr[i] / t_arr[i])
+
+    v_arr.insert(0, v_arr[0])
+
+
+    return v_arr
+    
+
 def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps, version):
     ''' Corrects the centroid coordinates of a given meteor.
 
