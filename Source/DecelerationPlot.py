@@ -30,7 +30,7 @@ for i in range(len(t_arr)):
 
 	t_meteor = t_arr[i]
 
-	print('{:.4f}'.format(t_meteor))
+	print('{}'.format(t_meteor))
 
 	# Form deceleration parameters array
 	dec_arr = [a, st.getparam(a, v_start, v_finish, t_meteor)]

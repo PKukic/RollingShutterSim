@@ -250,11 +250,8 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
 
         # Define time limits
         t_start = -t_meteor/2 + i*(1/fps)
-        t_finish = -t_meteor/2 + (i + 1)*(1/fps)
 
-        # Last frame case
-        if i == (frame_number - 1):
-           t_finish = t_meteor/2
+        t_finish = -t_meteor/2 + (i + 1)*(1/fps)
 
         # print("time limits: {:.4f} {:.4f}".format(t_start, t_finish))
 
@@ -344,7 +341,6 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
                 # plt.show()
                 # plt.imshow(read_image_array)
                 # plt.show()
-
 
         
         if rolling_shutter:

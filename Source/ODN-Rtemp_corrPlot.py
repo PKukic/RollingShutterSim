@@ -31,6 +31,7 @@ plt.title("Meteor angle {} [deg] (temporal correction)".format(par.phi))
 
 # Configure the plot axis
 plt.axis('tight')
+plt.ylim((0, 0.22))
 
 # Save and show plot
 plt.savefig('../Graphs/ODN/graph_odn_temp_rolling.png')

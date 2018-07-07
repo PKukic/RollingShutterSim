@@ -17,12 +17,13 @@ time_mark = 'beginning'
 # Initial parameters of the meteor
 omega = 50
 phi = 45
-t_meteor = 10/par.fps
+t_meteor = 0.5
 
 # Deceleration parameters of the meteor
 a = 1
 v_start = omega
 v_finish = omega*0.9
+
 
 # Form deceleration parameters array
 dec_arr = [a, st.getparam(a, v_start, v_finish, t_meteor)]
@@ -72,7 +73,7 @@ for i in range(len(centroid_rolling_coordinates)):
 
 	plt.savefig('temp/{}.png'.format(i))
 
-	plt.show()
+	# plt.show()
 	
 # time_rolling_coordinates, centroid_rolling_coordinates, model_rolling_coordinates_spat = st.pointsCentroidAndModel(rolling_shutter, t_meteor, phi, \
 	# omega, par.img_x, par.img_y, par.scale, par.fps, par.sigma_x, par.sigma_y, noise, par.offset, dec_arr, show_plots, centroid_rolling_coordinates_vcorr)
@@ -136,3 +137,5 @@ plt.show()
 # diff_avg_temp = st.centroidAverageDifference(model_rolling_coordinates_temp, centroid_rolling_coordinates)
 
 # print('Average difference (temporal correction): {:.2f} [px]'.format(diff_avg_temp))
+
+
