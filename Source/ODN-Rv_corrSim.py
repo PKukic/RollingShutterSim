@@ -32,7 +32,8 @@ for noise in par.noise_scale_arr:
 		t_meteor = st.timeFromAngle(par.phi, omega_iter, par.img_x, par.img_y, par.scale, par.fps)
 
 		# Get deceleration parameters
-		dec_arr = [1, st.getparam(1, omega_iter, omega_iter*0.9, t_meteor)]
+		a = 1e-3
+		dec_arr = [a, st.getparam(a, omega_iter, omega_iter*0.9, t_meteor)]
 		print('Deceleration parameters: ', dec_arr)
 
 		# Get average model - centroid point difference for each meteor

@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 omega_start = 50
 
 start = 0
-fin = omega_start*0.21
-step = omega_start*0.02
+fin = omega_start*0.11
+step = omega_start*0.01
 delta_omega = np.arange(start, fin, step)
 
 print(delta_omega)
