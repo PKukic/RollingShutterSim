@@ -416,8 +416,8 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
             # plt.xkcd()
 
             # t_finish -= 0.5*1/fps
-            # t_mid = (t_start + t_finish/2)
-            # x_model, y_model = drawPoints(t_mid, x_center, y_center, scale, phi, omega, fit_param, t_meteor) 
+            t_mid = t_start
+            x_model, y_model = drawPoints(t_mid, x_center, y_center, scale, phi, omega, fit_param, t_meteor) 
 
             # Plot crop window
             plt.gca().add_patch(patches.Rectangle((x_start, y_start), x_finish - x_start, \
@@ -439,6 +439,9 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
             plt.ylim([y_fin, y_st])
 
             plt.legend(loc='upper right')
+
+            plt.savefig('../Images/centroids/{}.png'.format(i))
+
             plt.show()
 
         

@@ -7,10 +7,11 @@ import Parameters as par
 
 rolling_shutter = True
 phi = 45
-omega = 50
+omega = 45
 show_plots = True
 noise_scale = 10
-t_meteor = 0.5
+
+t_meteor = st.timeFromAngle(phi, omega, par.img_x, par.img_y, par.scale, par.fps)
 
 # Get model and centroid coordinates
 time_coordinates, centroid_coordinates, model_coordinates = st.pointsCentroidAndModel(rolling_shutter, t_meteor, phi, \
