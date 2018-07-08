@@ -23,7 +23,7 @@ plt.plot(omega_arr, noise2_data, 'g-', label = '$\sigma$ = {}'.format(par.noise_
 plt.plot(omega_arr, noise3_data, 'b-', label = '$\sigma$ = {}'.format(par.noise_scale_arr[3]))
 
 # Label the plot, set plot title, set legend
-plt.legend(loc = 'lower right')
+plt.legend(loc = 'best')
 plt.xlabel("Angular velocity [px/s]")
 plt.ylabel("Average model-centroid point difference [px]")
 plt.title("Meteor angle {} [deg] (temporal correction)".format(par.phi))
@@ -31,7 +31,7 @@ plt.title("Meteor angle {} [deg] (temporal correction)".format(par.phi))
 
 # Configure the plot axis
 plt.axis('tight')
-plt.ylim((0, 0.22))
+plt.ylim((0, 0.45))
 
 # Save and show plot
 plt.savefig('../Graphs/ODN/graph_odn_temp_rolling.png')

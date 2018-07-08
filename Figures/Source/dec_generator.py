@@ -16,7 +16,7 @@ delta_omega = np.arange(start, fin, step)
 
 print(delta_omega)
 
-a = 1.1/1000
+a = 1/1000
 b_arr = []
 
 fin_t = 0.5
