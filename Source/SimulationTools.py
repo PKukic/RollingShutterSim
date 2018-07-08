@@ -413,7 +413,11 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
             
             # print(x_start, y_start, x_finish, y_finish)
 
-            #plt.xkcd()
+            # plt.xkcd()
+
+            # t_finish -= 0.5*1/fps
+            # t_mid = (t_start + t_finish/2)
+            # x_model, y_model = drawPoints(t_mid, x_center, y_center, scale, phi, omega, fit_param, t_meteor) 
 
             # Plot crop window
             plt.gca().add_patch(patches.Rectangle((x_start, y_start), x_finish - x_start, \
@@ -423,16 +427,16 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
             plt.scatter(x_centr, y_centr, c='red', marker='o', label = 'centroid', s = 70)
 
             # Plot model centre
-            plt.scatter(x_model, y_model, c='blue', marker='o', label = 'model', s = 70)
+            plt.scatter(x_model, y_model, c='blue', marker='^', label = 'model', s = 70)
 
             if corr_coord != None:
                 plt.scatter(corrx, corry, c = 'green', marker = 'o', label = 'corrected', s = 70)
 
-            #  plt.axhline(y=y_model, c='b')
+            plt.axhline(y=y_model, c='b')
 
-            # (x_st, x_fin, y_st, y_fin) = calcSigmaWindowLimits(x_model, x_model, sigma_x*10, y_model, y_model, sigma_y*10, phi)
-            # plt.xlim([x_st, x_fin])
-            # plt.ylim([y_fin, y_st])
+            (x_st, x_fin, y_st, y_fin) = calcSigmaWindowLimits(x_model, x_model, sigma_x*10, y_model, y_model, sigma_y*10, phi)
+            plt.xlim([x_st, x_fin])
+            plt.ylim([y_fin, y_st])
 
             plt.legend(loc='upper right')
             plt.show()

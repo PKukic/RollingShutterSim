@@ -17,19 +17,21 @@ noise2_data = data['arr_3']
 noise3_data = data['arr_4']
 
 # Plot all four noise arrays
-plt.plot(omega_arr, noise0_data, 'c-', label = '$\sigma$ = {}'.format(par.noise_scale_arr[0]))
-plt.plot(omega_arr, noise1_data, 'r-', label = '$\sigma$ = {}'.format(par.noise_scale_arr[1]))
-plt.plot(omega_arr, noise2_data, 'g-', label = '$\sigma$ = {}'.format(par.noise_scale_arr[2]))
-plt.plot(omega_arr, noise3_data, 'b-', label = '$\sigma$ = {}'.format(par.noise_scale_arr[3]))
+plt.plot(omega_arr, noise0_data, c = '0.8', ls = '-', label = '$\sigma$ = {}'.format(par.noise_scale_arr[0]))
+plt.plot(omega_arr, noise1_data, c = '0.8', ls = '--', label = '$\sigma$ = {}'.format(par.noise_scale_arr[1]))
+plt.plot(omega_arr, noise2_data, c = '0.5', ls = '-', label = '$\sigma$ = {}'.format(par.noise_scale_arr[2]))
+plt.plot(omega_arr, noise3_data, c = '0.5', ls = '--', label = '$\sigma$ = {}'.format(par.noise_scale_arr[3]))
 
 # Label the plot, set plot title, set legend
-plt.legend(loc = 'lower right')
+plt.legend(loc = 'best')
 plt.xlabel("Angular velocity [px/s]")
 plt.ylabel("Average model-centroid point difference [px]")
 plt.title("Meteor angle {} [deg] (global shutter)".format(par.phi))
 
 # Configure the plot axis
 plt.axis('tight')
+
+plt.ylim((0, 0.45))
 
 # Save and show plot
 plt.savefig('../Graphs/ODN/graph_odn_global.png')
