@@ -1,4 +1,4 @@
-''' Fit a model to the meteor angle [omega] - Y centroid coordinate [ycentr] - Model-centroid point difference [diff] data.
+`''' Fit a model to the meteor angle [omega] - Y centroid coordinate [ycentr] - Model-centroid point difference [diff] data.
 '''
 
 # Python 2/3 compatibility

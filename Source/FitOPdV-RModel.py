@@ -3,7 +3,7 @@
 import numpy as np 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-import scipy.optimize as opt
+# import scipy.optimize as opt
 import Parameters as par
 
 # Load data
@@ -14,28 +14,34 @@ omega_arr = data['arr_0']
 phi_arr = data['arr_1']
 deltav_arr = data['arr_2']
 
+print(max(omega_arr))
+
+# print(omega_arr)
+
 # Model function
-def correctionModel(param, a, b):
+def correctionModel(param, wo):
 
     # Define parameters and unpack from tuple
-    omega = param[0]
+    wroll = param[0]
     phi = np.deg2rad(param[1])
 
-    # Model
-    return (a*omega**2)*np.sin(phi + np.pi/2) + (b*omega**2)*np.sin(2*phi + np.pi/2) + b*omega**2
 
+    # Model
+    wdelta = - wo * (np.cos(phi)*(wroll/wo)**2 + 0.5*(1+np.cos(2*phi))*(wroll/wo)**3)
+
+    return wdelta
 
 # Fit model to data
-param, pcov = opt.curve_fit(correctionModel, (omega_arr, phi_arr), deltav_arr)
-print(param)
+# param, pcov = opt.curve_fit(correctionModel, (omega_arr, phi_arr), deltav_arr)
+# print(param)
+# print(param[0]/param[1])
 
 # Compare with estimated parameters
-a = -1.0/(par.img_y*par.fps)
-b = -1.0/(par.img_y*par.fps**2)
-print(a, b)
+wo = par.img_y * par.fps
+print(wo)
 
 # Calculate the difference between the model and the actual data
-fit = correctionModel((omega_arr, phi_arr), *param)
+fit = correctionModel((omega_arr, phi_arr), wo)
 delta = deltav_arr - fit
 
 # Check the maximum deviation of the model from the actual data 
@@ -67,7 +73,7 @@ plt.show()
 # compare to 3D scatter plot of the actual data
 fig = plt.figure()
 ax = Axes3D(fig)
-ax.plot_wireframe(omega_arr, phi_arr, fit, rstride = 1000, cstride = 1000)
+# ax.plot_wireframe(omega_arr, phi_arr, fit, rstride = 1000, cstride = 1000)
 ax.scatter(omega_arr, phi_arr, deltav_arr, c = deltav_arr, lw = 0)
 
 # Label and set title
