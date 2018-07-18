@@ -1,7 +1,10 @@
-""" Plot data obtained by the omega-difference-noise simulation for the rolling shutter camera, with the centroid coordinates corrected.
+""" Plot data obtained by the omega-difference-noise simulation for the rolling shutter camera, with the centroid coordinates SPATIALLY corrected.
+	Note: The centroid velocities are left UNCORRECTED.
 """
+
 # Python 2/3 compatibility
 from __future__ import print_function, division, absolute_import
+
 import matplotlib.pyplot as plt
 import numpy as np
 import Parameters as par

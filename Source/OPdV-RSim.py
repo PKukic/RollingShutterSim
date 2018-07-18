@@ -50,7 +50,7 @@ for omega in par.omega_odn_arr:
 			# Calculate the actual velocity
 			true_v_global = omega * par.scale
 			
-			# Calculate velocity error
+			# Calculate the velocity offset
 			delta_v = true_v_global - avg_v_rolling
 
 			print("Velocity: {:.2f}; angle: {}; velocity error: {:.2f}".format(avg_v_rolling, phi, delta_v))
@@ -63,5 +63,5 @@ omega_data = [point[0] for point in omega_phi_deltav_arr]
 phi_data = [point[1] for point in omega_phi_deltav_arr]
 deltav_data = [point[2] for point in omega_phi_deltav_arr]
 
-# Save data
+# Save data as an NPZ file
 np.savez('../Data/OPdV-R/data_velocity_error_rolling.npz', *[omega_data, phi_data, deltav_data])

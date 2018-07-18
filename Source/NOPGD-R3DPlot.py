@@ -1,4 +1,4 @@
-""" Plotting data obtained by the omega-phi-average difference [px] rolling shutter simulation.
+""" Plot data obtained by the noise-omega-phi-average difference [px] rolling shutter simulation.
 """
 
 # Python 2/3 compatibility

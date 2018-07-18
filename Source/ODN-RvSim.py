@@ -1,5 +1,5 @@
 """ Simulate the difference of the model and centroid points for the rolling shutter camera, depending on meteor velocity
-	and background noise value. The centroid coordinates are corrected.
+	and background noise value. The centroid coordinates are corrected, but the centroid velocities aren't.
 """
 
 # Python 2/3 compatibility

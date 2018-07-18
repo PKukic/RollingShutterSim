@@ -1,4 +1,4 @@
-""" Plotting data obtained by the omega-phi-delta velocity rolling shutter simulation.
+""" Plotting data obtained by the omega-phi-delta velocity rolling shutter simulation. [3D PLOT]
 """
 
 # Python 2/3 compatibility

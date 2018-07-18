@@ -1,7 +1,9 @@
-""" Plot data obtained by the omega-difference-noise simulation for the rolling shutter camera, with the centroid coordinates corrected.
+""" Plot data obtained by the omega-difference-noise simulation for the rolling shutter camera, with the centroid coordinates TEMPORALLY corrected.
 """
+
 # Python 2/3 compatibility
 from __future__ import print_function, division, absolute_import
+
 import matplotlib.pyplot as plt
 import numpy as np
 import Parameters as par
@@ -31,6 +33,8 @@ plt.title("Meteor angle {} [deg] (temporal correction)".format(par.phi))
 
 # Configure the plot axis
 plt.axis('tight')
+
+# Limit the centroid offset to the maximum offset found throughout the spatial and temporal simulations
 plt.ylim((0, 0.45))
 
 # Save and show plot

@@ -1,7 +1,9 @@
 """ Plot data obtained by the omega-difference-noise simulation.
 """
+
 # Python 2/3 compatibility
 from __future__ import print_function, division, absolute_import
+
 import matplotlib.pyplot as plt
 import numpy as np
 import Parameters as par

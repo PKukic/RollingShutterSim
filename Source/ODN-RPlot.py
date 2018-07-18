@@ -1,5 +1,6 @@
 """ Plot data obtained by the omega-difference-noise simulation for the rolling shutter camera
 """
+
 # Python 2/3 compatibility
 from __future__ import print_function, division, absolute_import
 import matplotlib.pyplot as plt

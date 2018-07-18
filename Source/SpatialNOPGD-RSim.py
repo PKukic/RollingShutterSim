@@ -81,4 +81,5 @@ for noise in par.noise_scale_arr:
 	phi_data = [point[1] for point in omega_phi_avg_diff_arr]
 	diff_avg_data = [point[2] for point in omega_phi_avg_diff_arr]
 
+	# Save the data as a file
 	np.savez('../Data/SpatialNOPGD-R/data_spatnopgd_rolling_{}.npz'.format(noise), *[omega_data, phi_data, diff_avg_data])
