@@ -591,11 +591,11 @@ def calculateCorrection(ycentr, img_y, omega_pxs, fps):
 
     return (1 - ycentr / img_y) * (omega_pxs / fps)
 
-def velocityCorrection(omega, phi, img_y, fps):
+def velocityCorrection(omega_roll, phi, img_y, fps):
     ''' Corrects the velocity of a given point.
 
         Arguments:
-            omega_pxs: [int or float] Meteor angular velocity [px/s].
+            omega_roll: [int or float] Meteor angular velocity [px/s].
             phi: [int or float] Meteor angle on the image.
             img_y: [int] Image Y coordinate size
             fps: [int] Number of frames per second taken by the camera.
@@ -605,16 +605,25 @@ def velocityCorrection(omega, phi, img_y, fps):
     '''
 
     # Define parameters used for correcting the velocity
-    a = -1.0/(img_y * fps)
-    b = -1.0/(img_y * fps ** 2)
+    omega_o = img_y * fps
 
     # Correct velocity using found model
-    v_corr = (a*omega**2)*np.sin(phi + np.pi/2) + (b*omega**2)*np.sin(2*phi + np.pi/2) + b*omega**2
+    v_corr = - omega_roll * ((np.cos(phi)*omega_roll/omega_o) / (1+np.cos(phi)*omega_roll/omega_o))
 
     return v_corr
 
 
 def getVelocity(time_coordinates, centroid_coordinates):
+    ''' Calculates the instanteanous velocities for a given set of temporal and spatial coordinates. 
+
+        Arguments:
+            time_coordinates: [array of floats] Temporal coordinates. (s)
+            centroid_coordinates: [array of floats] Spatial coordinates (centroid coordinates). (px)
+
+        Returns:
+            v_arr: [array of floats] Array of instanteanous velocities. (px/s)
+
+    '''
 
     num_coord = len(centroid_coordinates)
 
@@ -622,6 +631,7 @@ def getVelocity(time_coordinates, centroid_coordinates):
     t_arr = []
     v_arr = []
 
+    # Construct the instantaneous velocity array
     for i in range(num_coord - 1):
         r = centroidDifference(centroid_coordinates[i + 1], centroid_coordinates[i])
         r_arr.append(r)
@@ -632,6 +642,8 @@ def getVelocity(time_coordinates, centroid_coordinates):
     for i in range(num_coord - 1):
         v_arr.append(r_arr[i] / t_arr[i])
 
+
+    # Assume that the initial velocity is equal to the subsequent velocity
     v_arr.insert(0, v_arr[0])
 
 
@@ -814,13 +826,29 @@ def timeCorrection(centroid_coordinates, img_y, fps, t_meteor, time_mark):
 
     return time_coordinates_corr
 
-def getModelfromTime(time_coordinates_corr, img_x, img_y, scale, phi, omega, dec_arr, t_meteor):
+
+def getModelfromTime(time_coordinates_corr, img_x, img_y, scale, phi, omega, fit_param, t_meteor):
+    ''' Finds the model coordinates equivalent to the temporally corrected time coordinates. 
+
+        Arguments:
+            time_coordinates_corr: [array of floats] Corrected time coordinates of the meteor.
+            img_x: [int] Size of image X axis. 
+            img_y: [int] Size of image Y axis.
+            scale: [float] Image scale in px/deg.
+            phi: [int or float] Meteor angle, counterclockwise from Y axis.
+            omega: [int or float] Meteor angular velocity in deg.
+            fit_param: [array of floats] Parameters of the exponentional meteor deceleration function.
+            t_meteor: [int or float] Duration of meteor.
+
+        Returns:
+            model_coordinates_temp: [array of tuples of floats] The computed model coordinates. (px, px)
+    '''
 
     model_coordinates_temp = []
 
     for i in range(len(time_coordinates_corr)):
 
-        x_model, y_model = drawPoints(time_coordinates_corr[i], img_x/2, img_y/2, scale, phi, omega, dec_arr, t_meteor)
+        x_model, y_model = drawPoints(time_coordinates_corr[i], img_x/2, img_y/2, scale, phi, omega, fit_param, t_meteor)
         model_coordinates_temp.append((x_model, y_model))
 
     return model_coordinates_temp
