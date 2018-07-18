@@ -813,6 +813,17 @@ def timeCorrection(centroid_coordinates, img_y, fps, t_meteor, time_mark):
 
     return time_coordinates_corr
 
+def getModelfromTime(time_coordinates_corr, img_x, img_y, scale, phi, omega, dec_arr, t_meteor):
+
+    model_coordinates_temp = []
+
+    for i in range(len(time_coordinates_corr)):
+
+        x_model, y_model = drawPoints(time_coordinates_corr[i], img_x/2, img_y/2, scale, phi, omega, dec_arr, t_meteor)
+        model_coordinates_temp.append((x_model, y_model))
+
+    return model_coordinates_temp
+
 
 def meteorCorrection(time_coordinates, centroid_coordinates, img_y, fps, correction_type, frame_timestamp):
 
