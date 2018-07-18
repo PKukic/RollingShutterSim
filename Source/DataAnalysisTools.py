@@ -1,3 +1,6 @@
+''' Tools for dealing with RMS and CAMO data, and applying coordinate corrections to the data.
+'''
+
 import numpy as np
 import sys
 import os
@@ -14,7 +17,7 @@ def thetaToH(theta):
 		Arguments:
 			theta: [float] Theta angle, measured from the zenith to the ground. 
 
-		Return:
+		Returns:
 			height: [float] The height corresponding to a given theta angle. 
 	'''
 
@@ -29,7 +32,7 @@ def phiToAz(phi):
 		Arguments:
 			phi: [float] Phi angle. 
 
-		Return:
+		Returns:
 			azim: [float] Azimuth. 
 	'''
 
@@ -38,7 +41,6 @@ def phiToAz(phi):
 	return azim
 
 
-# Distance between two positions in the spherical coordinate system function
 def angleDist(pos_a, pos_b):
 	''' Calculates the distance between two points in a spherical coordinate system. 
 
@@ -46,7 +48,7 @@ def angleDist(pos_a, pos_b):
 			pos_a: [tuple of floats] First position composed of (height, azimuth) coordinates. (deg, deg)
 			pos_b: [tuple of floats] Second position composed of (height, azimuth) coordinates. (deg, deg)
 
-		Return:
+		Returns:
 			dist: [tuple of floats] Distance between the first and second points. (deg)
 	'''
 
@@ -65,7 +67,16 @@ def angleDist(pos_a, pos_b):
 
 	return dist
 
+
 def findFITS(fits_dir):
+    ''' Finds all *FITS files in a given directory. 
+
+        Arguments:
+            fits_dir: [string] The directory name. 
+
+        Returns:
+            fits_files: [list of strings] List containing the filenames in the directory. 
+    '''
 
     fits_files = []
 
@@ -77,32 +88,61 @@ def findFITS(fits_dir):
     return fits_files
 
 
-
 def phiList(data_dir, data_name, fits_files):
+    ''' Finds all meteor angles for a given set of meteors. 
 
+        Arguments:
+            data_dir: [string] The directory of the FTPdetectinfo file.
+            data_name: [string] The name of the FTPdetectinfo file.
+            fits_files: [list of strings] List containing the *FITS filenames in the directory. 
+
+        Returns:
+            phi_arr: [list of floats] All of the found meteor angles.
+    '''
+
+    # Read the FTP
     data = ftp.readFTPdetectinfo(data_dir, data_name)
 
     phi_arr = []
 
     for i in range(len(data)):
 
+        # Unpack one meteor
         meteor_data = data[i]
+
+        # Find the angle
         ff_name, phi = meteor_data[0], meteor_data[10]
 
+        # Check if in a given array
         if ff_name in fits_files:
             phi_arr.append(phi)
 
     return phi_arr
 
 
-def correctDataSpatial(data_dir, data_name, fits_files, ftp_dir, ftp_name, img_y):
+def correctDataSpatial(data_dir, data_name, fits_files, save_dir, save_name, img_y):
+    ''' Corrects a given FTPdetectinfo file using the spatial correction (see SimulationTools).
 
+        Arguments:
+            data_dir: [string] The directory of the FTPdetectinfo file.
+            data_name: [string] The name of the FTPdetectinfo file.
+            fits_files: [list of strings] List containing the *FITS filenames in the directory.
+            save_dir: [string] The directory where the new FTPdetectinfo file is saved. 
+            save_name: [string] The name of the new FTPdetectinfo. 
+            img_y: [float] The vertical image resolution. (px)
+
+        Returns:
+            None
+    ''' 
+
+    # Read the FTP
     data = ftp.readFTPdetectinfo(data_dir, data_name)
 
     meteor_list_spat = []
 
     for i in range(len(data)):
 
+        # Unpack one meteor
         meteor_data = data[i]
 
         ff_name, cam_code, meteor_no, n_segments, fps, hnr, mle, binn, pix_fm, rho, phi, meteor_meas = \
@@ -146,19 +186,37 @@ def correctDataSpatial(data_dir, data_name, fits_files, ftp_dir, ftp_name, img_y
     cam_code = data[0][1]
     fps = data[0][4]
 
-    ftp.writeFTPdetectinfo(meteor_list_spat, ftp_dir, ftp_name, ftp_dir, cam_code, fps, calibration=None, celestial_coords_given=True)
+    # Write the new FTPdetectinfo
+    ftp.writeFTPdetectinfo(meteor_list_spat, save_dir, save_name, save_dir, cam_code, fps, calibration=None, celestial_coords_given=True)
 
     return None
 
 
-def correctDataTemporal(data_dir, data_name, fits_files, ftp_dir, ftp_name, img_y, time_mark):
+def correctDataTemporal(data_dir, data_name, fits_files, save_dir, save_name, img_y, time_mark):
+    ''' Corrects a given FTPdetectinfo file using the spatial correction (see SimulationTools).
 
+        Arguments:
+            data_dir: [string] The directory of the FTPdetectinfo file.
+            data_name: [string] The name of the FTPdetectinfo file.
+            fits_files: [list of strings] List containing the *FITS filenames in the directory.
+            save_dir: [string] The directory where the new FTPdetectinfo file is saved. 
+            save_name: [string] The name of the new FTPdetectinfo. 
+            img_y: [float] The vertical image resolution. (px)
+            time_mark: [string] Indicates the position of the time mark for each frame. 'start' if the time mark is
+                at the start of the frame, 'end' if it is on the end of the frame.
+
+        Returns:
+            None
+    ''' 
+
+    # Read the FTP
     data = ftp.readFTPdetectinfo(data_dir, data_name)
 
     meteor_list_temp = []
 
     for i in range(len(data)):
 
+        # Unpack one meteor
         meteor_data = data[i]
 
         ff_name, cam_code, meteor_no, n_segments, fps, hnr, mle, binn, pix_fm, rho, phi, meteor_meas = \
@@ -201,27 +259,53 @@ def correctDataTemporal(data_dir, data_name, fits_files, ftp_dir, ftp_name, img_
     cam_code = data[0][1]
     fps = data[0][4]
 
-    ftp.writeFTPdetectinfo(meteor_list_temp, ftp_dir, ftp_name, ftp_dir, cam_code, fps, calibration=None, celestial_coords_given=True)
+    # Write the new FTPdetectinfo
+    ftp.writeFTPdetectinfo(meteor_list_temp, save_dir, save_name, save_dir, cam_code, fps, calibration=None, celestial_coords_given=True)
 
     return None
 
 
-def correctCelestial(rms_dir, project_dir, raw_dir, ftp_name):
+def correctCelestial(rms_dir, project_dir, data_dir, save_name):
+    ''' Applies the astrometric conversions (corrects the celestial coordinates) to a given data directory. 
+
+        Arguments:
+            rms_dir: [string] Local RMS directory location. 
+            project_dir: [string] Local RollingShutterSim repository location.
+            data_dir: [string] The directory on which the astrometric conversions are applied. 
+            save_name: [string] The directory where the calibrated data is saved. 
+    
+        Returns:
+            None
+    '''
 
     os.chdir(rms_dir)
-    os.system('python -m RMS.Astrometry.ApplyAstrometry ' + raw_dir + ftp_name)
+    os.system('python -m RMS.Astrometry.ApplyAstrometry ' + data_dir + save_name)
     os.chdir(project_dir + 'Source/')
 
     return None
 
-def FTPtoAVT(data_dir, data_name, fits_files):
 
+def FTPtoAVT(data_dir, data_name, fits_files):
+    ''' Reads the data from a given FTPdetectinfo file and computes angular velocities of meteors for that file. 
+
+        Arguments:
+            data_dir: [string] The directory of the FTPdetectinfo file.
+            data_name: [string] The name of the FTPdetectinfo file.
+            fits_files: [list of strings] List containing the *FITS filenames in the directory.
+
+        Returns:
+            fint_arr, av_arr: [two arrays of floats] The time coordinates and angular velocities of meteors.
+    '''
+
+    # Read the FTP
     data = ftp.readFTPdetectinfo(data_dir, data_name)
 
     for i in range(len(data)):
 
+        # Unpack one meteor
         meteor_data = data[i]
 
+        # Only need its name, measurements and FPS
         ff_name = meteor_data[0]
         fps = meteor_data[4]
         meteor_meas = meteor_data[11]
@@ -252,6 +336,7 @@ def FTPtoAVT(data_dir, data_name, fits_files):
                 deltat = t_arr[coord_i] - t_arr[coord_i-1]
                 deltat_arr.append(deltat)
 
+            # Construct AV array and final time array
             for coord_i in range(n_coord-1):
 
                 av = dist_arr[coord_i]/deltat_arr[coord_i]
