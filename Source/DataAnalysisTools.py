@@ -1,6 +1,9 @@
 ''' Tools for dealing with RMS and CAMO data, and applying coordinate corrections to the data.
 '''
 
+# Python 2/3 compatibility
+from __future__ import print_function, division, absolute_import
+
 import numpy as np
 import sys
 import os

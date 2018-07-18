@@ -1,6 +1,9 @@
 ''' Fit a velocity error model to the meteor velocity [omega] - meteor angle [phi] - velocity error [deltav] data.
 '''
 
+# Python 2/3 compatibility
+from __future__ import print_function, division, absolute_import
+
 import numpy as np 
 import matplotlib.pyplot as plt
 import scipy.optimize as opt
