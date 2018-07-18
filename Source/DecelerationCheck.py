@@ -76,7 +76,6 @@ for i in range(len(centroid_rolling_coordinates)):
 	plt.close()
 
 # Compute the difference between the true (global shutter) centroid positions and positions created by applying corrections to centroids
-
 diff_arr = []
 diff_v_arr = []
 diff_vcorr_arr = []

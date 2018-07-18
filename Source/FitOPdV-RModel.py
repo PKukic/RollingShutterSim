@@ -1,9 +1,10 @@
 ''' Fit a velocity error model to the meteor velocity [omega] - meteor angle [phi] - velocity error [deltav] data.
 '''
+
 import numpy as np 
 import matplotlib.pyplot as plt
+import scipy.optimize as opt
 from mpl_toolkits.mplot3d import Axes3D
-# import scipy.optimize as opt
 import Parameters as par
 
 # Load data
@@ -14,39 +15,38 @@ omega_arr = data['arr_0']
 phi_arr = data['arr_1']
 deltav_arr = data['arr_2']
 
-print(max(omega_arr))
-
-# print(omega_arr)
-
 # Model function
-def correctionModel(param, wo):
+def correctionModel(param, omega_o):
 
     # Define parameters and unpack from tuple
-    wroll = param[0]
+    omega_roll = param[0]
     phi = np.deg2rad(param[1])
 
-
     # Model
-    wdelta = - wo * (np.cos(phi)*(wroll/wo)**2 + 0.5*(1+np.cos(2*phi))*(wroll/wo)**3)
+    omega_delta = - omega_roll * ((np.cos(phi)*omega_roll/omega_o) / (1+np.cos(phi)*omega_roll/omega_o))
 
-    return wdelta
+    return omega_delta
+
 
 # Fit model to data
-# param, pcov = opt.curve_fit(correctionModel, (omega_arr, phi_arr), deltav_arr)
-# print(param)
-# print(param[0]/param[1])
+param, pcov = opt.curve_fit(correctionModel, (omega_arr, phi_arr), deltav_arr)
+print(param)
 
 # Compare with estimated parameters
-wo = par.img_y * par.fps
-print(wo)
+omega_o = par.img_y * par.fps
+print(omega_o)
 
 # Calculate the difference between the model and the actual data
-fit = correctionModel((omega_arr, phi_arr), wo)
+fit = correctionModel((omega_arr, phi_arr), omega_o)
 delta = deltav_arr - fit
 
 # Check the maximum deviation of the model from the actual data 
-deviation = max(abs(min(delta)), max(delta))
-print('Maximum deviation from the data: {:.2f}'.format(deviation))
+max_deviation = max(abs(min(delta)), max(delta))
+print('Maximum deviation from the data: {:.2f}'.format(max_deviation))
+
+# Check the maximum velocity
+max_omega = max(omega_arr)
+print('Maximum rolling shutter velocity [px/s]: {:.2f}'.format(max_omega))
 
 ### Model - data difference plot ###
 
