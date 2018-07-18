@@ -5,7 +5,9 @@
 from __future__ import print_function, division, absolute_import
 import SimulationTools as st 
 import Parameters as par
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
+
+plt.ioff() 
 		
 # Used for testing
 show_plots = False
@@ -19,7 +21,7 @@ phi = 45
 t_meteor = 0.5
 
 # Deceleration parameters of the meteor
-a = 1
+a = 1e-3
 v_start = omega
 v_finish = omega*0.9
 
@@ -47,24 +49,22 @@ centroid_rolling_coordinates_v = st.coordinateCorrection(time_rolling_coordinate
 centroid_rolling_coordinates_vcorr = st.coordinateCorrection(time_rolling_coordinates, centroid_rolling_coordinates, \
 	par.img_y, par.fps, version = 'v_corr')
 
-diff_arr = []
-diff_v_arr = []
-diff_vcorr_arr = []
+# Apply the temporal correction to centroid coordinates
+time_rolling_coordinates_corr = st.timeCorrection(centroid_rolling_coordinates, par.img_y, par.fps, t_meteor, time_mark)
 
-plt.ioff()
+# Compute the model coordinates for the temporally corrected centroid coordinates
+model_rolling_coordinates_temp = st.getModelfromTime(time_rolling_coordinates_corr, par.img_x, par.img_y, par.scale, phi, omega, dec_arr, t_meteor)
 
+
+# Plot the model coordinates, and spatially corrected coordinates with corrected and uncorrected centroid velocities
 for i in range(len(centroid_rolling_coordinates)):
+	
 	print(model_rolling_coordinates_spat[i], centroid_rolling_coordinates[i], centroid_rolling_coordinates_vcorr[i], centroid_rolling_coordinates_v[i])
-
-
-	diff_arr.append(st.centroidDifference(model_rolling_coordinates_spat[i], centroid_rolling_coordinates[i]))
-	diff_v_arr.append(st.centroidDifference(model_rolling_coordinates_spat[i], centroid_rolling_coordinates_v[i]))
-	diff_vcorr_arr.append(st.centroidDifference(model_rolling_coordinates_spat[i], centroid_rolling_coordinates_vcorr[i]))
 
 	plt.scatter(model_rolling_coordinates_spat[i][0], model_rolling_coordinates_spat[i][1], label = 'model')
 	plt.scatter(centroid_rolling_coordinates[i][0], centroid_rolling_coordinates[i][1], label = 'centroid')
-	plt.scatter(centroid_rolling_coordinates_vcorr[i][0], centroid_rolling_coordinates_vcorr[i][1], label = 'corrected vel')
-	plt.scatter(centroid_rolling_coordinates_v[i][0], centroid_rolling_coordinates_v[i][1], label = 'uncorrected vel')
+	plt.scatter(centroid_rolling_coordinates_vcorr[i][0], centroid_rolling_coordinates_vcorr[i][1], label = ' spatial [vcorr]')
+	plt.scatter(centroid_rolling_coordinates_v[i][0], centroid_rolling_coordinates_v[i][1], label = 'spatial [v]')
 
 	plt.legend(loc = 'best')
 
@@ -74,32 +74,33 @@ for i in range(len(centroid_rolling_coordinates)):
 	plt.savefig('../Graphs/DecelerationCheck/{}.png'.format(i))
 
 	plt.close()
-	
-# time_rolling_coordinates, centroid_rolling_coordinates, model_rolling_coordinates_spat = st.pointsCentroidAndModel(rolling_shutter, t_meteor, phi, \
-	# omega, par.img_x, par.img_y, par.scale, par.fps, par.sigma_x, par.sigma_y, noise, par.offset, dec_arr, show_plots, centroid_rolling_coordinates_vcorr)
 
+# Compute the difference between the true (global shutter) centroid positions and positions created by applying corrections to centroids
 
+diff_arr = []
+diff_v_arr = []
+diff_vcorr_arr = []
+diff_temp_arr = []
 
-# Correct the rolling shutter temporal coordinates
-print('Correcting temporal coordinates...')
-time_rolling_coordinates_corr = st.timeCorrection(centroid_rolling_coordinates, par.img_y, par.fps, t_meteor, time_mark)
+for i in range(len(centroid_rolling_coordinates)):
 
-# Calculate the model points' coordinates
-print('Getting model coordinates...')
-model_rolling_coordinates_temp = []
+	diff_arr.append(st.centroidDifference(model_rolling_coordinates_spat[i], centroid_rolling_coordinates[i]))
+	diff_v_arr.append(st.centroidDifference(model_rolling_coordinates_spat[i], centroid_rolling_coordinates_v[i]))
+	diff_vcorr_arr.append(st.centroidDifference(model_rolling_coordinates_spat[i], centroid_rolling_coordinates_vcorr[i]))
+	diff_temp_arr.append(st.centroidDifference(model_rolling_coordinates_spat[i], model_rolling_coordinates_temp[i]))
 
-for i in range(len(time_rolling_coordinates)):
-
-	x_model, y_model = st.drawPoints(time_rolling_coordinates_corr[i], par.img_x/2, par.img_y/2, par.scale, phi, omega, dec_arr, t_meteor)
-	model_rolling_coordinates_temp.append((x_model, y_model))
-
+# Compute the velocity arrays of different centroid coordinate arrays
 vel_v = st.getVelocity(time_rolling_coordinates, centroid_rolling_coordinates_v)
 vel_vcorr = st.getVelocity(time_rolling_coordinates, centroid_rolling_coordinates_vcorr)
+vel_temp = st.getVelocity(time_rolling_coordinates_corr, model_rolling_coordinates_temp)
 vel_model = st.getVelocity(time_rolling_coordinates, model_rolling_coordinates_spat)
 
-plt.plot(time_rolling_coordinates, vel_v, label = 'uncorrected velocity')
-plt.plot(time_rolling_coordinates, vel_vcorr, label = 'corrected velocity')
+
+# Plot the velocities over time
 plt.plot(time_rolling_coordinates, vel_model, label = 'model')
+plt.plot(time_rolling_coordinates_corr, vel_temp, label = 'temporal')
+plt.plot(time_rolling_coordinates, vel_v, label = 'spatial [v]')
+plt.plot(time_rolling_coordinates, vel_vcorr, label = 'spatial [vcorr]')
 
 plt.xlabel('Time [s]')
 plt.ylabel('Velocity [px/s]')
@@ -110,12 +111,11 @@ plt.savefig('../Graphs/DecelerationCheck/vel_time.png')
 
 plt.close()
 
-# diff_v = [st.centroidDifference(x, y) for x, y in zip(model_rolling_coordinates_spat, centroid_rolling_coordinates_v)]
-# diff_vcorr = [st.centroidDifference(x, y) for x, y in zip(model_rolling_coordinates_spat, centroid_rolling_coordinates_vcorr)]
-
-plt.plot(time_rolling_coordinates, diff_arr, label = 'centroid')
-plt.plot(time_rolling_coordinates, diff_v_arr, label = 'uncorrected velocity')
-plt.plot(time_rolling_coordinates, diff_vcorr_arr, label = 'corrected velocity')
+# Plot the centroid offsets over time
+plt.plot(time_rolling_coordinates, diff_arr, label = 'uncorrected')
+plt.plot(time_rolling_coordinates_corr, diff_temp_arr, label = 'temporal')
+plt.plot(time_rolling_coordinates, diff_v_arr, label = 'spatial [v]')
+plt.plot(time_rolling_coordinates, diff_vcorr_arr, label = 'spatial [vcorr]')
 
 plt.xlabel('Time [s]')
 plt.ylabel('Centroid offset [px]')
@@ -125,16 +125,3 @@ plt.legend(loc = 'best')
 plt.savefig('../Graphs/DecelerationCheck/offset_time.png')
 
 plt.close()
-
-
-# print('Calculating average difference...')
-# diff_avg_spat = st.centroidAverageDifference(centroid_rolling_coordinates_corr, model_rolling_coordinates_spat)
-
-# print('Average difference (spatial correction): {:.2f} [px]'.format(diff_avg_spat))
-
-# print('Calculating average difference...')
-# diff_avg_temp = st.centroidAverageDifference(model_rolling_coordinates_temp, centroid_rolling_coordinates)
-
-# print('Average difference (temporal correction): {:.2f} [px]'.format(diff_avg_temp))
-
-
