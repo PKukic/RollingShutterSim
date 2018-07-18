@@ -26,7 +26,7 @@ def correctionModel(param, omega_o):
     phi = np.deg2rad(param[1])
 
     # Model
-    omega_delta = - omega_roll * ((np.cos(phi)*omega_roll/omega_o) / (1+np.cos(phi)*omega_roll/omega_o))
+    omega_delta = - (np.cos(phi)*omega_roll**2)/(omega_o+np.cos(phi)*omega_roll)
 
     return omega_delta
 
