@@ -1,87 +1,64 @@
 import numpy as np 
 import matplotlib.pyplot as plt 
-import os
 import re
 
-# Directories where both the angular velocity data and the corrected angular velocity data are saved
-RMS_NOCORR_DIR =  '../Data/0521/CA0001_20180521_012018_461559/ang_vel_nocorr/'
-RMS_TEMP_DIR = '../Data/0521/CA0001_20180521_012018_461559/ang_vel_temp/'
-RMS_SPAT_DIR = '../Data/0521/CA0001_20180521_012018_461559/ang_vel_spat/'
-CAMO_DIR = '../Data/0521/camo_20180521/ang_vel/'
+import DataAnalysisTools as dat
 
-# Directories where the plots are saved
-SAVE = '../Plots/0521/all/'
-ANG_DIR = '../Data/0521/angles/'
+# Directories where both the angular velocity data and the corrected angular velocity data are saved
+camo_dir = '../Observations/0521/ang_vel_CAMO/'
+rms_dir = '../Observations/0521/ang_vel_RMS/'
+save = '../Graphs/Obs-0521/'
+ang_dir = '../Observations/0521/angles/'
 
 # Directory matrix
-DIR_ARR = [RMS_NOCORR_DIR, RMS_TEMP_DIR, RMS_SPAT_DIR, CAMO_DIR]
+files_arr = [dat.findCAMO(camo_dir), dat.findNoCorr(rms_dir), dat.findTemporal(rms_dir), dat.findSpatial(rms_dir)]
 
-# Files matrix
-files_arr = [[], [], [], []]
+print(files_arr[0])
+print(files_arr[1])
+print(files_arr[2])
 
-# Get all files
-for i in range(4):
-	for root, dirs, files in os.walk(DIR_ARR[i]):
-		for file in files:
-			if file.endswith('.npz'):
-				files_arr[i].append(DIR_ARR[i] + file)
 
-# print(files_arr)
-
-n = len(files_arr[0])
-print(len(files_arr[0]), len(files_arr[1]), len(files_arr[2]), len(files_arr[3]))
-
-# for i in range(n):
-	# print(files_arr[0][i], files_arr[1][i], files_arr[2][i], sep = '\t')
-
-def strip_nocorr(s):
-	global RMS_NOCORR_DIR
-	s = s[len(RMS_NOCORR_DIR)::]
+def strip_rms(s):
+	global rms_dir
+	print(s)
 	sub = re.findall(r'_.*?_.*?_(.*?)_.*?_.*?_.*?', s)[0]
 	print(1, sub)
 	return int(sub[:2])*3600 + int(sub[2:4])*60 + int(sub[4:6]) 
 
-def strip_corr(s):
-	global RMS_TEMP_DIR
-	s = s[len(RMS_TEMP_DIR)::]
-	sub = re.findall(r'_.*?_.*?_(.*?)_.*?_.*?_.*?', s)[0]
-	print(2, sub)
-	return int(sub[:2])*3600 + int(sub[2:4])*60 + int(sub[4:6])
-
 def strip_camo(s):
-	global CAMO_DIR
-	s = s[len(CAMO_DIR)::]
-	sub = re.findall(r'_(.*?)_.*?', s)[0][:-1]
+	global camo_dir
+	print(s)
+	sub = re.findall(r'_.*?_(.*?)_.*?', s)[0][:-1]
 	print(3, sub)
 	return int(sub[:2])*3600 + int(sub[2:4])*60 + int(sub[4:6])
 
 
 # Sort the filename matrix by date of file
-files_arr = (sorted(files_arr[0], key=strip_nocorr), sorted(files_arr[1], key=strip_corr), sorted(files_arr[2], key=strip_corr), sorted(files_arr[3], key=strip_camo))
+files_arr = (sorted(files_arr[0], key=strip_camo), sorted(files_arr[1], key=strip_rms), sorted(files_arr[2], key=strip_rms), sorted(files_arr[3], key=strip_rms))
 
+n = len(files_arr[0])
 
 for i in range(n):
 
 	# Form filenames
 	print(i)
-	filename = SAVE + str(i) + '.png'
+	filename = save + str(i) + '.png'
 
 	# Extract data
-	time_nocorr = np.load(files_arr[0][i])['arr_0']
-	time_temp = np.load(files_arr[1][i])['arr_0']
-	time_spat = np.load(files_arr[2][i])['arr_0']
-	time_camo = np.load(files_arr[3][i])['arr_0']
+	time_camo = np.load(camo_dir + files_arr[0][i])['arr_0']
+	time_nocorr = np.load(rms_dir + files_arr[1][i])['arr_0']
+	time_temp = np.load(rms_dir + files_arr[2][i])['arr_0']
+	time_spat = np.load(rms_dir + files_arr[3][i])['arr_0']
 
-	av_nocorr = np.load(files_arr[0][i])['arr_1']
-	av_temp = np.load(files_arr[1][i])['arr_1']
-	av_spat = np.load(files_arr[2][i])['arr_1']
-	av_camo = np.load(files_arr[3][i])['arr_1']
+	av_camo = np.load(camo_dir + files_arr[0][i])['arr_1']
+	av_nocorr = np.load(rms_dir + files_arr[1][i])['arr_1']
+	av_temp = np.load(rms_dir + files_arr[2][i])['arr_1']
+	av_spat = np.load(rms_dir + files_arr[3][i])['arr_1']
 
-	phi = np.load(ANG_DIR + 'rms.npz')['arr_0'][i]
+	phi = np.load(ang_dir + 'rms.npz')['arr_0'][i]
 
-	name_rms = files_arr[0][i][len(RMS_NOCORR_DIR):-4]
-	name_camo = files_arr[3][i][len(CAMO_DIR):-4]
-
+	name_rms = files_arr[0][i][:-4]
+	name_camo = files_arr[3][i][:-4]
 	print(name_rms, name_camo)
 
 	print(phi)

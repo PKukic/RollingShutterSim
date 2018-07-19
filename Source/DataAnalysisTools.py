@@ -101,6 +101,43 @@ def findTXT(txt_dir):
 
     return txt_files
 
+def findCAMO(loc):
+    camo_files = []
+    for root, dirs, files in os.walk(loc):
+        for file in files:
+            if file.endswith('_02K.npz'):
+                camo_files.append(file)
+
+    return camo_files
+
+def findSpatial(loc):
+    spat_files = []
+    for root, dirs, files in os.walk(loc):
+        for file in files:
+            if file.endswith('_spat.npz'):
+                spat_files.append(file)
+
+    return spat_files
+
+
+def findTemporal(loc):
+    temp_files = []
+    for root, dirs, files in os.walk(loc):
+        for file in files:
+            if file.endswith('_temp.npz'):
+                temp_files.append(file)
+
+    return temp_files
+
+def findNoCorr(loc):
+    nocorr_files = []
+    for root, dirs, files in os.walk(loc):
+        for file in files:
+            if file.endswith('_nocorr.npz'):
+                nocorr_files.append(file)
+
+    return nocorr_files
+
 
 def phiList(data_dir, data_name, fits_files):
     ''' Finds all meteor angles for a given set of meteors. 

@@ -1,11 +1,11 @@
 import numpy as np
 import sys
 
-RMS_DIR = '/home/patrik/RMS/RMS/'
+RMS_DIR = '/home/patrik/Dropbox/Workspace/RMS/RMS/'
 sys.path.insert(0, RMS_DIR)
 from Formats import FTPdetectinfo as ftp
 
-ftps_dir = '../Data/allRMS/ftps/'
+ftps_dir = '../Observations/allRMS/ftps/'
 
 data_temp_o = ftp.readFTPdetectinfo(ftps_dir, 'FTPdetectinfo_CA0001_20180614_014042_812605_temporal.txt')
 data_temp_t = ftp.readFTPdetectinfo(ftps_dir, 'FTPdetectinfo_CA0003_20180614_024551_045135_temporal.txt')
