@@ -7,6 +7,7 @@ from __future__ import print_function, division, absolute_import
 import numpy as np
 import sys
 import os
+import re
 
 RMS_DIR = '/home/patrik/Dropbox/Workspace/RMS/RMS/'
 sys.path.insert(0, RMS_DIR)
@@ -92,22 +93,23 @@ def findFiles(data_dir, ext):
     return data_files
 
 
-def phiList(data_dir, data_name, fits_files):
+def saveAngles(data_dir, data_name, fits_files, save_dir):
     ''' Finds all meteor angles for a given set of meteors. 
 
         Arguments:
             data_dir: [string] The directory of the FTPdetectinfo file.
             data_name: [string] The name of the FTPdetectinfo file.
-            fits_files: [list of strings] List containing the *FITS filenames in the directory. 
+            fits_files: [list of strings] List containing the *FITS filenames in the directory.
+            save_dir: [string] Where the extracted angles are saved.
 
         Returns:
-            phi_arr: [list of floats] All of the found meteor angles.
+            None
     '''
 
     # Read the FTP
     data = ftp.readFTPdetectinfo(data_dir, data_name)
 
-    phi_arr = []
+    ff_phi_arr = []
 
     for i in range(len(data)):
 
@@ -119,9 +121,24 @@ def phiList(data_dir, data_name, fits_files):
 
         # Check if in a given array
         if ff_name in fits_files:
-            phi_arr.append(phi)
+            ff_phi_arr.append((ff_name, phi))
 
-    return phi_arr
+    # Sort the ff-phi array of tuples
+    def strip_angles(tup):
+        s = tup[0]
+        print(s)
+        sub = re.findall(r'_.*?_.*?_(.*?)_.*?_.*?_.*?', s)[0]
+        print(1, sub)
+        return int(sub[:2])*3600 + int(sub[2:4])*60 + int(sub[4:6])
+
+    ff_phi_arr = sorted(ff_phi_arr, key = strip_angles)
+
+    phi_arr = [x[1] for x in ff_phi_arr]
+
+    # Save the angles array
+    np.savez(save_dir + 'angles.npz', phi_arr)
+
+    return None
 
 
 def correctDataSpatial(data_dir, data_name, fits_files, save_dir, save_name, img_y):

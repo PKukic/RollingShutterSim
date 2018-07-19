@@ -15,6 +15,8 @@ ftp_name_spat = 'FTPdetectinfo_CA0001_20180521_012018_461559_spatial.txt'
 ftp_name_temp = 'FTPdetectinfo_CA0001_20180521_012018_461559_temporal.txt'
 ftp_name_nocorr = 'FTPdetectinfo_CA0001_20180521_012018_461559.txt'
 
+angles_dir = '../Observations/0521/angles/'
+
 # Get all FITS
 fits_files = dat.findFITS(raw_dir)
 
@@ -25,3 +27,7 @@ save_dir = '../Observations/0521/ang_vel_RMS/'
 dat.FTPtoAVT(ftp_dir, ftp_name_spat, fits_files, save_dir, corr_type = 'spat')
 dat.FTPtoAVT(ftp_dir, ftp_name_temp, fits_files, save_dir, corr_type = 'temp')
 dat.FTPtoAVT(ftp_dir, ftp_name_nocorr, fits_files, save_dir, corr_type = 'nocorr')
+
+# Save the meteor angles as a NPZ file
+dat.saveAngles(ftp_dir, ftp_name_nocorr, fits_files, angles_dir)
+

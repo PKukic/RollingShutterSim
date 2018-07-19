@@ -46,6 +46,10 @@ def strip_camo(s):
 # Sort the filename matrix by date of file
 files_arr = (sorted(files_arr[0], key=strip_camo), sorted(files_arr[1], key=strip_rms), sorted(files_arr[2], key=strip_rms), sorted(files_arr[3], key=strip_rms))
 
+# Get meteor angles
+phi_arr = np.load(ang_dir + 'angles.npz')['arr_0']
+
+
 n = len(files_arr[0])
 
 # Go through each meteor event
@@ -67,7 +71,7 @@ for i in range(n):
 	av_spat = np.load(rms_dir + files_arr[3][i])['arr_1']
 
 	# Angle belonging to that meteor event
-	phi = np.load(ang_dir + 'rms.npz')['arr_0'][i]
+	phi = phi_arr[i]
 
 	# Event names
 	name_rms = files_arr[0][i][:-4]
