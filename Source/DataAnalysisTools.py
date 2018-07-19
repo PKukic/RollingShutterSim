@@ -8,7 +8,7 @@ import numpy as np
 import sys
 import os
 
-RMS_DIR = '/home/patrik/RMS/RMS/'
+RMS_DIR = '/home/patrik/Dropbox/Workspace/RMS/RMS/'
 sys.path.insert(0, RMS_DIR)
 from Formats import FTPdetectinfo as ftp
 
@@ -247,7 +247,7 @@ def correctDataTemporal(data_dir, data_name, fits_files, save_dir, save_name, im
             coord_arr += [(col_arr[coord_i], row_arr[coord_i]) for coord_i in range(n_coord)]
 
             # Correct temporal coordinates
-            t_arr_corr = st.timeCorrection(coord_arr, img_y, fps, t_init = t_arr[0], time_mark = time_mark)
+            t_arr_corr = st.timeCorrection(coord_arr, img_y, fps, 0, time_mark = time_mark, t_init = t_arr[0])
             frame_n_arr_corr = [x*fps for x in t_arr_corr]
 
             # Construct centroids array

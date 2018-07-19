@@ -1,9 +1,9 @@
 Meteor Count = 000006
 -----------------------------------------------------
-Processed with RMS 20180622_230027 3ac859d249f777c2c7d09b47a14f6f3c80fd98fb on 2018-06-22 21:04:54.414863 UTC
+Processed with RMS 20180719_121256 b9f363f5ec6a4cbf282be7a297785ef0d6f8bb7d on 2018-07-19 10:59:03.377548 UTC
 -----------------------------------------------------
-FF  folder = /home/patrik/Workspace/RollingComp/Data/allRMS/CA0001_20180614_014042_812605_detected/
-CAL folder = /home/patrik/Workspace/RollingComp/Data/allRMS/CA0001_20180614_014042_812605_detected/
+FF  folder = /home/patrik/Dropbox/Workspace/RollingShutterSim/Observations/allRMS/CA0001_20180614_014042_812605_detected/
+CAL folder = /home/patrik/Dropbox/Workspace/RollingShutterSim/Observations/allRMS/CA0001_20180614_014042_812605_detected/
 -----------------------------------------------------
 FF  file processed
 CAL file processed

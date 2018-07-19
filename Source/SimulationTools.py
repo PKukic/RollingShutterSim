@@ -777,7 +777,7 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps, ver
     return centroid_coordinates_corr
 
 
-def timeCorrection(centroid_coordinates, img_y, fps, t_meteor, time_mark):
+def timeCorrection(centroid_coordinates, img_y, fps, t_meteor, time_mark, t_init=None):
     ''' Corrects the time coordinates of a given meteor, changes the time assignment for each frame.
 
         Arguments:
@@ -797,10 +797,14 @@ def timeCorrection(centroid_coordinates, img_y, fps, t_meteor, time_mark):
     # Initialize array of corrected time coordinates
     time_coordinates_corr = []
 
+
     for i in range(num_coord):
 
         # Define starting time for each frame
-        t_start = -t_meteor/2 + i * (1/fps)
+        if t_init != None:
+            t_start = t_init + i * (1/fps)
+        else:
+            t_start = -t_meteor/2 + i * (1/fps)
 
         # Set time offset for different frame time marks
         if time_mark == 'beginning':
@@ -808,6 +812,9 @@ def timeCorrection(centroid_coordinates, img_y, fps, t_meteor, time_mark):
 
         elif time_mark == 'end':
             t_start -= 0.5 * (1/fps)
+
+        elif time_mark == 'middle':
+            t_start += 0
 
         else:
             print('Invalid time mark flag!')
