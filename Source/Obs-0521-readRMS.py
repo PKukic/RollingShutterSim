@@ -18,7 +18,7 @@ ftp_name_nocorr = 'FTPdetectinfo_CA0001_20180521_012018_461559.txt'
 angles_dir = '../Observations/0521/angles/'
 
 # Get all FITS
-fits_files = dat.findFITS(raw_dir)
+fits_files = dat.findFiles(raw_dir, '.fits')
 
 save_dir = '../Observations/0521/ang_vel_RMS/'
 

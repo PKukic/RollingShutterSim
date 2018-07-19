@@ -21,7 +21,7 @@ save = '../Graphs/Obs-0521/'
 ang_dir = '../Observations/0521/angles/'
 
 # Directory matrix
-files_arr = [dat.findCAMO(camo_dir), dat.findNoCorr(rms_dir), dat.findTemporal(rms_dir), dat.findSpatial(rms_dir)]
+files_arr = [dat.findFiles(camo_dir, '_02K.npz'), dat.findFiles(rms_dir, '_nocorr.npz'), dat.findFiles(rms_dir, '_temp.npz'), dat.findFiles(rms_dir, '_spat.npz')]
 
 print(files_arr[0])
 print(files_arr[1])

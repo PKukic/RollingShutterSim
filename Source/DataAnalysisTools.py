@@ -127,7 +127,7 @@ def saveAngles(data_dir, data_name, fits_files, save_dir):
     def strip_angles(tup):
         s = tup[0]
         print(s)
-        sub = re.findall(r'_.*?_.*?_(.*?)_.*?_.*?_.*?', s)[0]
+        sub = re.findall(r'_.*?_.*?_(.*?)_.*?_.*?', s)[0]
         print(1, sub)
         return int(sub[:2])*3600 + int(sub[2:4])*60 + int(sub[4:6])
 

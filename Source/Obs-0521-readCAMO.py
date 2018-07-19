@@ -8,7 +8,7 @@ import DataAnalysisTools as dat
 
 # Where the data is stored
 data_dir = '../Observations/0521/camo_20180521/'
-data_name_arr = dat.findTXT(data_dir)
+data_name_arr = dat.findFiles(data_dir, '.txt')
 
 # Target directory of the angular velocity arrays
 save_dir = '../Observations/0521/ang_vel_CAMO/'
