@@ -575,7 +575,7 @@ def timeFromAngle(phi, omega, img_x, img_y, scale, fps):
     
     return t_meteor
 
-def calculateCorrection(ycentr, img_y, omega_pxs, fps):
+def calculateCorrection(ycentr, img_y, omega_pxs, fps, f = 1):
     ''' Calculates the correction factor for the rolling shutter centroid
         coordinates.
 
@@ -584,12 +584,13 @@ def calculateCorrection(ycentr, img_y, omega_pxs, fps):
             img_y: [int] Size of image Y coordinate [px].
             omega_pxs: [int or float] Angular velocity of the meteor [px/s].
             fps: [int] Number of frames taken per second by the camera.
+            f: [float] The ratio between the exposure time and frame time.
 
         Return:
             corr: [float] Correction distance [px].
     '''
 
-    return (1 - ycentr / img_y) * (omega_pxs / fps)
+    return (f - ycentr / img_y) * (omega_pxs / fps)
 
 def velocityCorrection(omega_roll, phi, img_y, fps):
     ''' Corrects the velocity of a given point.
