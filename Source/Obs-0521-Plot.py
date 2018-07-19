@@ -1,13 +1,23 @@
+''' Plots the angular velocities with respect to time as observed by RMS and CAMO stations on 21-05-2018.
+'''
+
+# Python 2/3 compatibility
+from __future__ import print_function, division, absolute_import
+
 import numpy as np 
 import matplotlib.pyplot as plt 
 import re
 
 import DataAnalysisTools as dat
 
-# Directories where both the angular velocity data and the corrected angular velocity data are saved
+# Directories where the angular velocity arrays are saved
 camo_dir = '../Observations/0521/ang_vel_CAMO/'
 rms_dir = '../Observations/0521/ang_vel_RMS/'
+
+# Plots saving location
 save = '../Graphs/Obs-0521/'
+
+# Where the meteor angles are stored
 ang_dir = '../Observations/0521/angles/'
 
 # Directory matrix
@@ -17,7 +27,7 @@ print(files_arr[0])
 print(files_arr[1])
 print(files_arr[2])
 
-
+# Functions for sorting the filenames by date
 def strip_rms(s):
 	global rms_dir
 	print(s)
@@ -38,6 +48,7 @@ files_arr = (sorted(files_arr[0], key=strip_camo), sorted(files_arr[1], key=stri
 
 n = len(files_arr[0])
 
+# Go through each meteor event
 for i in range(n):
 
 	# Form filenames
@@ -55,8 +66,10 @@ for i in range(n):
 	av_temp = np.load(rms_dir + files_arr[2][i])['arr_1']
 	av_spat = np.load(rms_dir + files_arr[3][i])['arr_1']
 
+	# Angle belonging to that meteor event
 	phi = np.load(ang_dir + 'rms.npz')['arr_0'][i]
 
+	# Event names
 	name_rms = files_arr[0][i][:-4]
 	name_camo = files_arr[3][i][:-4]
 	print(name_rms, name_camo)
@@ -79,9 +92,6 @@ for i in range(n):
 
 	# Plot the data
 	plt.ioff()
-
-	# plt.rc('text', usetex=True)
-	# plt.rc('font', family='serif')
 	
 	plt.plot(time_nocorr, av_nocorr, 'ro', label = 'RMS uncorrected')
 	plt.plot(time_temp, av_temp, 'go', label = 'RMS temporal')

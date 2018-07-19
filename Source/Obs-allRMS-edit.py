@@ -1,3 +1,8 @@
+''' Merges the FTPdetectinfo files from stations CA001 and CA003 for 14-06-2018 into one file. Separate files for temporally and spatially corrected data.
+'''
+# Python 2/3 compatibility
+from __future__ import print_function, division, absolute_import
+
 import numpy as np
 import sys
 
@@ -7,6 +12,7 @@ from Formats import FTPdetectinfo as ftp
 
 ftps_dir = '../Observations/allRMS/ftps/'
 
+# Read the FTP data
 data_temp_o = ftp.readFTPdetectinfo(ftps_dir, 'FTPdetectinfo_CA0001_20180614_014042_812605_temporal.txt')
 data_temp_t = ftp.readFTPdetectinfo(ftps_dir, 'FTPdetectinfo_CA0003_20180614_024551_045135_temporal.txt')
 
@@ -127,5 +133,6 @@ for i in range(len(data_temp_o)):
 cam_code = data_temp_o[0][1]
 fps = data_temp_o[0][4]
 
+# Save the data as separate temporal and spatial FTPdetectinfo files
 ftp.writeFTPdetectinfo(meteor_list_temp, ftps_dir, 'FTPdetectinfo_temporal.txt', ftps_dir, cam_code, fps, calibration=None, celestial_coords_given=True)
 ftp.writeFTPdetectinfo(meteor_list_spat, ftps_dir, 'FTPdetectinfo_spatial.txt', ftps_dir, cam_code, fps, calibration=None, celestial_coords_given=True)

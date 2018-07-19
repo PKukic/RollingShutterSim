@@ -71,72 +71,25 @@ def angleDist(pos_a, pos_b):
 	return dist
 
 
-def findFITS(fits_dir):
-    ''' Finds all *FITS files in a given directory. 
+def findFiles(data_dir, ext):
+    ''' Finds all X files in a given directory [that is, files with an arbitrary extension]. 
 
         Arguments:
-            fits_dir: [string] The directory name. 
+            data_dir: [string] The directory name. 
+            ext: [string] Filename extension.
 
         Returns:
-            fits_files: [list of strings] List containing the filenames in the directory. 
+            data_files: [list of strings] List containing the filenames in the directory. 
     '''
 
-    fits_files = []
+    data_files = []
 
-    for root, dirs, files in os.walk(fits_dir):
+    for root, dirs, files in os.walk(data_dir):
         for file in files:
-            if file.endswith('.fits'):
-                fits_files.append(file)
+            if file.endswith(ext):
+                data_files.append(file)
 
-    return fits_files
-
-def findTXT(txt_dir):
-
-    txt_files = []
-
-    for root, dirs, files in os.walk(txt_dir):
-        for file in files:
-            if file.endswith('.txt'):
-                txt_files.append(file)
-
-    return txt_files
-
-def findCAMO(loc):
-    camo_files = []
-    for root, dirs, files in os.walk(loc):
-        for file in files:
-            if file.endswith('_02K.npz'):
-                camo_files.append(file)
-
-    return camo_files
-
-def findSpatial(loc):
-    spat_files = []
-    for root, dirs, files in os.walk(loc):
-        for file in files:
-            if file.endswith('_spat.npz'):
-                spat_files.append(file)
-
-    return spat_files
-
-
-def findTemporal(loc):
-    temp_files = []
-    for root, dirs, files in os.walk(loc):
-        for file in files:
-            if file.endswith('_temp.npz'):
-                temp_files.append(file)
-
-    return temp_files
-
-def findNoCorr(loc):
-    nocorr_files = []
-    for root, dirs, files in os.walk(loc):
-        for file in files:
-            if file.endswith('_nocorr.npz'):
-                nocorr_files.append(file)
-
-    return nocorr_files
+    return data_files
 
 
 def phiList(data_dir, data_name, fits_files):
@@ -316,26 +269,36 @@ def correctDataTemporal(data_dir, data_name, fits_files, save_dir, save_name, im
     return None
 
 
-def correctCelestial(rms_dir, project_dir, data_dir, save_name):
+def correctCelestial(rms_dir, project_dir, data_dir, save_dir):
     ''' Applies the astrometric conversions (corrects the celestial coordinates) to a given data directory. 
 
         Arguments:
             rms_dir: [string] Local RMS directory location. 
             project_dir: [string] Local RollingShutterSim repository location.
             data_dir: [string] The directory on which the astrometric conversions are applied. 
-            save_name: [string] The directory where the calibrated data is saved. 
+            save_dir: [string] The directory where the calibrated data is saved. 
     
         Returns:
             None
     '''
 
     os.chdir(rms_dir)
-    os.system('python -m RMS.Astrometry.ApplyAstrometry ' + data_dir + save_name)
+    os.system('python -m RMS.Astrometry.ApplyAstrometry ' + data_dir + save_dir)
     os.chdir(project_dir + 'Source/')
 
     return None
 
 def CAMOtoAVT(data_dir, data_name, save_dir):
+    ''' Reads the data from a given CAMO *.txt file and computes the centroid angular velocities. 
+
+        Arguments:
+            data_dir: [string] The directory of the FTPdetectinfo file.
+            data_name: [string] The name of the FTPdetectinfo file.
+            save_dir: [string] The directory where the computed angular velocities and the equivalent temporal coordinates are stored.
+
+        Returns:
+            None
+    '''
 
     # The only used columns are time, theta and phi
     columns_used = (1, 6, 7)
@@ -347,10 +310,8 @@ def CAMOtoAVT(data_dir, data_name, save_dir):
     h_arr = thetaToH(theta_arr)
     azim_arr = phiToAz(phi_arr)
 
-    # Distance array
+    # Distance and time difference arrays
     dist_arr = []
-
-    # Time difference array 
     delta_t_arr = []
 
     # Go through all coordinates and get angular distance; get time difference
@@ -399,9 +360,11 @@ def FTPtoAVT(data_dir, data_name, fits_files, save_dir, corr_type):
             data_dir: [string] The directory of the FTPdetectinfo file.
             data_name: [string] The name of the FTPdetectinfo file.
             fits_files: [list of strings] List containing the *FITS filenames in the directory.
+            save_dir: [string] The directory where the computed angular velocities and the equivalent temporal coordinates are stored.
+            corr_type: [string] The correction type (e.g. 'temporal'; 'spatial'; 'nocorr')
 
         Returns:
-            fint_arr, av_arr: [two arrays of floats] The time coordinates and angular velocities of meteors.
+            None
     '''
 
     # Read the FTP
@@ -427,8 +390,11 @@ def FTPtoAVT(data_dir, data_name, fits_files, save_dir, corr_type):
             # Length of all arrays
             n_coord = len(t_arr)
 
+            # Distance and time difference arrays
             dist_arr = []
             deltat_arr = []
+            
+            # Angular velocity and final time arrays
             av_arr = []
             fint_arr = []
 
@@ -455,6 +421,7 @@ def FTPtoAVT(data_dir, data_name, fits_files, save_dir, corr_type):
             fint_arr.insert(0, t_arr[0])
             av_arr.insert(0, av_arr[0])
 
+            # Save file in the appropriate directory
             np.savez(save_dir + ff_name[:-5] + '_' + corr_type + '.npz', *[fint_arr, av_arr])
 
 
