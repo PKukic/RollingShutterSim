@@ -90,6 +90,17 @@ def findFITS(fits_dir):
 
     return fits_files
 
+def findTXT(txt_dir):
+
+    txt_files = []
+
+    for root, dirs, files in os.walk(txt_dir):
+        for file in files:
+            if file.endswith('.txt'):
+                txt_files.append(file)
+
+    return txt_files
+
 
 def phiList(data_dir, data_name, fits_files):
     ''' Finds all meteor angles for a given set of meteors. 
@@ -287,8 +298,64 @@ def correctCelestial(rms_dir, project_dir, data_dir, save_name):
 
     return None
 
+def CAMOtoAVT(data_dir, data_name, save_dir):
 
-def FTPtoAVT(data_dir, data_name, fits_files):
+    # The only used columns are time, theta and phi
+    columns_used = (1, 6, 7)
+
+    # Load the data into arrays
+    t_arr, theta_arr, phi_arr = np.loadtxt(data_dir + data_name, comments='#', usecols=columns_used, unpack=True)
+
+    # Convert (theta, phi) to (height, azimuth)
+    h_arr = thetaToH(theta_arr)
+    azim_arr = phiToAz(phi_arr)
+
+    # Distance array
+    dist_arr = []
+
+    # Time difference array 
+    delta_t_arr = []
+
+    # Go through all coordinates and get angular distance; get time difference
+    n_coord = len(h_arr)
+
+    for coord_i in range(1, n_coord):
+
+        # Create coordinate tuples
+        pos_1 = (h_arr[coord_i-1], azim_arr[coord_i-1])
+        pos_2 = (h_arr[coord_i], azim_arr[coord_i]) 
+
+        # Get coordinate distance
+        dist = angleDist(pos_1, pos_2)
+        dist_arr.append(dist)
+
+        # Get time difference
+        delta_t = t_arr[coord_i] - t_arr[coord_i-1]
+        delta_t_arr.append(delta_t)
+
+
+    # Output arrays
+    ang_vel_arr = []
+    final_t_arr = []
+
+    # Check if two subsequent entries in the data files have the same time
+    for coord_i in range(n_coord - 1):
+
+        if delta_t_arr[coord_i] != 0:
+            ang_vel_arr.append(dist_arr[coord_i] / delta_t_arr[coord_i])
+            final_t_arr.append(t_arr[coord_i+1])
+
+    # Assume that the initial velocity is equal to the subsequent velocity
+    ang_vel_arr.insert(0, ang_vel_arr[0])
+    final_t_arr.insert(0, t_arr[0])
+
+    # Save angular velocity data array
+    np.savez(save_dir + data_name[:-4] + '.npz', *[final_t_arr, ang_vel_arr])
+
+    return None
+
+
+def FTPtoAVT(data_dir, data_name, fits_files, save_dir, corr_type):
     ''' Reads the data from a given FTPdetectinfo file and computes angular velocities of meteors for that file. 
 
         Arguments:
@@ -351,4 +418,7 @@ def FTPtoAVT(data_dir, data_name, fits_files):
             fint_arr.insert(0, t_arr[0])
             av_arr.insert(0, av_arr[0])
 
-    return fint_arr, av_arr
+            np.savez(save_dir + ff_name[:-5] + '_' + corr_type + '.npz', *[fint_arr, av_arr])
+
+
+    return None
