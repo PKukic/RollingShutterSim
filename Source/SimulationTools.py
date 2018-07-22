@@ -6,8 +6,8 @@
 from __future__ import print_function, division, absolute_import
 
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
+# import matplotlib.pyplot as plt
+# import matplotlib.patches as patches
 import scipy.optimize as opt
 import scipy.special as sp
 
@@ -333,8 +333,6 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
 
         # Read image (output image) array
         read_image_array = np.zeros(shape=(img_y, img_x), dtype=np.float_)
-
-        # print('-'*20)
 
 
         # Draw two dimensional Gaussian function for each point in time
@@ -722,6 +720,7 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps, ver
         r = centroidDifference(start_coord, ind_coord)
         r_coordinates.append(r)
 
+    # Find meteor angle
     delta_r = r_coordinates[num_coord-1] - r_coordinates[0]
     delta_x = x_coordinates[num_coord-1] - x_coordinates[0]
     delta_y = y_coordinates[num_coord-1] - y_coordinates[0]
@@ -743,8 +742,6 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps, ver
     # Fit to find slope
     # param, pcov = opt.curve_fit(linFit, r_coordinates, y_coordinates)
     # phi = param[0]
-
-    # phi = np.deg2rad(315)
     
 
     print('Meteor slope fit finished.')
@@ -790,7 +787,7 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps, ver
         for i in range(num_coord):
             v_arr[i] += velocityCorrection(v_arr[i], phi, img_y, fps)
             # print('velocity, correction, product')
-            print('{:.2f} {:.2f} {:.2f}'.format(v_arr[i], velocityCorrection(v_arr[i], phi, img_y, fps), v_arr[i] + velocityCorrection(v_arr[i], phi, img_y, fps)))
+            # print('{:.2f} {:.2f} {:.2f}'.format(v_arr[i], velocityCorrection(v_arr[i], phi, img_y, fps), v_arr[i] + velocityCorrection(v_arr[i], phi, img_y, fps)))
             
 
         print('Velocity correction done. ')
@@ -947,7 +944,7 @@ def meteorCorrection(time_coordinates, centroid_coordinates, img_y, fps, correct
         return centroid_coordinates_corr
 
 
-def getparam(a, v_start, v_finish, t, fps):
+def getparam(a, v_start, v_finish, t):
     ''' Calculates the second parameter of the exponentional meteor deceleration function. 
     Arugments:
         a: [float or int] First parameter of the exponentional function. 
@@ -958,10 +955,7 @@ def getparam(a, v_start, v_finish, t, fps):
     Return:
         b: [float] The second parameter of the exponentional function. 
     '''
-    
-    t_new = int(round(t*fps))/fps
-    print(t, t_new)
 
-    b = sp.lambertw((v_start - v_finish) / a * t_new).real / t_new
+    b = sp.lambertw((v_start - v_finish) / a * t).real / t
     
     return b

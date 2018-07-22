@@ -24,14 +24,12 @@ n_iter = 2
 noise_arr = []
 
 
-omega_odn_arr = np.arange(46, 50, 0.5)
-
 # Go through all noise and velocity values
 for noise in par.noise_scale_arr:
 
 	noise_diff_arr_iter = []
 
-	for omega_iter in omega_odn_arr:
+	for omega_iter in par.omega_odn_arr:
 
 		# if omega_iter > 46:
 			# show_plots = True
@@ -45,17 +43,16 @@ for noise in par.noise_scale_arr:
 
 		# Get deceleration parameters
 		a = 1e-3
-		dec_arr = [a, st.getparam(a, omega_iter, omega_iter*0.9, t_meteor, par.fps)]
+		dec_arr = [a, st.getparam(a, omega_iter, omega_iter*0.9, t_meteor)]
 		print('Deceleration parameters: ', dec_arr)
 
 		# Get average model - centroid point difference for each meteor
 		for i in range(n_iter):
 
 			# Get model and centroid coordinates
-			time_coordinates, centroid_coordinates, model_coordinates = st.pointsCentroidAndModel(rolling_shutter, par.t_meteor, phi, \
+			time_coordinates, centroid_coordinates, model_coordinates = st.pointsCentroidAndModel(rolling_shutter, t_meteor, phi, \
             	omega_iter, par.img_x, par.img_y, par.scale, par.fps, par.sigma_x, par.sigma_y, noise, par.offset, dec_arr, show_plots)
 
-			print('-'*20)
 
 			# print(centroid_coordinates)
 
@@ -65,9 +62,9 @@ for noise in par.noise_scale_arr:
 			# print(centroid_coordinates)
 			# print(model_coordinates)
 
-			vel_model = st.getVelocity(time_coordinates, model_coordinates)
-			for v in vel_model:
-				print('{:.2f}'.format(v))
+			# vel_model = st.getVelocity(time_coordinates, model_coordinates)
+			# for v in vel_model:
+				# print('{:.2f}'.format(v))
 
 			# Compute difference
 			diff = st.centroidAverageDifference(centroid_coordinates, model_coordinates)
