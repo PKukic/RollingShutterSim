@@ -33,6 +33,9 @@ plt.title("Meteor angle {} [deg]".format(par.phi))
 # Configure the plot axis
 plt.axis('tight')
 
+plt.xlim((min(omega_arr), max(omega_arr)))
+plt.ylim((min(noise0_data), max(noise0_data)))
+
 # Save and show plot
 plt.savefig('../Graphs/ODN/graph_odn_rolling.png')
 plt.show()

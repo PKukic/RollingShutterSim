@@ -7,6 +7,11 @@ import Parameters as par
 
 rolling_shutter = True
 phi = 45
+
+# Correction for the new definition of phi
+phi = st.ConvToSim(phi)
+
+
 omega = 45
 show_plots = True
 noise_scale = 10

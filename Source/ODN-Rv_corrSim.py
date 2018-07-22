@@ -6,42 +6,56 @@
 from __future__ import print_function, division, absolute_import
 import numpy as np
 import SimulationTools as st
+# import DataAnalysisTools as dat 
 import Parameters as par
 
 # Parameters that are used only for this simulation
 rolling_shutter = True
 show_plots = False
 
+# Correction for the new definition of phi
+phi = st.ConvToSim(par.phi)
+
 # Number of iterations for each angular velocity value - 
 # used to have a better representatin of the actual difference value
-n_iter = 10
+n_iter = 2
 
 # Final array with all 4 noise values
 noise_arr = []
+
+
+omega_odn_arr = np.arange(46, 50, 0.5)
 
 # Go through all noise and velocity values
 for noise in par.noise_scale_arr:
 
 	noise_diff_arr_iter = []
 
-	for omega_iter in par.omega_odn_arr:
+	for omega_iter in omega_odn_arr:
+
+		# if omega_iter > 46:
+			# show_plots = True
 		
 		# Average of averages array
 		diff_arr = []
 
 		t_meteor = st.timeFromAngle(par.phi, omega_iter, par.img_x, par.img_y, par.scale, par.fps)
 
+		print('Duration:',t_meteor)
+
 		# Get deceleration parameters
 		a = 1e-3
-		dec_arr = [a, st.getparam(a, omega_iter, omega_iter*0.9, t_meteor)]
+		dec_arr = [a, st.getparam(a, omega_iter, omega_iter*0.9, t_meteor, par.fps)]
 		print('Deceleration parameters: ', dec_arr)
 
 		# Get average model - centroid point difference for each meteor
 		for i in range(n_iter):
 
 			# Get model and centroid coordinates
-			time_coordinates, centroid_coordinates, model_coordinates = st.pointsCentroidAndModel(rolling_shutter, par.t_meteor, par.phi, \
+			time_coordinates, centroid_coordinates, model_coordinates = st.pointsCentroidAndModel(rolling_shutter, par.t_meteor, phi, \
             	omega_iter, par.img_x, par.img_y, par.scale, par.fps, par.sigma_x, par.sigma_y, noise, par.offset, dec_arr, show_plots)
+
+			print('-'*20)
 
 			# print(centroid_coordinates)
 
@@ -49,6 +63,11 @@ for noise in par.noise_scale_arr:
 			centroid_coordinates = st.coordinateCorrection(time_coordinates, centroid_coordinates, par.img_y, par.fps, version = 'v_corr')
 			
 			# print(centroid_coordinates)
+			# print(model_coordinates)
+
+			vel_model = st.getVelocity(time_coordinates, model_coordinates)
+			for v in vel_model:
+				print('{:.2f}'.format(v))
 
 			# Compute difference
 			diff = st.centroidAverageDifference(centroid_coordinates, model_coordinates)

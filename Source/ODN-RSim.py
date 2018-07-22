@@ -12,6 +12,10 @@ import Parameters as par
 # Parameters that are used only for this simulation
 rolling_shutter = True
 show_plots = False
+phi = st.ConvToSim(par.phi)
+
+print(phi)
+
 
 # Number of iterations for each angular velocity value - 
 # used to have a better representatin of the actual difference value

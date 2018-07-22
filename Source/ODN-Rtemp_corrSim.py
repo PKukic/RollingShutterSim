@@ -23,7 +23,9 @@ y_center = par.img_y/2
 # used to have a better representatin of the actual difference value
 n_iter = 10
 
-phi = par.phi
+# Correction for the new definition of phi
+phi = st.ConvToSim(par.phi)
+
 noise_arr = []
 
 for noise in par.noise_scale_arr:

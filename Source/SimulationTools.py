@@ -11,6 +11,18 @@ import matplotlib.patches as patches
 import scipy.optimize as opt
 import scipy.special as sp
 
+def ConvToSim(conv_phi):
+
+    sim_phi = (conv_phi + 270) % 360
+
+    return sim_phi
+
+def SimToConv(sim_phi):
+
+    conv_phi = (sim_phi - 270) % 360
+
+    return conv_phi
+
 def drawPoints(t, x_center, y_center, scale, phi, omega, fit_param, t_meteor):
     """ Calculate position of a meteor on image with the given simulation parameters. 
 
@@ -35,8 +47,16 @@ def drawPoints(t, x_center, y_center, scale, phi, omega, fit_param, t_meteor):
     # Convert angle to radians
     phi = np.radians(phi)
 
+    # print(t)
+    # print(t+t_meteor/2)
+    # print(omega*t*scale)
+    # print(- a*np.exp(b*(t+t_meteor/2))*scale)
+
+    omega_dec = omega - a*b*np.exp(b*(t+t_meteor/2))
+    # print(omega_dec)
+
     # Calculate distance from centre in pixels
-    z = omega*t*scale - a*np.exp(b*(t+t_meteor/2))*scale
+    z = omega_dec*t*scale
 
     # Calculate position of meteor on the image
     x_meteor = x_center - np.sin(phi)*z
@@ -263,6 +283,17 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
         x_start, y_start = drawPoints(t_start, x_center, y_center, scale, phi, omega, fit_param, t_meteor)
         x_finish, y_finish = drawPoints(t_finish, x_center, y_center, scale, phi, omega, fit_param, t_meteor)
 
+        # print('-'*20)
+
+        # print(t_start, t_finish)
+        # print(t_start + t_meteor/2, t_finish + t_meteor/2)
+        # print(omega*t_start*scale, omega*t_finish*scale)
+        # print(- fit_param[0]*np.exp(fit_param[1]*(t_start+t_meteor/2))*scale, - fit_param[0]*np.exp(fit_param[1]*(t_finish+t_meteor/2))*scale)
+
+        # print(x_start - x_finish)
+        # print(y_start - y_finish)
+
+        # print('-'*20)
 
         # Add 3 sigma border around them
         x_start, x_finish, y_start, y_finish = calcSigmaWindowLimits(x_start, x_finish, sigma_x, y_start, \
@@ -303,9 +334,13 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
         # Read image (output image) array
         read_image_array = np.zeros(shape=(img_y, img_x), dtype=np.float_)
 
+        # print('-'*20)
+
 
         # Draw two dimensional Gaussian function for each point in time
         for t in t_arr_iter:
+
+            # print(t)
 
             # Evaluate meteor point and 2D Gaussian
             x, y = drawPoints(t, x_center, y_center, scale, phi, omega, fit_param, t_meteor)
@@ -435,13 +470,13 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
 
             plt.axhline(y=y_model, c='b')
 
-            (x_st, x_fin, y_st, y_fin) = calcSigmaWindowLimits(x_model, x_model, sigma_x*10, y_model, y_model, sigma_y*10, phi)
-            plt.xlim([x_st, x_fin])
-            plt.ylim([y_fin, y_st])
+            # (x_st, x_fin, y_st, y_fin) = calcSigmaWindowLimits(x_model, x_model, sigma_x*10, y_model, y_model, sigma_y*10, phi)
+            # plt.xlim([x_st, x_fin])
+            # plt.ylim([y_fin, y_st])
 
             plt.legend(loc='upper right')
 
-            plt.savefig('../Images/centroids/{}.png'.format(i))
+            plt.savefig('../Figures/Images/centroids/{}i.png'.format(i))
 
             plt.show()
 
@@ -687,13 +722,29 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps, ver
         r = centroidDifference(start_coord, ind_coord)
         r_coordinates.append(r)
 
+    delta_r = r_coordinates[num_coord-1] - r_coordinates[0]
+    delta_x = x_coordinates[num_coord-1] - x_coordinates[0]
+    delta_y = y_coordinates[num_coord-1] - y_coordinates[0]
+
+    if delta_x <= 0:
+        phi = np.arccos(delta_y/delta_r)
+    else:
+        phi = -np.arccos(delta_y/delta_r)
+
+    print('New phi', phi)
+
+    if phi < 0:
+        phi += 2*np.pi
+
     # Linear fit function
-    def linFit(r, phi, b):
-        return r * np.cos(phi) + b
+    # def linFit(r, phi, b):
+        # return r * np.cos(phi) + b
 
     # Fit to find slope
-    param, pcov = opt.curve_fit(linFit, r_coordinates, y_coordinates)
-    phi = param[0]
+    # param, pcov = opt.curve_fit(linFit, r_coordinates, y_coordinates)
+    # phi = param[0]
+
+    # phi = np.deg2rad(315)
     
 
     print('Meteor slope fit finished.')
@@ -719,14 +770,18 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps, ver
     # Assume that the first velocity is equal to the subsequent velocity
     v_arr.insert(0, v_arr[0])
 
+    print('Average velocity without smoothening:', np.average(v_arr))
+
     print('Point to point velocity calculation done.')
 
     ### Smooth out velocity ###
     
-    for i in range(num_coord - 2):
-        v_arr[i + 1] = (v_arr[i] + v_arr[i + 2]) / 2
+    # for i in range(num_coord - 2):
+        # v_arr[i + 1] = (v_arr[i] + v_arr[i + 2]) / 2
 
-    print('Velocity smoothened out.')
+    # print('Average velocity after smoothening:', np.average(v_arr))
+
+    # print('Velocity smoothened out.')
     
     ### Apply correction to velocity array ###
 
@@ -734,6 +789,9 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps, ver
 
         for i in range(num_coord):
             v_arr[i] += velocityCorrection(v_arr[i], phi, img_y, fps)
+            # print('velocity, correction, product')
+            print('{:.2f} {:.2f} {:.2f}'.format(v_arr[i], velocityCorrection(v_arr[i], phi, img_y, fps), v_arr[i] + velocityCorrection(v_arr[i], phi, img_y, fps)))
+            
 
         print('Velocity correction done. ')
 
@@ -889,7 +947,7 @@ def meteorCorrection(time_coordinates, centroid_coordinates, img_y, fps, correct
         return centroid_coordinates_corr
 
 
-def getparam(a, v_start, v_finish, t):
+def getparam(a, v_start, v_finish, t, fps):
     ''' Calculates the second parameter of the exponentional meteor deceleration function. 
     Arugments:
         a: [float or int] First parameter of the exponentional function. 
@@ -901,6 +959,9 @@ def getparam(a, v_start, v_finish, t):
         b: [float] The second parameter of the exponentional function. 
     '''
     
-    b = sp.lambertw((v_start - v_finish) / a * t).real / t
+    t_new = int(round(t*fps))/fps
+    print(t, t_new)
+
+    b = sp.lambertw((v_start - v_finish) / a * t_new).real / t_new
     
     return b

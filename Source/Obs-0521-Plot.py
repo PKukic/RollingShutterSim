@@ -8,6 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt 
 import re
 
+import SimulationTools as st 
 import DataAnalysisTools as dat
 
 # Directories where the angular velocity arrays are saved
@@ -47,7 +48,7 @@ def strip_camo(s):
 files_arr = (sorted(files_arr[0], key=strip_camo), sorted(files_arr[1], key=strip_rms), sorted(files_arr[2], key=strip_rms), sorted(files_arr[3], key=strip_rms))
 
 # Get meteor angles
-phi_arr = np.load(ang_dir + 'angles.npz')['arr_0']
+phi_arr = st.SimToConv(np.load(ang_dir + 'angles.npz')['arr_0']) 
 
 
 n = len(files_arr[0])
@@ -102,7 +103,7 @@ for i in range(n):
 	plt.plot(time_spat, av_spat, 'bo', markersize = 8, markerfacecolor = "None", markeredgecolor = "blue", markeredgewidth = 2, label = 'RMS spatial')
 	plt.plot(time_camo, av_camo, 'y^', label = 'CAMO')
 	
-	plt.title(r'$\phi$ = {} [deg]'.format(phi))
+	plt.title(r'$\phi$(FTP) = {} [deg]'.format(phi))
 
 	plt.legend(loc='best')
 

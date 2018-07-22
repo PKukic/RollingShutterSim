@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import Parameters as par
 
+plt.ioff()
+
 # Load data
 data = np.load('../Data/ODN/data_odn_v_corr_rolling.npz')
 
@@ -34,8 +36,9 @@ plt.title("Meteor angle {} [deg] (corrected velocity)".format(par.phi))
 plt.axis('tight')
 
 # Limit the centroid offset to the maximum offset found throughout the spatial and temporal simulations
-plt.ylim((0, 0.45))
+# plt.ylim((0, 0.45))
 
 # Save and show plot
 plt.savefig('../Graphs/ODN/graph_odn_v_corr_rolling.png')
-plt.show()
+
+plt.close()

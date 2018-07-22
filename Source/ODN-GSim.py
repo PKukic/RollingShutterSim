@@ -9,9 +9,13 @@ import numpy as np
 import SimulationTools as st
 import Parameters as par
 
-# Parameters that are used only for this simulation
+# Parameters that are used only for this simulationb
 rolling_shutter = False
-show_plots = True
+show_plots = False
+
+# Correction for the new definition of phi
+phi = st.ConvToSim(par.phi)
+print(phi)
 
 # Number of iterations for each angular velocity value - 
 # used to have a better representatin of the actual difference value
@@ -34,8 +38,8 @@ for noise in par.noise_scale_arr:
 		for i in range(n_iter):
 
 			# Get model and centroid coordinates
-			time_coordinates, centroid_coordinates, model_coordinates = st.pointsCentroidAndModel(rolling_shutter, par.t_meteor, par.phi, \
-            	omega_iter, par.img_x, par.img_y, par.scale, par.fps, par.sigma_x, par.sigma_y, noise, par.offset, par.fit_param, par.show_plots)
+			time_coordinates, centroid_coordinates, model_coordinates = st.pointsCentroidAndModel(rolling_shutter, par.t_meteor, phi, \
+            	omega_iter, par.img_x, par.img_y, par.scale, par.fps, par.sigma_x, par.sigma_y, noise, par.offset, par.fit_param, show_plots)
 
 			# Compute difference
 			diff = st.centroidAverageDifference(centroid_coordinates, model_coordinates)

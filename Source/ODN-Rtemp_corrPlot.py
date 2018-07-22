@@ -8,6 +8,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import Parameters as par
 
+plt.ioff()
+
 # Load data
 data = np.load('../Data/ODN/data_odn_temp_rolling.npz')
 
@@ -39,4 +41,5 @@ plt.ylim((0, 0.45))
 
 # Save and show plot
 plt.savefig('../Graphs/ODN/graph_odn_temp_rolling.png')
-plt.show()
+
+plt.close()

@@ -15,6 +15,10 @@ omega_arr = data['arr_0']
 phi_arr = data['arr_1']
 deltav_arr = data['arr_2']
 
+# Correction for the new definition of image angle phi
+phi_arr = [(x-90)%360 for x in phi_arr]
+deltav_arr = [x*-1 for x in deltav_arr]
+
 # Set 3D scatter plot
 fig = plt.figure()
 ax = Axes3D(fig)
