@@ -37,7 +37,7 @@ plt.title("Meteor angle {} [deg] (temporal correction)".format(par.phi))
 plt.axis('tight')
 
 # Limit the centroid offset to the maximum offset found throughout the spatial and temporal simulations
-plt.ylim((0, 0.45))
+plt.ylim((0, 0.36))
 
 # Save and show plot
 plt.savefig('../Graphs/ODN/graph_odn_temp_rolling.png')

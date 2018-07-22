@@ -33,7 +33,7 @@ plt.title("Meteor angle {} [deg] (global shutter)".format(par.phi))
 # Configure the plot axis
 plt.axis('tight')
 
-plt.ylim((0, 0.45))
+plt.ylim((0, 0.36))
 
 # Save and show plot
 plt.savefig('../Graphs/ODN/graph_odn_global.png')

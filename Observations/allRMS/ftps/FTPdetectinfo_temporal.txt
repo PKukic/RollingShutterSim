@@ -1,6 +1,6 @@
 Meteor Count = 000012
 -----------------------------------------------------
-Processed with RMS 20180719_142828 4f882cc89ee2c554830cfe93bcdd371bf41d3081 on 2018-07-19 13:22:49.163756 UTC
+Processed with RMS 20180722_132412 734f830b7727967d83815cf5814c4da7476addf3 on 2018-07-22 16:59:43.100611 UTC
 -----------------------------------------------------
 FF  folder = ../Observations/allRMS/ftps/
 CAL folder = ../Observations/allRMS/ftps/

@@ -18,7 +18,7 @@ phi = st.ConvToSim(par.phi)
 
 # Number of iterations for each angular velocity value - 
 # used to have a better representatin of the actual difference value
-n_iter = 2
+n_iter = 10
 
 # Final array with all 4 noise values
 noise_arr = []
@@ -31,15 +31,13 @@ for noise in par.noise_scale_arr:
 
 	for omega_iter in par.omega_odn_arr:
 
-		# if omega_iter > 46:
-			# show_plots = True
 		
 		# Average of averages array
 		diff_arr = []
 
 		t_meteor = st.timeFromAngle(par.phi, omega_iter, par.img_x, par.img_y, par.scale, par.fps)
 
-		print('Duration:',t_meteor)
+		print('Duration:', t_meteor)
 
 		# Get deceleration parameters
 		a = 1e-3
