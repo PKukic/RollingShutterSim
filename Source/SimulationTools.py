@@ -6,9 +6,8 @@
 from __future__ import print_function, division, absolute_import
 
 import numpy as np
-# import matplotlib.pyplot as plt
-# import matplotlib.patches as patches
-import scipy.optimize as opt
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 import scipy.special as sp
 
 def ConvToSim(conv_phi):
@@ -233,8 +232,10 @@ def pointsCentroidAndModel(rolling_shutter, t_meteor, phi, omega, img_x, img_y, 
         noise scale [float] The standard deviation of a probability density function. 
         offset: [int or float] Offset of pixel levels for the entire image.
         show_plots: [bool] Argument for showing individual frame plots.
+        coor_coord: [list of tuples] List of the corrected rolling shutter coordinates (used for plotting, None by default.)
 
     Return:
+        time_coordinates: [list] The time coordinates of both the rolling shutter and model centroids
         centroid_coordinates: [list of tuples] X and Y coordinates of meteor center calculated by centroiding.
         model_coordinates: [list of tuples] X and Y coordinates of meteor center calculated by model.
 
@@ -655,6 +656,7 @@ def getVelocity(time_coordinates, centroid_coordinates):
             centroid_coordinates: [array of floats] Spatial coordinates (centroid coordinates). (px)
 
         Returns:
+            dist_arr: [array of floats] Array of distances from the starting centroid. (px)
             v_arr: [array of floats] Array of instanteanous velocities. (px/s)
 
     '''
@@ -665,6 +667,9 @@ def getVelocity(time_coordinates, centroid_coordinates):
     t_arr = []
     v_arr = []
 
+    dist_arr = []
+    start_coord = centroid_coordinates[0]
+
     # Construct the instantaneous velocity array
     for i in range(num_coord - 1):
         r = centroidDifference(centroid_coordinates[i + 1], centroid_coordinates[i])
@@ -673,15 +678,23 @@ def getVelocity(time_coordinates, centroid_coordinates):
         t = time_coordinates[i + 1] - time_coordinates[i]
         t_arr.append(t)
 
+
     for i in range(num_coord - 1):
         v_arr.append(r_arr[i] / t_arr[i])
-
+    
+    print(r_arr)
+    print(t_arr)
+    print(v_arr)
 
     # Assume that the initial velocity is equal to the subsequent velocity
     v_arr.insert(0, v_arr[0])
 
+    # Construct the distances array
+    for i in range(num_coord):
+        ind_coord = centroid_coordinates[i]
+        dist_arr.append(centroidDifference(start_coord, ind_coord))
 
-    return v_arr
+    return dist_arr, v_arr
     
 
 def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps, version):
@@ -730,19 +743,11 @@ def coordinateCorrection(time_coordinates, centroid_coordinates, img_y, fps, ver
     else:
         phi = -np.arccos(delta_y/delta_r)
 
-    print('New phi', phi)
+    print('Meteor angle:', phi)
 
     if phi < 0:
         phi += 2*np.pi
 
-    # Linear fit function
-    # def linFit(r, phi, b):
-        # return r * np.cos(phi) + b
-
-    # Fit to find slope
-    # param, pcov = opt.curve_fit(linFit, r_coordinates, y_coordinates)
-    # phi = param[0]
-    
 
     print('Meteor slope fit finished.')
     print('Calculated angle: {:.2f}'.format(np.rad2deg(phi)))
