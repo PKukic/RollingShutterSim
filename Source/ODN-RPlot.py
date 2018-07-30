@@ -38,4 +38,5 @@ plt.ylim((min(noise0_data), max(noise0_data)))
 
 # Save and show plot
 plt.savefig('../Graphs/ODN/graph_odn_rolling.png')
+plt.savefig('../Graphs/ODN/graph_odn_rolling.pdf')
 plt.show()

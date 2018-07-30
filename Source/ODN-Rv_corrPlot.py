@@ -40,5 +40,6 @@ plt.ylim((0, 0.36))
 
 # Save and show plot
 plt.savefig('../Graphs/ODN/graph_odn_v_corr_rolling.png')
+plt.savefig('../Graphs/ODN/graph_odn_v_corr_rolling.pdf')
 
 plt.close()

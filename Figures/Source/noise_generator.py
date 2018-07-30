@@ -18,4 +18,10 @@ for i, ax in zip(range(len(noise_scale)), axes):
 
 plt.tight_layout()
 plt.subplots_adjust(wspace=0.1)
+
+plt.figure(figsize = (16, 9))
+
+plt.savefig('../Images/noise/noise_levels.pdf')
+plt.savefig('../Images/noise/noise_levels.png')
+
 plt.show()

@@ -18,6 +18,8 @@ print(file_num_range)
 # Generate 2 plots for each file
 for file_n in range(file_num_range):
 
+	print(file_n)
+
 	# Load data
 	data = np.load('../Data/OPYD-R/data_opyd_rolling{}.npz'.format(file_n))
 
@@ -49,6 +51,7 @@ for file_n in range(file_num_range):
 
 	# Save the plot and close it
 	plt.savefig("../Graphs/OPYD-R/graph_opyd_rolling{}.png".format(file_n))
+	plt.savefig("../Graphs/OPYD-R/graph_opyd_rolling{}.pdf".format(file_n))
 	plt.close()
 
 	### 2D color plot; color = phi ###
@@ -69,4 +72,5 @@ for file_n in range(file_num_range):
 
 	# Save the plot and close it
 	plt.savefig("../Graphs/ODYP-R/graph_odyp_rolling{}.png".format(file_n))
+	plt.savefig("../Graphs/ODYP-R/graph_odyp_rolling{}.pdf".format(file_n))
 	plt.close()
